@@ -35,6 +35,7 @@ async def view(ctx):
             854005851717894166: "TFFS",
             854008993248051230: "VNTA"}
     data = await getdata()
+    print(data)
     data = data[3]["p"]
     active = PrettyTable()
     active.field_names = ["S.No.", "Player Name", "Kills", "Deaths", "Time Played"]
