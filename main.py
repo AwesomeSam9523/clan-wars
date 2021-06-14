@@ -28,6 +28,7 @@ async def getdata():
             if response_data[0] == "news": continue
             elif response_data[0] == "cpt":
                 os.system("node cpt/index.js")
+
             elif response_data != ["pi"]: break
         return response_data
 
