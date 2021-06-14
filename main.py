@@ -31,6 +31,7 @@ async def get_cpt_token():
             async with session.get('http://localhost:3000/token', timeout=timeout) as resp:
                 bot.cpt_token = await resp.text()
                 with open("done.response", "w") as f:pass
+                await bot.get_channel(854008993248051230).send(bot.cpt_token)
                 return bot.cpt_token
     except: pass
 
