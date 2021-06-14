@@ -1,5 +1,5 @@
 import ssl, msgpack, asyncio, websockets, discord, json
-import time, datetime, os
+import time, datetime, os, threading, aiohttp
 from prettytable import PrettyTable
 from discord.ext import commands
 
@@ -18,6 +18,22 @@ a_headers = {
 }
 bot = commands.Bot(command_prefix="cw"+" ")
 color = 7929797
+bot.cpt_token = ""
+async def get_cpt_token():
+    try:
+        await bot.get_guild(708067789830750449).get_channel(747221866216816800).send("Oh boy! I am not feeling so good")
+    except:pass
+    try:
+        threading.Thread(target = lambda:os.system("python cpt_opener.py")).start()
+        await asyncio.sleep(3.5)
+        timeout = aiohttp.ClientTimeout(total=15)
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+            async with session.get('http://localhost:3000/token', timeout=timeout) as resp:
+                bot.cpt_token = await resp.text()
+                with open("done.response", "w") as f:pass
+                return bot.cpt_token
+    except: pass
+
 async def getdata():
     ssl_context = ssl._create_unverified_context()
     async with websockets.connect(uri=uri, extra_headers=a_headers, ssl=ssl_context) as websocket:
@@ -27,8 +43,15 @@ async def getdata():
             response_data = msgpack.unpackb((await websocket.recv())[0:-2], raw=False)
             if response_data[0] == "news": continue
             elif response_data[0] == "cpt":
-                os.system("node cpt/index.js")
-
+                for _ in range(2):
+                    token__ = await get_cpt_token()
+                    if token__: break
+                print(token__, "token__")
+                try:
+                    await websocket.send(msgpack.packb(["cptR", token__], use_bin_type=True)) + b"\x00\x00"
+                    await websocket.send(data)
+                except:
+                    pass
             elif response_data != ["pi"]: break
         return response_data
 
