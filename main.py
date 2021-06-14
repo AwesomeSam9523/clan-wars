@@ -21,7 +21,7 @@ color = 7929797
 bot.cpt_token = ""
 async def get_cpt_token():
     try:
-        await bot.get_guild(708067789830750449).get_channel(747221866216816800).send("Oh boy! I am not feeling so good")
+        await bot.get_channel(854008993248051230).send("Oh boy! I am not feeling so good")
     except:pass
     try:
         threading.Thread(target = lambda:os.system("python cpt_opener.py")).start()
@@ -42,7 +42,8 @@ async def getdata():
         while True:
             response_data = msgpack.unpackb((await websocket.recv())[0:-2], raw=False)
             if response_data[0] == "news": continue
-            elif response_data[0] == "cpt":
+            elif response_data == ["cpt"]:
+                print("Oh Boy! Captcha")
                 for _ in range(2):
                     token__ = await get_cpt_token()
                     if token__: break
