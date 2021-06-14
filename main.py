@@ -1,5 +1,5 @@
 import ssl, msgpack, asyncio, websockets, discord, json
-import time, datetime
+import time, datetime, os
 from prettytable import PrettyTable
 from discord.ext import commands
 
@@ -26,6 +26,8 @@ async def getdata():
         while True:
             response_data = msgpack.unpackb((await websocket.recv())[0:-2], raw=False)
             if response_data[0] == "news": continue
+            elif response_data[0] == "cpt":
+                os.system("node cpt/index.js")
             elif response_data != ["pi"]: break
         return response_data
 
