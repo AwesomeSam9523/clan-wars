@@ -160,6 +160,11 @@ async def update_embeds(clan):
     else:
         return await view(channel, "sam123", clan)
 
+async def update_links():
+    with open("links.json", "w") as f:
+        f.write(str(json.dumps(bot.links, indent=2)))
+    await bot.get_channel(854721559359913994).send(file=discord.File("links.json"))
+
 @bot.command()
 @commands.has_permissions(manage_channels=True)
 async def view(channel, via=None, clan=None):
@@ -227,7 +232,45 @@ async def end(ctx):
     embed.set_footer(text=f"Estimated Ending: {finalkills}")
     await ctx.send(embed=embed)
 
+@bot.command()
+async def link(ctx, *, ign):
+    bot.links[str(ctx.author.id)] = str(ign)
+    await update_links()
+
+@bot.command()
+async def contract(ctx, *, ign=None):
+    if ign is None:
+        ign = bot.links.get(str(ctx.author.id))
+        if ign is None:
+            embed = discord.Embed(description="You aren't linked yet. Use `cw link <ign>` to get linked.\n"
+                                              "Or use `cw contract <ign> to view",
+                                  color=16730441)
+            embed.set_footer(text="#vantalizing")
+            return ctx.reply(embed=embed)
+    data = await getdata("VNTA")
+    data = data["data"]["members"]
+    found = False
+    for i in data:
+        if ign.lower() == i["username"].lower():
+            userdata = i
+            con = i["contract"]
+            found = True
+            break
+    if not found:
+        return await ctx.reply("User not in VNTA")
+    timeplayed = int(con["timeplayed"] / 1000)
+    left = datetime.timedelta(seconds=timeplayed)
+    final = datetime.datetime.strptime(str(left), '%H:%M:%S').replace(microsecond=0)
+    colon_format = str(final).split(" ")[1].split(':')
+    est = int(con["kills"] / timeplayed) * 10800
+    games = timeplayed/240
+    kpg = con["kills"]/games
+    x = PrettyTable()
+    x.field_names = ["IGN", "Kills", "Deaths", "KPG", "Est Kills", "Play Time"]
+    x.add_row([userdata["username"], con["kills"], con["deaths"], kpg, est, f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
+
 bot.refr = {}
+bot.links = {}
 bot.dev = ""
 @bot.event
 async def on_connect():
@@ -236,6 +279,10 @@ async def on_connect():
     chl = bot.get_channel(854692793276170280)
     msgs = await chl.history(limit=1).flatten()
     bot.refr = json.loads(msgs[0].content)
+
+    chl = bot.get_channel(854721559359913994)
+    msgs = await chl.history(limit=1).flatten()
+    bot.links = json.loads(requests.get(msgs[0].attachments[0]).text)
     bot.dev = await bot.fetch_user(771601176155783198)
     asyncio.create_task(auto_update())
 
