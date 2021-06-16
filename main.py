@@ -237,16 +237,17 @@ async def link(ctx, *, ign):
     bot.links[str(ctx.author.id)] = str(ign)
     await update_links()
 
-@bot.command()
+@bot.command(aliases=["con"])
 async def contract(ctx, *, ign=None):
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
+        print(ign, bot.links)
         if ign is None:
             embed = discord.Embed(description="You aren't linked yet. Use `cw link <ign>` to get linked.\n"
                                               "Or use `cw contract <ign> to view",
                                   color=16730441)
             embed.set_footer(text="#vantalizing")
-            return ctx.reply(embed=embed)
+            return await ctx.reply(embed=embed)
     data = await getdata("VNTA")
     data = data["data"]["members"]
     found = False
@@ -257,17 +258,26 @@ async def contract(ctx, *, ign=None):
             found = True
             break
     if not found:
-        return await ctx.reply("User not in VNTA")
+        return await ctx.reply("User not in VNTA or incorrect IGN!")
     timeplayed = int(con["timeplayed"] / 1000)
     left = datetime.timedelta(seconds=timeplayed)
     final = datetime.datetime.strptime(str(left), '%H:%M:%S').replace(microsecond=0)
     colon_format = str(final).split(" ")[1].split(':')
-    est = int(con["kills"] / timeplayed) * 10800
-    games = timeplayed/240
-    kpg = con["kills"]/games
+    games = timeplayed / 240
+    if timeplayed == 0:
+        est = 0
+        kpg = 0
+    else:
+        est = int(con["kills"] / timeplayed) * 10800
+        kpg = con["kills"]/games
     x = PrettyTable()
     x.field_names = ["IGN", "Kills", "Deaths", "KPG", "Est Kills", "Play Time"]
-    x.add_row([userdata["username"], con["kills"], con["deaths"], kpg, est, f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
+    x.add_row([userdata["username"], con["kills"], con["deaths"], "{:.2f}".format(kpg), est, f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
+    embed = discord.Embed(title="CW Contract",
+                          description=f"```css\n{x}```",
+                          color=4521960)
+    await ctx.send(embed=embed)
+
 
 bot.refr = {}
 bot.links = {}
