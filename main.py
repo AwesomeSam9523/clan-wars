@@ -161,6 +161,7 @@ async def update_embeds(clan):
         return await view(channel, "sam123", clan)
 
 @bot.command()
+@commands.has_permissions(manage_channels=True)
 async def view(channel, via=None, clan=None):
     if via == "sam123" and clan is not None:
         pass
@@ -184,6 +185,7 @@ async def view(channel, via=None, clan=None):
 
 bot.data = {}
 @bot.command()
+@commands.has_permissions(manage_channels=True)
 async def refresh(ctx, what:str=None):
     clan = "VNTA"
     if what is None:
