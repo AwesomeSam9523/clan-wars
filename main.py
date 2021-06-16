@@ -18,11 +18,7 @@ a_headers = {
 }
 bot = commands.Bot(command_prefix="cw"+" ")
 color = 7929797
-chls = {853973674309582868: "VNTA",
-        854395888540450827: "VNTA",
-        854008993248051230: "VNTA"}
 sampfp = "https://media.discordapp.net/attachments/854008993248051230/854708889059852288/sam_av.png"
-#"VNTA": {"chl":854395888540450827, "act":[854418930080546856], "exp":[854418928255500308]},
 
 async def getdata(clan):
     """ssl_context = ssl._create_unverified_context()
@@ -170,7 +166,7 @@ async def view(channel, via=None, clan=None):
         pass
     else:
         channel = channel.channel
-    data = await embed_view(chls[channel.id])
+    data = await embed_view("VNTA")
     maybeupdate = {}
     for i in data.keys():
         em = data[i]
@@ -189,7 +185,7 @@ async def view(channel, via=None, clan=None):
 bot.data = {}
 @bot.command()
 async def refresh(ctx, what:str=None):
-    clan = chls[ctx.channel.id]
+    clan = "VNTA"
     if what is None:
         await update_embeds(clan)
         await ctx.message.add_reaction("✅")
