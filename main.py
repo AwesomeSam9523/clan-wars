@@ -17,10 +17,12 @@ a_headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36'
 }
 bot = commands.Bot(command_prefix="cw"+" ")
+bot.remove_command("help")
 color = 7929797
 sampfp = "https://media.discordapp.net/attachments/854008993248051230/854708889059852288/sam_av.png"
 bot.refr = {}
 bot.links = {}
+bot.data = {}
 bot.dev = ""
 
 async def getdata(clan):
@@ -191,7 +193,6 @@ async def view(channel, via=None, clan=None):
         bot.refr[clan] = maybeupdate
         await update_embeds(clan)
 
-bot.data = {}
 @bot.command()
 @commands.has_permissions(manage_channels=True)
 async def refresh(ctx, what:str=None):
@@ -238,6 +239,8 @@ async def end(ctx):
 @bot.command()
 async def link(ctx, *, ign):
     bot.links[str(ctx.author.id)] = str(ign)
+    embed = discord.Embed(description=f"✅ Linked successfully!", color=5963593)
+    await ctx.reply(embed=embed)
     await update_links()
 
 @bot.command(aliases=["con"])
@@ -278,6 +281,16 @@ async def contract(ctx, *, ign=None):
     embed = discord.Embed(title=f"CW Contract- {userdata['username']}",
                           description=f"```css\n{x}```",
                           color=4521960)
+    embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def help(ctx):
+    embed=discord.Embed(title="VNTA Clan Wars Bot",
+                        description="View below the commands available for use:",
+                        color=4849598)
+    embed.add_field(name="`link`", value="Syntax: `cw link <ign>`\nLink account to bot", inline=False)
+    embed.add_field(name="`contract`", value="Syntax: `cw contract [ign]`\nShows clan war contract", inline=False)
     embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
     await ctx.send(embed=embed)
 
