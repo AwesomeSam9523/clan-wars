@@ -1,5 +1,5 @@
-import ssl, msgpack, asyncio, websockets, discord, json
-import time, datetime, os, threading, aiohttp, requests
+import ssl, msgpack, asyncio, discord, json
+import time, datetime, os, threading, requests
 from prettytable import PrettyTable
 from discord.ext import commands
 
