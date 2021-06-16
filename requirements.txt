@@ -1,4 +1,0 @@
-msgpack
-websockets
-discord
-prettytable
