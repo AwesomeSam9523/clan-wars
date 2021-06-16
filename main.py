@@ -24,8 +24,6 @@ chls = {853973674309582868: "VNTA",
         854395888540450827: "VNTA",
         854008993248051230: "VNTA"}
 
-with open("refr.json", "r") as r:
-    refr = json.load(r)
 #"VNTA": {"chl":854395888540450827, "act":[854418930080546856], "exp":[854418928255500308]},
 
 async def getdata(clan):
@@ -118,13 +116,13 @@ async def embed_view(clan):
 
 async def auto_update():
     while True:
-        for i in refr.keys():
+        for i in bot.refr.keys():
             await update_embeds(i)
         await asyncio.sleep(300)
 
 async def update_embeds(clan):
     await bot.wait_until_ready()
-    all_data = refr[clan]
+    all_data = bot.refr[clan]
     channel = bot.get_channel(all_data["chl"])
 
     actlist = []
@@ -175,11 +173,9 @@ async def view(channel, via=None, clan=None):
             maybeupdate[i] = ids
     if len(maybeupdate.values()) != 0:
         maybeupdate["chl"] = channel.id
-        refr[clan] = maybeupdate
-        with open("refr.json", "r") as r:
-            refrold = json.load(r)
-        with open("refr.json", "w") as r:
-            r.write(json.dumps(refr, indent=2))
+        bot.refr[clan] = maybeupdate
+        chl = bot.get_channel(854692793276170280)
+        await chl.send(bot.refr)
         await update_embeds(clan)
 
 @bot.command()
@@ -223,9 +219,14 @@ async def end(ctx):
     embed.set_footer(text=f"Estimated Ending: {finalkills}")
     await ctx.send(embed=embed)
 
+bot.refr = {}
 @bot.event
 async def on_connect():
     print("Connected")
+    await bot.wait_until_ready()
+    chl = bot.get_channel(854692793276170280)
+    msgs = await chl.history(limit=1).flatten()
+    bot.refr = json.loads(msgs[0].content)
     asyncio.create_task(auto_update())
 
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
