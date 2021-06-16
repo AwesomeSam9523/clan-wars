@@ -174,8 +174,6 @@ async def view(channel, via=None, clan=None):
     if len(maybeupdate.values()) != 0:
         maybeupdate["chl"] = channel.id
         bot.refr[clan] = maybeupdate
-        chl = bot.get_channel(854692793276170280)
-        await chl.send(bot.refr)
         await update_embeds(clan)
 
 @bot.command()
@@ -186,6 +184,8 @@ async def refresh(ctx, what:str=None):
         await ctx.message.add_reaction("✅")
     elif what == "setup":
         await view(ctx.channel, "sam123", clan)
+        chl = bot.get_channel(854692793276170280)
+        await chl.send(str(json.dumps(bot.refr)))
 
 @bot.command()
 async def end(ctx):
