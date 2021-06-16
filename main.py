@@ -19,11 +19,9 @@ a_headers = {
 bot = commands.Bot(command_prefix="cw"+" ")
 color = 7929797
 chls = {853973674309582868: "VNTA",
-        854244917877538846: "TFFS",
-        854005851717894166: "TFFS",
         854395888540450827: "VNTA",
         854008993248051230: "VNTA"}
-
+sampfp = "https://media.discordapp.net/attachments/854008993248051230/854708889059852288/sam_av.png"
 #"VNTA": {"chl":854395888540450827, "act":[854418930080546856], "exp":[854418928255500308]},
 
 async def getdata(clan):
@@ -40,7 +38,11 @@ async def getdata(clan):
                         elif response_data != ["pi"]: break
                     return response_data"""
     data = requests.get(f"https://kr.vercel.app/api/clan?clan={clan}")
-    return json.loads(data.text)
+    res = json.loads(data.text)
+    today = bot.data.get(time.strftime("%d-%m-%Y"), {})
+    today[res["data"]["name"]] = res
+    bot.data[time.strftime("%d-%m-%Y")] = today
+    return res
 
 async def embed_view(clan):
     data = await getdata(clan)
@@ -84,6 +86,7 @@ async def embed_view(clan):
             active_con = discord.Embed(title=f'{clan}- Active Contracts',
                                    description=f"```css\n{active}```",
                                    color=color)
+            active_con.set_footer(text=f"Bot by {bot.dev}", icon_url=sampfp)
             actlist.append(active_con)
             break
         else:
@@ -91,6 +94,7 @@ async def embed_view(clan):
             active_con = discord.Embed(title=f'{clan}- Active Contracts',
                                    description=f"```css\n{active.get_string()[count:2000]}```",
                                    color=color)
+            active_con.set_footer(text=f"Bot by {bot.dev}", icon_url=sampfp)
             count += 2000
             actlist.append(active_con)
 
@@ -102,6 +106,7 @@ async def embed_view(clan):
             active_con = discord.Embed(title=f'{clan}- Expired Contracts',
                                    description=f"```css\n{expired}```",
                                    color=color)
+            active_con.set_footer(text=f"Bot by {bot.dev}", icon_url=sampfp)
             explist.append(active_con)
             break
         else:
@@ -109,6 +114,7 @@ async def embed_view(clan):
             active_con = discord.Embed(title=f'{clan}- Expired Contracts',
                                    description=f"```css\n{expired.get_string()[count:2000]}```",
                                    color=color)
+            active_con.set_footer(text=f"Bot by {bot.dev}", icon_url=sampfp)
             count += 2000
             explist.append(active_con)
 
@@ -118,6 +124,10 @@ async def auto_update():
     while True:
         for i in bot.refr.keys():
             await update_embeds(i)
+        files = bot.get_channel(854698116255318057)
+        with open("botdata.json", "w") as f:
+            f.write(str(json.dumps(bot.data, indent=2)))
+        #await files.send(file=discord.File("botdata.json"))
         await asyncio.sleep(300)
 
 async def update_embeds(clan):
@@ -139,7 +149,7 @@ async def update_embeds(clan):
     if len(data["active"]) == len(actlist):
         count = 0
         for i in data["active"]:
-            i.set_footer(text="Last Refreshed")
+            i.set_footer(text=f"Bot by {bot.dev} | Last Refreshed", icon_url=sampfp)
             i.timestamp = datetime.datetime.utcnow()
             await actlist[count].edit(embed=i)
     else:
@@ -148,7 +158,7 @@ async def update_embeds(clan):
     if len(data["expired"]) == len(actlist):
         for i in data["expired"]:
             count = 0
-            i.set_footer(text="Last Refreshed")
+            i.set_footer(text=f"Bot by {bot.dev} | Last Refreshed", icon_url=sampfp)
             i.timestamp = datetime.datetime.utcnow()
             await explist[count].edit(embed=i)
     else:
@@ -176,6 +186,7 @@ async def view(channel, via=None, clan=None):
         bot.refr[clan] = maybeupdate
         await update_embeds(clan)
 
+bot.data = {}
 @bot.command()
 async def refresh(ctx, what:str=None):
     clan = chls[ctx.channel.id]
@@ -191,7 +202,6 @@ async def refresh(ctx, what:str=None):
 async def end(ctx):
     return
     chls = {853973674309582868: "VNTA",
-            854005851717894166: "TFFS",
             854008993248051230: "VNTA"}
     data = await getdata()
     data = data[3]["p"]
@@ -220,6 +230,7 @@ async def end(ctx):
     await ctx.send(embed=embed)
 
 bot.refr = {}
+bot.dev = ""
 @bot.event
 async def on_connect():
     print("Connected")
@@ -227,6 +238,7 @@ async def on_connect():
     chl = bot.get_channel(854692793276170280)
     msgs = await chl.history(limit=1).flatten()
     bot.refr = json.loads(msgs[0].content)
+    bot.dev = await bot.fetch_user(771601176155783198)
     asyncio.create_task(auto_update())
 
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
