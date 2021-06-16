@@ -19,6 +19,9 @@ a_headers = {
 bot = commands.Bot(command_prefix="cw"+" ")
 color = 7929797
 sampfp = "https://media.discordapp.net/attachments/854008993248051230/854708889059852288/sam_av.png"
+bot.refr = {}
+bot.links = {}
+bot.dev = ""
 
 async def getdata(clan):
     """ssl_context = ssl._create_unverified_context()
@@ -241,12 +244,11 @@ async def link(ctx, *, ign):
 async def contract(ctx, *, ign=None):
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
-        print(ign, bot.links)
         if ign is None:
             embed = discord.Embed(description="You aren't linked yet. Use `cw link <ign>` to get linked.\n"
                                               "Or use `cw contract <ign> to view",
                                   color=16730441)
-            embed.set_footer(text="#vantalizing")
+            embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
             return await ctx.reply(embed=embed)
     data = await getdata("VNTA")
     data = data["data"]["members"]
@@ -271,17 +273,14 @@ async def contract(ctx, *, ign=None):
         est = int(con["kills"] / timeplayed) * 10800
         kpg = con["kills"]/games
     x = PrettyTable()
-    x.field_names = ["IGN", "Kills", "Deaths", "KPG", "Est Kills", "Play Time"]
-    x.add_row([userdata["username"], con["kills"], con["deaths"], "{:.2f}".format(kpg), est, f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
-    embed = discord.Embed(title="CW Contract",
+    x.field_names = ["Kills", "Deaths", "KPG", "Est Kills", "Play Time"]
+    x.add_row([con["kills"], con["deaths"], "{:.2f}".format(kpg), est, f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
+    embed = discord.Embed(title=f"CW Contract- {userdata['username']}",
                           description=f"```css\n{x}```",
                           color=4521960)
+    embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
     await ctx.send(embed=embed)
 
-
-bot.refr = {}
-bot.links = {}
-bot.dev = ""
 @bot.event
 async def on_connect():
     print("Connected")
@@ -292,8 +291,9 @@ async def on_connect():
 
     chl = bot.get_channel(854721559359913994)
     msgs = await chl.history(limit=1).flatten()
-    bot.links = json.loads(requests.get(msgs[0].attachments[0]).text)
+    bot.links.update(json.loads(requests.get(msgs[0].attachments[0]).text))
     bot.dev = await bot.fetch_user(771601176155783198)
+    print("Ready")
     asyncio.create_task(auto_update())
 
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
