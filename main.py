@@ -16,7 +16,7 @@ a_headers = {
     'Upgrade': 'websocket',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36'
 }
-bot = commands.Bot(command_prefix="cw"+" ")
+bot = commands.Bot(command_prefix=["cw"+" ", "Cw"+" ", "cW"+" ","CW"+" "], case_insensitive=True)
 bot.remove_command("help")
 color = 7929797
 sampfp = "https://media.discordapp.net/attachments/854008993248051230/854708889059852288/sam_av.png"
