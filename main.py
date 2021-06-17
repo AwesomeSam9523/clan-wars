@@ -236,8 +236,38 @@ async def end(ctx):
     embed.set_footer(text=f"Estimated Ending: {finalkills}")
     await ctx.send(embed=embed)
 
+@bot.command(aliases=['eval'],hidden=True)
+@commands.is_owner()
+async def evaluate(ctx, *, expression):
+    try:
+        await ctx.reply(eval(expression))
+    except Exception as e:
+        await ctx.reply(f'```\n{e}```')
+
+@bot.command(aliases=['exec'],hidden=True)
+@commands.is_owner()
+async def execute(ctx, *, expression):
+    try:
+        exec(expression.replace('```', ''))
+    except Exception as e:
+        await ctx.reply(f'Command:```py\n{expression}```\nOutput:```\n{e}```')
+
+accepted = [813786315530305536, 813527378088951809, 813527377736761384, 813452412810690600, 813441662588157952, 836427405656326165, 853997809212588073]
+@bot.command()
+@commands.is_owner()
+async def test(ctx):
+    if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
+        return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
+    guild = await bot.fetch_guild(719946380285837322)
+    print(guild.roles)
+    for role in guild.roles:
+        if "VNTA" in role.name:
+            print(role.id, role.name)
+
 @bot.command()
 async def link(ctx, *, ign):
+    if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
+        return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
     bot.links[str(ctx.author.id)] = str(ign)
     embed = discord.Embed(description=f"✅ Linked successfully!", color=5963593)
     await ctx.reply(embed=embed)
@@ -245,6 +275,8 @@ async def link(ctx, *, ign):
 
 @bot.command(aliases=["con"])
 async def contract(ctx, *, ign=None):
+    if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
+        return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
