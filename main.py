@@ -454,6 +454,6 @@ async def on_raw_reaction_add(payload):
             user = bot.get_user(user)
             bot.links[str(user.id)] = userd.values()[0]
             await update_links()
-            await user.send(f"✅ Your request to link with `{userd.values()[0]}` is denied!")
+            await user.send(f"✅ Your request to link with `{userd.values()[0]}` is accepted!")
 
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
