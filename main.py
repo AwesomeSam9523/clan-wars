@@ -59,10 +59,12 @@ async def embed_view(clan):
     exp = 1
     activefinal = PrettyTable()
     activefinal.field_names = ["S.No.", "Player Name", "Kills", "Deaths", "Time Played"]
-    activefinal.title = "Active Contracts"
+
     expiredfinal = PrettyTable()
     expiredfinal.field_names = ["S.No.", "Player Name", "Kills", "Deaths", "Time Played"]
     expiredfinal.title = "Expired Contracts"
+    allkills = 0
+    ellkills = 0
     for i in data:
         j = i
         i = i["contract"]
@@ -74,10 +76,14 @@ async def embed_view(clan):
         if timeplayed < 10800 and timeplayed != 0:
             active.add_row([j["username"], i["kills"], i["deaths"],
                             f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
+            allkills += i["kills"]
 
         elif timeplayed >= 10800:
             expired.add_row([j["username"], i["kills"], i["deaths"],
                              f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
+            ellkills += i["kills"]
+    activefinal.title = f"Active Contracts- {allkills} kills"
+    expiredfinal.title = f"Expired Contracts- {ellkills} kills"
     active.sortby = "Kills"
     active.reversesort = True
     finallist = []
