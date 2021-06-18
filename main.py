@@ -80,11 +80,16 @@ async def embed_view(clan):
                              f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
     active.sortby = "Kills"
     active.reversesort = True
-    print(active._rows)
-    for i in range(1, len(active._rows) + 1):
-        mylist = active._rows[i-1]
-        mylist.insert(0, f"{i}.")
-        activefinal.add_row(mylist)
+    finallist = []
+    for i in active._rows:
+        finallist.append(i[1])
+    finallist.sort(reverse=True)
+    for i in range(1, len(finallist) + 1):
+        for j in active._rows:
+            if j[1] == finallist[i-1]:
+                mylist = j
+                mylist.insert(0, f"{i}.")
+                activefinal.add_row(mylist)
     del active
     active = activefinal
     actlist = []
@@ -108,10 +113,16 @@ async def embed_view(clan):
 
     expired.sortby = "Kills"
     expired.reversesort = True
-    for i in range(1, len(expired._rows) + 1):
-        mylist = expired._rows[i-1]
-        mylist.insert(0, f"{i}.")
-        expiredfinal.add_row(mylist)
+    finallist = []
+    for i in expired._rows:
+        finallist.append(i[1])
+    finallist.sort(reverse=True)
+    for i in range(1, len(finallist) + 1):
+        for j in expired._rows:
+            if j[1] == finallist[i - 1]:
+                mylist = j
+                mylist.insert(0, f"{i}.")
+                expiredfinal.add_row(mylist)
     del expired
     expired = expiredfinal
     count = 0
@@ -263,10 +274,16 @@ async def end(ctx):
 
     active.sortby = "Estd. Kills"
     active.reversesort = True
-    for i in range(1, len(active._rows) + 1):
-        mylist = active._rows[i-1]
-        mylist.insert(0, f"{i}.")
-        activefinal.add_row(mylist)
+    finallist = []
+    for i in active._rows:
+        finallist.append(i[1])
+    finallist.sort(reverse=True)
+    for i in range(1, len(finallist) + 1):
+        for j in active._rows:
+            if j[1] == finallist[i - 1]:
+                mylist = j
+                mylist.insert(0, f"{i}.")
+                activefinal.add_row(mylist)
     del active
     active = activefinal
     actlist = []
@@ -364,7 +381,8 @@ async def contract(ctx, *, ign=None):
     x = PrettyTable()
     x.field_names = ["Kills", "Deaths", "KPG", "Est Kills", "Play Time"]
     x.add_row([con["kills"], con["deaths"], "{:.2f}".format(kpg), est, f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
-    embed = discord.Embed(title=f"CW Contract- {userdata['username']}",
+    x.title = userdata['username']
+    embed = discord.Embed(title=f"CW Contract",
                           description=f"```css\n{x}```",
                           color=4521960)
     embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
