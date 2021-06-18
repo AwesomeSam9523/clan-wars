@@ -276,7 +276,7 @@ async def end(ctx):
     active.reversesort = True
     finallist = []
     for i in active._rows:
-        finallist.append(i[1])
+        finallist.append(i[2])
     finallist.sort(reverse=True)
     for i in range(1, len(finallist) + 1):
         for j in active._rows:
