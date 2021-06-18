@@ -130,7 +130,7 @@ async def embed_view(clan):
 
     return {"active":actlist, "expired":explist}
 
-@bot.event
+#@bot.event
 async def on_message(message):
     if message.channel.id != 854008993248051230:
         return
@@ -391,6 +391,6 @@ async def on_connect():
     bot.links.update(json.loads(requests.get(msgs[0].attachments[0]).text))
     bot.dev = await bot.fetch_user(771601176155783198)
     print("Ready")
-    #asyncio.create_task(auto_update())
+    asyncio.create_task(auto_update())
 
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
