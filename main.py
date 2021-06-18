@@ -62,7 +62,6 @@ async def embed_view(clan):
 
     expiredfinal = PrettyTable()
     expiredfinal.field_names = ["S.No.", "Player Name", "Kills", "Deaths", "Time Played"]
-    expiredfinal.title = "Expired Contracts"
     allkills = 0
     ellkills = 0
     for i in data:
@@ -362,6 +361,9 @@ async def contract(ctx, *, ign=None):
                                   color=16730441)
             embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
             return await ctx.reply(embed=embed)
+    else:
+        if len(str(ign)) == len("537623052775718912"):
+            ign = bot.links.get(str(ign))
     data = await getdata("VNTA")
     data = data["data"]["members"]
     found = False
