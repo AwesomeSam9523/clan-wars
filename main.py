@@ -49,14 +49,19 @@ async def embed_view(clan):
     data = await getdata(clan)
     data = data["data"]["members"]
     active = PrettyTable()
-    active.field_names = ["S.No.", "Player Name", "Kills", "Deaths", "Time Played"]
+    active.field_names = ["Player Name", "Kills", "Deaths", "Time Played"]
 
     expired = PrettyTable()
-    expired.field_names = ["S.No.", "Player Name", "Kills", "Deaths", "Time Played"]
+    expired.field_names = ["Player Name", "Kills", "Deaths", "Time Played"]
 
     act = 1
     exp = 1
-    yets = 1
+    activefinal = PrettyTable()
+    activefinal.field_names = ["S.No.", "Player Name", "Kills", "Deaths", "Time Played"]
+    activefinal.title = "Active Contracts"
+    expiredfinal = PrettyTable()
+    expiredfinal.field_names = ["S.No.", "Player Name", "Kills", "Deaths", "Time Played"]
+    expiredfinal.title = "Expired Contracts"
     for i in data:
         j = i
         i = i["contract"]
@@ -66,32 +71,34 @@ async def embed_view(clan):
         colon_format = str(final).split(" ")[1].split(':')
 
         if timeplayed < 10800 and timeplayed != 0:
-            active.add_row([str(act) + ".", j["username"], i["kills"], i["deaths"],
+            active.add_row([j["username"], i["kills"], i["deaths"],
                             f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
-            act += 1
 
         elif timeplayed >= 10800:
-            expired.add_row([str(exp) + ".", j["username"], i["kills"], i["deaths"],
+            expired.add_row([j["username"], i["kills"], i["deaths"],
                              f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
-            exp += 1
     active.sortby = "Kills"
     active.reversesort = True
+    for i in range(1, len(active._rows) + 1):
+        mylist = active._rows[i-1]
+        mylist.insert(0, f"{i}.")
+        activefinal.add_row(mylist)
+    del active
+    active = activefinal
     actlist = []
     explist = []
 
     count = 0
     while True:
         if len(active.get_string()) <= 2000:
-            active_con = discord.Embed(title=f'{clan}- Active Contracts',
-                                   description=f"```css\n{active}```",
+            active_con = discord.Embed(description=f"```css\n{active}```",
                                    color=color)
             active_con.set_footer(text=f"Bot by {bot.dev}", icon_url=sampfp)
             actlist.append(active_con)
             break
         else:
             if count > len(active.get_string()): break
-            active_con = discord.Embed(title=f'{clan}- Active Contracts',
-                                   description=f"```css\n{active.get_string()[count:2000]}```",
+            active_con = discord.Embed(description=f"```css\n{active.get_string()[count:2000]}```",
                                    color=color)
             active_con.set_footer(text=f"Bot by {bot.dev}", icon_url=sampfp)
             count += 2000
@@ -99,25 +106,35 @@ async def embed_view(clan):
 
     expired.sortby = "Kills"
     expired.reversesort = True
+    for i in range(1, len(expired._rows) + 1):
+        mylist = expired._rows[i-1]
+        mylist.insert(0, f"{i}.")
+        expiredfinal.add_row(mylist)
+    del expired
+    expired = expiredfinal
     count = 0
     while True:
         if len(expired.get_string()) <= 2000:
-            active_con = discord.Embed(title=f'{clan}- Expired Contracts',
-                                   description=f"```css\n{expired}```",
+            active_con = discord.Embed(description=f"```css\n{expired}```",
                                    color=color)
             active_con.set_footer(text=f"Bot by {bot.dev}", icon_url=sampfp)
             explist.append(active_con)
             break
         else:
             if count > len(expired.get_string()): break
-            active_con = discord.Embed(title=f'{clan}- Expired Contracts',
-                                   description=f"```css\n{expired.get_string()[count:2000]}```",
+            active_con = discord.Embed(description=f"```css\n{expired.get_string()[count:2000]}```",
                                    color=color)
             active_con.set_footer(text=f"Bot by {bot.dev}", icon_url=sampfp)
             count += 2000
             explist.append(active_con)
 
     return {"active":actlist, "expired":explist}
+
+@bot.event
+async def on_message(message):
+    if message.channel.id != 854008993248051230:
+        return
+    await bot.process_commands(message)
 
 async def auto_update():
     while True:
@@ -212,7 +229,11 @@ async def end(ctx):
     data = await getdata("VNTA")
     data = data["data"]["members"]
     active = PrettyTable()
-    active.field_names = ["S.No.", "Player Name", "Kills", "Estd. Kills", "Time Played"]
+    active.field_names = ["Player Name", "Kills", "Estd. Kills", "Time Played"]
+
+    activefinal = PrettyTable()
+    activefinal.field_names = ["S.No.", "Player Name", "Kills", "Deaths", "Time Played"]
+    activefinal.title = "Estimated Kills"
     sno = 1
     finalkills = 0
     act = 1
@@ -234,27 +255,31 @@ async def end(ctx):
             est = int((i["kills"]/timeplayed)*10800)
         finalkills += est
         if timeplayed < 10800 and timeplayed != 0:
-            active.add_row([str(act) + ".", j["username"], i["kills"], est,
+            active.add_row([j["username"], i["kills"], est,
                             f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
             act += 1
 
     active.sortby = "Kills"
     active.reversesort = True
+    for i in range(1, len(active._rows) + 1):
+        mylist = active._rows[i-1]
+        mylist.insert(0, f"{i}.")
+        activefinal.add_row(mylist)
+    del active
+    active = activefinal
     actlist = []
     explist = []
 
     count = 0
     while True:
         if len(active.get_string()) <= 2000:
-            active_con = discord.Embed(title=f'{clan}- Active Contracts',
-                                       description=f"```css\n{active}```",
+            active_con = discord.Embed(description=f"```css\n{active}```",
                                        color=color)
             actlist.append(active_con)
             break
         else:
             if count > len(active.get_string()): break
-            active_con = discord.Embed(title=f'{clan}- Active Contracts',
-                                       description=f"```css\n{active.get_string()[count:2000]}```",
+            active_con = discord.Embed(description=f"```css\n{active.get_string()[count:2000]}```",
                                        color=color)
             count += 2000
             actlist.append(active_con)
@@ -366,6 +391,6 @@ async def on_connect():
     bot.links.update(json.loads(requests.get(msgs[0].attachments[0]).text))
     bot.dev = await bot.fetch_user(771601176155783198)
     print("Ready")
-    asyncio.create_task(auto_update())
+    #asyncio.create_task(auto_update())
 
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
