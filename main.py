@@ -432,4 +432,13 @@ async def on_connect():
     print("Ready")
     asyncio.create_task(auto_update())
 
+@bot.event
+async def on_raw_reaction_add(payload):
+    if payload.user_id != 771601176155783198:
+        return
+    if str(payload.emoji) == "🗑️":
+        chl = await bot.fetch_channel(payload.channel_id)
+        msg = await chl.fetch_message(payload.message_id)
+        await msg.delete()
+
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
