@@ -345,11 +345,11 @@ bot.pendings = {}
 async def link(ctx, *, ign):
     if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
         return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
-    staff = bot.get_channel(813447381752348723)
+    staff = bot.get_channel(855450311808122951)
     a = await staff.send(f"{ctx.author.mention} wants to link with {ign}")
     await a.add_reaction("✅")
     await a.add_reaction("❌")
-    bot.pendings[a.id] = {ctx.author.id:str(ign)}
+    bot.pendings[a.id] = (ctx.author.id, str(ign))
     embed = discord.Embed(description=f"Link request submitted to staff successfully!", color=5963593)
     await ctx.reply(embed=embed)
 
@@ -438,22 +438,29 @@ async def on_connect():
 
 @bot.event
 async def on_raw_reaction_add(payload):
+    if payload.user_id == 853971223682482226: return
     if str(payload.emoji) == "🗑️" and payload.user_id == 771601176155783198:
         chl = await bot.fetch_channel(payload.channel_id)
         msg = await chl.fetch_message(payload.message_id)
         await msg.delete()
-    if payload.channel_id == 813447381752348723 and str(payload.emoji) in ["✅", "❌"]:
+    if payload.channel_id == 855450311808122951 and str(payload.emoji) in ["✅", "❌"]:
         if str(payload.emoji) == "❌":
             userd = bot.pendings[payload.message_id]
-            user = userd.keys()[0]
-            user = bot.get_user(user)
-            await user.send(f"❌ Your request to link with `{userd.values()[0]}` is denied!")
+            user = userd[0]
+            user = await bot.fetch_user(user)
+            await user.send(f"❌ Your request to link with `{userd[1]}` is denied!")
+            state= "Denied"
         else:
             userd = bot.pendings[payload.message_id]
-            user = userd.keys()[0]
-            user = bot.get_user(user)
-            bot.links[str(user.id)] = userd.values()[0]
+            user = userd[0]
+            user = await bot.fetch_user(user)
+            bot.links[str(user.id)] = userd[1]
+            state= "Accepted"
             await update_links()
-            await user.send(f"✅ Your request to link with `{userd.values()[0]}` is accepted!")
+            await user.send(f"✅ Your request to link with `{userd[1]}` is accepted!")
+        chl = await bot.fetch_channel(payload.channel_id)
+        msg = await chl.fetch_message(payload.message_id)
+        await msg.edit(content=f"{msg.content} (`{state}` by {await bot.fetch_user(payload.user_id)})")
+        await msg.clear_reactions()
 
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
