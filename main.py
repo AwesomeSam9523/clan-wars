@@ -280,7 +280,7 @@ async def end(ctx):
     finallist.sort(reverse=True)
     for i in range(1, len(finallist) + 1):
         for j in active._rows:
-            if j[1] == finallist[i - 1]:
+            if j[2] == finallist[i - 1]:
                 mylist = j
                 mylist.insert(0, f"{i}.")
                 activefinal.add_row(mylist)
