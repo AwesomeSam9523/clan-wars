@@ -232,7 +232,7 @@ async def end(ctx):
     active.field_names = ["Player Name", "Kills", "Estd. Kills", "Time Played"]
 
     activefinal = PrettyTable()
-    activefinal.field_names = ["S.No.", "Player Name", "Kills", "Deaths", "Time Played"]
+    activefinal.field_names = ["S.No.", "Player Name", "Kills", "Est. Kills", "Time Played"]
     activefinal.title = "Estimated Kills"
     sno = 1
     finalkills = 0
