@@ -444,6 +444,7 @@ async def on_raw_reaction_add(payload):
         msg = await chl.fetch_message(payload.message_id)
         await msg.delete()
     if payload.channel_id == 855450311808122951 and str(payload.emoji) in ["✅", "❌"]:
+
         if str(payload.emoji) == "❌":
             userd = bot.pendings[payload.message_id]
             user = userd[0]
