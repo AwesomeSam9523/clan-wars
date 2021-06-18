@@ -54,8 +54,6 @@ async def embed_view(clan):
     expired = PrettyTable()
     expired.field_names = ["S.No.", "Player Name", "Kills", "Deaths", "Time Played"]
 
-    yet = PrettyTable()
-    yet.field_names = ["S.No.", "Player Name"]
     act = 1
     exp = 1
     yets = 1
@@ -171,11 +169,12 @@ async def update_links():
     await bot.get_channel(854721559359913994).send(file=discord.File("links.json"))
 
 @bot.command()
-@commands.has_permissions(manage_channels=True)
 async def view(channel, via=None, clan=None):
     if via == "sam123" and clan is not None:
         pass
     else:
+        if not any(allow in [role.id for role in channel.author.roles] for allow in accepted):
+            return await channel.reply("Only VNTA members are given the exclusive rights to use the bot.")
         channel = channel.channel
     data = await embed_view("VNTA")
     maybeupdate = {}
@@ -207,34 +206,57 @@ async def refresh(ctx, what:str=None):
 
 @bot.command()
 async def end(ctx):
-    return
-    chls = {853973674309582868: "VNTA",
-            854008993248051230: "VNTA"}
-    data = await getdata()
-    data = data[3]["p"]
-    x = PrettyTable()
-    x.field_names = ["S.No.", "Player Name", "Kills", "Estd. Kills", "Time Played"]
+    clan = "VNTA"
+    data = await getdata("VNTA")
+    data = data["data"]["members"]
+    active = PrettyTable()
+    active.field_names = ["S.No.", "Player Name", "Kills", "Estd. Kills", "Time Played"]
     sno = 1
     finalkills = 0
+    act = 1
+    exp = 1
+    fianlkills = 0
     for i in data:
-        if i["c"] == chls[ctx.channel.id]:
-            timeplayed = int(i["tp"] / 1000)
-            finalkills += i["k"]
-            if timeplayed > 10800:
-                continue
-            left = datetime.timedelta(seconds=timeplayed)
-            final = datetime.datetime.strptime(str(left), '%H:%M:%S').replace(microsecond=0)
-            colon_format = str(final).split(" ")[1].split(':')
-            est = int(i["k"]/timeplayed)*10800
-            x.add_row([str(sno) + ".", i["p"], i["k"], est, f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
-            sno += 1
-    x.sortby = "Kills"
-    x.reversesort = True
-    embed = discord.Embed(title=f'{chls[ctx.channel.id]}- Estimated Kills',
-                          description=f"```css\n{x}```",
-                          color=color)
-    embed.set_footer(text=f"Estimated Ending: {finalkills}")
-    await ctx.send(embed=embed)
+        j = i
+        i = i["contract"]
+        timeplayed = int(i["timeplayed"] / 1000)
+        left = datetime.timedelta(seconds=timeplayed)
+        final = datetime.datetime.strptime(str(left), '%H:%M:%S').replace(microsecond=0)
+        colon_format = str(final).split(" ")[1].split(':')
+        finalkills += i["kills"]
+        if timeplayed == 0:
+            est = 0
+        else:
+            est = int((i["kills"]/timeplayed)*10800)
+        if timeplayed < 10800 and timeplayed != 0:
+            active.add_row([str(act) + ".", j["username"], i["kills"], est,
+                            f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
+            act += 1
+
+    active.sortby = "Kills"
+    active.reversesort = True
+    actlist = []
+    explist = []
+
+    count = 0
+    while True:
+        if len(active.get_string()) <= 2000:
+            active_con = discord.Embed(title=f'{clan}- Active Contracts',
+                                       description=f"```css\n{active}```",
+                                       color=color)
+            actlist.append(active_con)
+            break
+        else:
+            if count > len(active.get_string()): break
+            active_con = discord.Embed(title=f'{clan}- Active Contracts',
+                                       description=f"```css\n{active.get_string()[count:2000]}```",
+                                       color=color)
+            count += 2000
+            actlist.append(active_con)
+
+    for j in actlist:
+        j.set_footer(text=f"Est. Kills: {finalkills} | Bot by {bot.dev}", icon_url=sampfp)
+        a = await ctx.send(embed=j)
 
 @bot.command(aliases=['eval'],hidden=True)
 @commands.is_owner()
