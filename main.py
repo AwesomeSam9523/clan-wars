@@ -364,6 +364,11 @@ async def contract(ctx, *, ign=None):
     else:
         if len(str(ign)) == len("537623052775718912"):
             ign = bot.links.get(str(ign))
+            if ign is None:
+                embed = discord.Embed(description="User not linked yet.",
+                                      color=16730441)
+                embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
+                return await ctx.reply(embed=embed)
     data = await getdata("VNTA")
     data = data["data"]["members"]
     found = False
