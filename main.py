@@ -376,11 +376,11 @@ async def contract(ctx, *, ign=None):
         est = 0
         kpg = 0
     else:
-        est = int(con["kills"] / timeplayed) * 10800
+        est = int((con["kills"] / timeplayed) * 10800)
         kpg = con["kills"]/games
     x = PrettyTable()
     x.field_names = ["Kills", "Deaths", "KPG", "Est Kills", "Play Time"]
-    x.add_row([con["kills"], con["deaths"], "{:.2f}".format(kpg), est, f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
+    x.add_row([con["kills"], con["deaths"], "{:.2f}".format(kpg), str(est), f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
     x.title = userdata['username']
     embed = discord.Embed(title=f"CW Contract",
                           description=f"```css\n{x}```",
