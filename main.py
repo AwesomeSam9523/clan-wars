@@ -206,6 +206,8 @@ async def refresh(ctx, what:str=None):
 
 @bot.command()
 async def end(ctx):
+    if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
+        return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
     clan = "VNTA"
     data = await getdata("VNTA")
     data = data["data"]["members"]
