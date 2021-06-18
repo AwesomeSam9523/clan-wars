@@ -362,8 +362,9 @@ async def contract(ctx, *, ign=None):
             embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
             return await ctx.reply(embed=embed)
     else:
-        if len(str(ign)) == len("537623052775718912"):
-            ign = bot.links.get(str(ign))
+        newign = str(ign).replace('<@', '').replace('>', '')
+        if len(newign) == len("537623052775718912"):
+            ign = bot.links.get(str(newign))
             if ign is None:
                 embed = discord.Embed(description="User not linked yet.",
                                       color=16730441)
