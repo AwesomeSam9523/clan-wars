@@ -251,12 +251,10 @@ async def end(ctx):
 
     activefinal = PrettyTable()
     activefinal.field_names = ["S.No.", "Player Name", "Kills", "Est. Kills", "Time Played"]
-    activefinal.title = "Estimated Kills"
     sno = 1
     finalkills = 0
     act = 1
     exp = 1
-    fianlkills = 0
     for i in data:
         j = i
         i = i["contract"]
@@ -279,6 +277,7 @@ async def end(ctx):
 
     active.sortby = "Estd. Kills"
     active.reversesort = True
+    activefinal.title = f"Estimated Kills- {finalkills}"
     finallist = []
     for i in active._rows:
         finallist.append(i[2])
