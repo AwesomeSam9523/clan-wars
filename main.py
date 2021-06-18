@@ -225,11 +225,14 @@ async def end(ctx):
         left = datetime.timedelta(seconds=timeplayed)
         final = datetime.datetime.strptime(str(left), '%H:%M:%S').replace(microsecond=0)
         colon_format = str(final).split(" ")[1].split(':')
-        finalkills += i["kills"]
+
         if timeplayed == 0:
             est = 0
+        elif timeplayed > 10800:
+            est = i["kills"]
         else:
             est = int((i["kills"]/timeplayed)*10800)
+        finalkills += est
         if timeplayed < 10800 and timeplayed != 0:
             active.add_row([str(act) + ".", j["username"], i["kills"], est,
                             f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
