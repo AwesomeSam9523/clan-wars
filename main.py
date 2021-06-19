@@ -434,6 +434,7 @@ async def link(ctx, *, ign):
     await ctx.reply(embed=embed)
 
 @bot.command(aliases=["con"])
+@commands.check(general)
 async def contract(ctx, *, ign=None):
     if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
         return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
@@ -485,6 +486,54 @@ async def contract(ctx, *, ign=None):
                           color=4521960)
     embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
     await ctx.send(embed=embed)
+
+@bot.command(aliases=["p", "pf"])
+@commands.check(general)
+async def profile(ctx, *, ign=None):
+    if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
+        return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
+    if ign is None:
+        ign = bot.links.get(str(ctx.author.id))
+        if ign is None:
+            embed = discord.Embed(description="You aren't linked yet. Use `cw link <ign>` to get linked.\n"
+                                              "Or use `cw contract <ign> to view",
+                                  color=16730441)
+            embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
+            return await ctx.reply(embed=embed)
+    else:
+
+        newign = str(ign).replace('<@', '').replace('>', '')
+        if len(newign) == len("537623052775718912"):
+            ign = bot.links.get(str(newign))
+            if ign is None:
+                embed = discord.Embed(description="User not linked yet.",
+                                      color=error_embed)
+                embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
+                return await ctx.reply(embed=embed)
+
+    data = requests.get(f"https://kr.vercel.app/api/profile?username={ign}")
+    userdata = json.loads(data.text)
+
+    clan = userdata["clan"]
+    kills = userdata["kills"]
+    deaths = userdata["deaths"]
+    wins = userdata["wins"]
+    score = userdata["score"]
+    level = userdata["level"]
+    games = userdata["games"]
+    loses = games - wins
+    chl = userdata["challenge"]
+    nukes = userdata["stats"]["n"]
+    headshots = userdata["stats"]["hs"]
+    shots = userdata["stats"]["s"]
+    hits = userdata["stats"]["h"]
+    timeplayed = int(userdata["timePlayed"]/1000)
+
+    mpk = (shots - hits) / kills
+    hsp = (headshots - hits) / kills
+    gpn = games / nukes
+    npd = nukes * 86400 / time
+    kpm = kills * 4 / games
 
 @bot.command()
 @commands.check(general)
