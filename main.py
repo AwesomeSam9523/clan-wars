@@ -24,6 +24,27 @@ bot.refr = {}
 bot.links = {}
 bot.data = {}
 bot.dev = ""
+economyerror = "❌"
+economysuccess = "✅"
+disregarded = []
+warn1 = []
+warn2 = []
+devs = [771601176155783198]
+usercmds = {}
+error_embed = 16730441
+embedcolor = 5046208
+success_embed = 5963593
+
+@bot.check
+async def if_allowed(ctx):
+    return await check_channel(ctx.channel.id)
+
+async def check_channel(chlid):
+    server = await get_admin()
+    if server is None: return True
+    if len(server) == 0: return True
+    if chlid in server: return True
+    else: return False
 
 async def getdata(clan):
     """ssl_context = ssl._create_unverified_context()
@@ -148,16 +169,48 @@ async def embed_view(clan):
 
     return {"active":actlist, "expired":explist}
 
-@bot.event
-async def on_message(message):
-    if message.channel.id in bot.stop:
-        return
-    await bot.process_commands(message)
+async def handle_1(userid):
+    warn1.append(userid)
+    await asyncio.sleep(2)
+    warn1.remove(userid)
+
+async def handle_2(userid):
+    warn2.append(userid)
+    await asyncio.sleep(2)
+    warn2.remove(userid)
+
+async def handle_disregard(userid):
+    disregarded.append(userid)
+    await asyncio.sleep(10*60)
+    disregarded.remove(userid)
+
+async def general(ctx):
+    state = await spam_protect(ctx.author.id)
+    print(state)
+    toreturn = True
+    if state == 'warn':
+        embed = discord.Embed(description=f'{economyerror} You are being rate-limited for using commands too fast!\nTry again in few secs..', color=error_embed)
+        await ctx.send(embed=embed)
+        toreturn = False
+    elif state == 'disregard':
+        embed = discord.Embed(title=f'{economyerror} Warning!',
+                              description=f'{ctx.author.mention} has been disregarded for 10 mins!\n**Reason: Spamming Commands**',
+                              color=error_embed)
+        await ctx.send(embed=embed)
+        toreturn= False
+    elif state == 'return':
+        toreturn= False
+    return toreturn
+
+async def close_admin(a):
+    bot.refr["719946380285837322"] = a
+    chl = bot.get_channel(854692793276170280)
+    print(bot.refr)
+    await chl.send(json.dumps(bot.refr))
 
 async def auto_update():
     while True:
-        for i in bot.refr.keys():
-            await update_embeds(i)
+        await update_embeds("VNTA")
         files = bot.get_channel(854698116255318057)
         with open("botdata.json", "w") as f:
             f.write(str(json.dumps(bot.data, indent=2)))
@@ -349,7 +402,7 @@ async def link(ctx, *, ign):
     await a.add_reaction("✅")
     await a.add_reaction("❌")
     bot.pendings[a.id] = (ctx.author.id, str(ign))
-    embed = discord.Embed(description=f"Link request submitted to staff successfully!", color=5963593)
+    embed = discord.Embed(description=f"Link request submitted to staff successfully!", color=success_embed)
     await ctx.reply(embed=embed)
 
 @bot.command(aliases=["con"])
@@ -370,7 +423,7 @@ async def contract(ctx, *, ign=None):
             ign = bot.links.get(str(newign))
             if ign is None:
                 embed = discord.Embed(description="User not linked yet.",
-                                      color=16730441)
+                                      color=error_embed)
                 embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
                 return await ctx.reply(embed=embed)
     data = await getdata("VNTA")
@@ -415,10 +468,77 @@ async def help(ctx):
     embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
     await ctx.send(embed=embed)
 
-bot.stop = []
+async def get_admin():
+    return bot.refr["719946380285837322"]
+
+async def spam_protect(userid):
+    if userid in disregarded:
+        if userid not in devs: return 'return'
+        else: return 'ok'
+    last = usercmds.get(userid, 0)
+    current = time.time()
+    usercmds[userid] = current
+    if current - last < 2:
+        if userid in warn2:
+            asyncio.create_task(handle_disregard(userid))
+            return 'disregard'
+        elif userid in warn1:
+            asyncio.create_task(handle_2(userid))
+            return 'warn'
+        else:
+            asyncio.create_task(handle_1(userid))
+            return 'warn'
+    else:
+        return 'ok'
+
+@bot.command(aliases=['add_chl'])
+#@commands.check(general)
+@commands.has_permissions(manage_channels=True)
+async def set_chl(ctx, channel:discord.TextChannel):
+    server = await get_admin()
+    if channel.id in server:
+        embed = discord.Embed(description=f'{economyerror} {channel.mention} is already in list of registered channels!', color=error_embed)
+        return await ctx.send(embed=embed)
+    server.append(channel.id)
+    if ctx.channel.id not in server:
+        server.append(ctx.channel.id)
+    await close_admin(server)
+    embed = discord.Embed(description=f'{economysuccess} {channel.mention} added to list of registered channels successfully!', color=success_embed)
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=['rem_chl', 'remove_chl', 'delete_chl'])
+@commands.check(general)
+@commands.has_permissions(manage_channels=True)
+async def del_chl(ctx, channel:discord.TextChannel):
+    server = await get_admin()
+    if channel.id not in server:
+        embed = discord.Embed(description=f'{economyerror} {channel.mention} not in list of registered channels!', color=error_embed)
+        return await ctx.send(embed=embed)
+    server.remove(channel.id)
+    await close_admin(server)
+    embed = discord.Embed(description=f'{economysuccess} {channel.mention} removed from list of registered channels successfully!', color=success_embed)
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=['show_chl'])
+@commands.check(general)
+@commands.has_permissions(manage_channels=True)
+async def list_chl(ctx):
+    server = await get_admin()
+    if len(server) == 0: channels = ['> No channels set']
+    else: channels = [f'> <#{x}>' for x in server]
+    embed = discord.Embed(title=f'{economysuccess} Allowed Channels for the bot:', description='\n'.join(channels), color=embedcolor)
+    embed.set_footer(text='Add a channel using e.set_chl <name>\nRemove a channel using e.del_chl <name>')
+    await ctx.send(embed=embed)
+
 @bot.command()
-async def stop(ctx):
-    bot.stop.append(ctx.channel.id)
+@commands.check(general)
+@commands.has_permissions(manage_channels=True)
+async def reset_chl(ctx):
+    server = await get_admin()
+    embed = discord.Embed(title=f'{economysuccess} Done', description='Cleared Successfully!', color=embedcolor)
+    await close_admin(server)
+    embed.set_footer(text='Add a channel using e.set_chl <name>\nRemove a channel using e.del_chl <name>')
+    await ctx.send(embed=embed)
 
 @bot.event
 async def on_connect():
@@ -434,6 +554,10 @@ async def on_connect():
     bot.dev = await bot.fetch_user(771601176155783198)
     print("Ready")
     asyncio.create_task(auto_update())
+
+@bot.event
+async def on_message(message):
+    await bot.process_commands(message)
 
 @bot.event
 async def on_raw_reaction_add(payload):
