@@ -186,7 +186,6 @@ async def handle_disregard(userid):
 
 async def general(ctx):
     state = await spam_protect(ctx.author.id)
-    print(state)
     toreturn = True
     if state == 'warn':
         embed = discord.Embed(description=f'{economyerror} You are being rate-limited for using commands too fast!\nTry again in few secs..', color=error_embed)
@@ -205,7 +204,6 @@ async def general(ctx):
 async def close_admin(a):
     bot.refr["719946380285837322"] = a
     chl = bot.get_channel(854692793276170280)
-    print(bot.refr)
     await chl.send(json.dumps(bot.refr))
 
 async def auto_update():
@@ -257,6 +255,7 @@ async def update_links():
     await bot.get_channel(854721559359913994).send(file=discord.File("links.json"))
 
 @bot.command()
+@commands.check(general)
 async def view(channel, via=None, clan=None):
     if via == "sam123" and clan is not None:
         pass
@@ -281,6 +280,7 @@ async def view(channel, via=None, clan=None):
         await update_embeds(clan)
 
 @bot.command()
+@commands.check(general)
 @commands.has_permissions(manage_channels=True)
 async def refresh(ctx, what:str=None):
     clan = "VNTA"
@@ -293,6 +293,7 @@ async def refresh(ctx, what:str=None):
         await chl.send(str(json.dumps(bot.refr)))
 
 @bot.command()
+@commands.check(general)
 async def end(ctx):
     if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
         return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
@@ -394,6 +395,7 @@ async def test(ctx):
 
 bot.pendings = {}
 @bot.command()
+@commands.check(general)
 async def link(ctx, *, ign):
     if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
         return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
@@ -459,6 +461,7 @@ async def contract(ctx, *, ign=None):
     await ctx.send(embed=embed)
 
 @bot.command()
+@commands.check(general)
 async def help(ctx):
     embed=discord.Embed(title="VNTA Clan Wars Bot",
                         description="View below the commands available for use:",
@@ -492,7 +495,7 @@ async def spam_protect(userid):
         return 'ok'
 
 @bot.command(aliases=['add_chl'])
-#@commands.check(general)
+@commands.check(general)
 @commands.has_permissions(manage_channels=True)
 async def set_chl(ctx, channel:discord.TextChannel):
     server = await get_admin()
@@ -527,7 +530,7 @@ async def list_chl(ctx):
     if len(server) == 0: channels = ['> No channels set']
     else: channels = [f'> <#{x}>' for x in server]
     embed = discord.Embed(title=f'{economysuccess} Allowed Channels for the bot:', description='\n'.join(channels), color=embedcolor)
-    embed.set_footer(text='Add a channel using e.set_chl <name>\nRemove a channel using e.del_chl <name>')
+    embed.set_footer(text='Add a channel using cw set_chl <name>\nRemove a channel using cw del_chl <name>')
     await ctx.send(embed=embed)
 
 @bot.command()
@@ -539,6 +542,13 @@ async def reset_chl(ctx):
     await close_admin(server)
     embed.set_footer(text='Add a channel using e.set_chl <name>\nRemove a channel using e.del_chl <name>')
     await ctx.send(embed=embed)
+
+@bot.command()
+@commands.check(general)
+async def ping(ctx):
+    msg = await ctx.send('Pong!')
+    ping = "{:.2f}".format(bot.latency*1000)
+    await msg.edit(content=f'Pong! `{ping} ms`')
 
 @bot.event
 async def on_connect():
