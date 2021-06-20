@@ -2,6 +2,7 @@ import ssl, msgpack, asyncio, discord, json
 import time, datetime, os, threading, requests
 from prettytable import PrettyTable
 from discord.ext import commands
+from discord.ext.commands import *
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
 from io import BytesIO
 
@@ -526,13 +527,13 @@ async def profile(ctx, *, ign=None):
     kills = userdata["kills"]
     deaths = userdata["deaths"]
     kr = userdata["funds"]
-    date = userdata["createdAt"]
+    date = userdata["createdAt"].split("T")[0]
     wins = userdata["wins"]
     score = userdata["score"]
     level = userdata["level"]
     played = userdata["games"]
     loses = played - wins
-    challenge = userdata["challenge"]
+    challenge = int(userdata["challenge"])+1
     nukes = userdata["stats"]["n"]
     headshots = userdata["stats"]["hs"]
     shots = userdata["stats"]["s"]
@@ -541,10 +542,12 @@ async def profile(ctx, *, ign=None):
     melee = userdata["stats"]["mk"]
     wallbangs = userdata["stats"]["wb"]
 
+    date = datetime.datetime.strptime(date, '%d-%m-%y')
+    now = datetime.datetime.now()
     mpk = "{:.2f}".format((shots - hits)/kills)
     hps = "{:.2f}%".format((headshots/hits)*100)
     gpn = "{:.2f}".format(played/nukes)
-    npd = "{:.2f}".format(nukes/ (timeplayed/86400))
+    npd = "{:.2f}".format(nukes/ (now-date).days)
     kpg = "{:.2f}".format(kills/played)
     kpm = "{:.2f}".format(float(kpg)/4)
     wl = "{:.2f}".format(wins/loses)
@@ -565,6 +568,8 @@ async def profile(ctx, *, ign=None):
     font3 = ImageFont.truetype("bgs/font.ttf", 26)
     shadow = Image.new("RGBA", statsoverlay.size)
     draw2 = ImageDraw.Draw(shadow)
+
+
     if challenge > 20:
         fill = (255, 43, 43)
     elif challenge > 15:
@@ -621,6 +626,8 @@ async def profile(ctx, *, ign=None):
         clancolor = (68, 255, 25)
     elif clan == "DEV":
         clancolor = (25, 191, 255)
+    elif clan == "VNTA":
+        draw.text((1050, 655), "#vantalizing", fill=(36, 36, 36), font=font3)
     draw.text((35, 32), str(level), fill=fill, font=font2)
     draw.text((65+font2.getsize(str(level))[0], 32), str(username), fill=(36, 36, 36), font=font2)
     draw.text((85+font2.getsize(str(level))[0]+font2.getsize(str(username))[0], 32), f"[{clan}]", fill=clancolor, font=font2)
@@ -754,5 +761,9 @@ async def on_raw_reaction_add(payload):
         msg = await chl.fetch_message(payload.message_id)
         await msg.edit(content=f"{msg.content} (`{state}` by {await bot.fetch_user(payload.user_id)})")
         await msg.clear_reactions()
+
+@bot.event
+async def on_command_error(ctx, error):
+    pass
 
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
