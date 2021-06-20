@@ -589,14 +589,16 @@ async def profile(ctx, *, ign=None):
     level = userdata["level"]
     played = userdata["games"]
     loses = played - wins
-    challenge = int(userdata["challenge"])+1
+    challenge = userdata["challenge"]
+    if challenge is None: challenge = 0
+    else: challenge = int(challenge) + 1
     nukes = userdata["stats"]["n"]
-    headshots = userdata["stats"]["hs"]
-    shots = userdata["stats"]["s"]
-    hits = userdata["stats"]["h"]
+    headshots = userdata["stats"].get("hs", 0)
+    shots = userdata["stats"].get("s", 0)
+    hits = userdata["stats"].get("h", 0)
     timeplayed = int(userdata["timePlayed"]/1000)
-    melee = userdata["stats"]["mk"]
-    wallbangs = userdata["stats"]["wb"]
+    melee = userdata["stats"].get("mk", 0)
+    wallbangs = userdata["stats"].get("wb", 0)
     date_obj = datetime.datetime.strptime(datestr, '%Y-%m-%d')
     now = datetime.datetime.now()
     daysplayed = (now-date_obj).days
@@ -632,7 +634,7 @@ async def profile(ctx, *, ign=None):
     elif challenge > 10:
         fill = (255, 130, 58)
     else:
-        fill = (222, 222, 222)
+        fill = (36, 36, 36)
     user = "???"
     for key, value in bot.links.items():
         if value.lower() == username.lower():
