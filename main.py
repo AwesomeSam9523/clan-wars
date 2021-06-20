@@ -485,8 +485,16 @@ async def contract(ctx, *, ign=None):
         return await ctx.reply("User not in VNTA or incorrect IGN!")
     timeplayed = int(con["timeplayed"] / 1000)
     left = datetime.timedelta(seconds=timeplayed)
-    final = datetime.datetime.strptime(str(left), '%H:%M:%S').replace(microsecond=0)
-    colon_format = str(final).split(" ")[1].split(':')
+    tleft = 10800 - timeplayed
+    diff = (timeplayed/10800)
+    hours, remainder = divmod(int(timeplayed), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    days, hours = divmod(hours, 24)
+
+    hours2, remainder2 = divmod(int(tleft), 3600)
+    minutes2, seconds2 = divmod(remainder2, 60)
+    days2, hours2 = divmod(hours2, 24)
+
     games = timeplayed / 240
     if timeplayed == 0:
         est = 0
@@ -494,15 +502,51 @@ async def contract(ctx, *, ign=None):
     else:
         est = int((con["kills"] / timeplayed) * 10800)
         kpg = con["kills"]/games
-    x = PrettyTable()
-    x.field_names = ["Kills", "Deaths", "KPG", "Est Kills", "Play Time"]
-    x.add_row([con["kills"], con["deaths"], "{:.2f}".format(kpg), str(est), f"{colon_format[0]}h {colon_format[1]}m {colon_format[2]}s"])
-    x.title = userdata['username']
-    embed = discord.Embed(title=f"CW Contract",
-                          description=f"```css\n{x}```",
-                          color=4521960)
+    img = Image.open("bgs/contract.png")
+    font = ImageFont.truetype("bgs/font.ttf", 14)
+    font2 = ImageFont.truetype("bgs/font.ttf", 18)
+    shadow = Image.new("RGBA", img.size)
+    draw2 = ImageDraw.Draw(shadow)
+    order = [str(con["kills"]), str(con["deaths"]), "{:.2f}".format(kpg), "{:.2f}".format(kpg/4)]
+
+    xloc = 60
+    for i in order:
+        draw2.text((xloc - (font.getsize(i)[0] / 2), 110), i, font=font, fill=(0,0,0))
+        xloc += 111
+    draw2.text((330, 155), f"{hours}h {minutes}m {seconds}s", font=font, fill=(0,0,0))
+    draw2.text((160, 187), str(est), font=font, fill=(0,0,0))
+    draw2.text((225 - (font2.getsize(userdata['username'])[0]) / 2, 40), str(userdata["username"]), font=font2, fill=(0,0,0))
+    draw2.text((160, 216), f"{hours2}h {minutes2}m {seconds2}s", font=font, fill=(0,0,0))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=2))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=4))
+    img = Image.alpha_composite(img, shadow)
+    draw = ImageDraw.Draw(img)
+    xloc = 60
+    for i in order:
+        draw.text((xloc-(font.getsize(i)[0]/2), 110), i, font=font)
+        xloc += 111
+    draw.text((330, 155), f"{hours}h {minutes}m {seconds}s", font=font)
+    draw.text((160, 187), str(est), font=font)
+    draw.text((225-(font2.getsize(userdata['username'])[0])/2, 40), str(userdata["username"]), font=font2, fill=(255, 251, 57))
+    draw.text((160, 216), f"{hours2}h {minutes2}m {seconds2}s", font=font)
+
+    xpbar = Image.open("bgs/xpbar.png")
+    pixdata = xpbar.load()
+    for y in range(xpbar.size[1]):
+        for x in range(xpbar.size[0]):
+            pixdata[x, y] = tuple(list((255, 123, 57)) + [pixdata[x, y][-1]])
+    xpbar = xpbar.crop((0, 0, xpbar.width*diff, xpbar.height))
+    img.paste(xpbar, (10, 157), xpbar)
+
+    imagebytes = BytesIO()
+    enhancer = ImageEnhance.Sharpness(img)
+    img = enhancer.enhance(2)
+    img.save(imagebytes, "PNG")
+    imagebytes.seek(0)
+    embed = discord.Embed(color=4521960)
     embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
-    await ctx.send(embed=embed)
+    embed.set_image(url="attachment://contract.png")
+    await ctx.send(embed=embed, file=discord.File(imagebytes, filename="contract.png"))
 
 @bot.command(aliases=["p", "pf"])
 @commands.check(general)
@@ -760,7 +804,7 @@ async def on_connect():
 
 @bot.event
 async def on_message(message):
-    #if message.channel.id != 854008993248051230: return
+    if message.channel.id != 854008993248051230: return
     await bot.process_commands(message)
 
 @bot.event
