@@ -26,6 +26,7 @@ sampfp = "https://media.discordapp.net/attachments/854008993248051230/8547088890
 bot.refr = {}
 bot.links = {}
 bot.data = {}
+bot.userdata = {}
 bot.dev = ""
 economyerror = "❌"
 economysuccess = "✅"
@@ -212,6 +213,12 @@ async def close_admin(a):
     bot.refr["719946380285837322"] = a
     chl = bot.get_channel(854692793276170280)
     await chl.send(json.dumps(bot.refr))
+
+async def updateuserdata():
+    chl = bot.get_channel(856070919033978932)
+    with open("userdata.json", "w") as f:
+        f.write(json.dumps(bot.userdata, indent=2))
+    await chl.send(file=discord.File("userdata.json"))
 
 async def auto_update():
     while True:
@@ -458,6 +465,8 @@ async def contract(ctx, *, ign=None):
         newign = str(ign).replace('<@', '').replace('>', '')
         if len(newign) == len("537623052775718912"):
             ign = bot.links.get(str(newign))
+            work = bot.userdata.get(str(newign), {"incognito": False})["incognito"]
+            if work and ctx.author.id != int(newign): ign = None
             if ign is None:
                 embed = discord.Embed(description="User not linked yet.",
                                       color=error_embed)
@@ -507,10 +516,11 @@ async def profile(ctx, *, ign=None):
             embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
             return await ctx.reply(embed=embed)
     else:
-
         newign = str(ign).replace('<@', '').replace('>', '')
         if len(newign) == len("537623052775718912"):
             ign = bot.links.get(str(newign))
+            work = bot.userdata.get(str(ctx.author.id), {"incognito": False})["incognito"]
+            if work and ctx.author.id != int(newign): ign = None
             if ign is None:
                 embed = discord.Embed(description="User not linked yet.",
                                       color=error_embed)
@@ -624,7 +634,7 @@ async def profile(ctx, *, ign=None):
     elif clan == "DEV":
         clancolor = (25, 191, 255)
     elif clan == "VNTA":
-        draw.text((1050, 655), "#vantalizing", fill=(36, 36, 36), font=font3)
+        draw.text((950, 655), "#vantalizing", fill=(36, 36, 36), font=font3)
     draw.text((35, 32), str(level), fill=fill, font=font2)
     draw.text((65+font2.getsize(str(level))[0], 32), str(username), fill=(36, 36, 36), font=font2)
     draw.text((85+font2.getsize(str(level))[0]+font2.getsize(str(username))[0], 32), f"[{clan}]", fill=clancolor, font=font2)
@@ -641,6 +651,21 @@ async def profile(ctx, *, ign=None):
     statsoverlay.close()
     bgimage.close()
     await ctx.send(file=discord.File(image_bytes, filename="profile.png"))
+
+@bot.command(aliases=["incog"])
+@commands.check(general)
+async def incognito(ctx):
+    data = bot.userdata.setdefault(str(ctx.author.id), {"incognito":False})
+    if data["incognito"]:
+        data["incognito"] = False
+        embed=discord.Embed(description=f"{economysuccess} You are **no longer** in incognito mode", color=success_embed)
+        await ctx.reply(embed=embed)
+    else:
+        data["incognito"] = True
+        embed = discord.Embed(description=f"{economysuccess} You are in incognito mode", color=success_embed)
+        await ctx.reply(embed=embed)
+    bot.userdata[str(ctx.author.id)] = data
+    await updateuserdata()
 
 @bot.command()
 @commands.check(general)
@@ -721,12 +746,17 @@ async def on_connect():
     msgs = await chl.history(limit=1).flatten()
     bot.links.update(json.loads(requests.get(msgs[0].attachments[0]).text))
     bot.dev = await bot.fetch_user(771601176155783198)
+
+    chl = bot.get_channel(856070919033978932)
+    msgs = await chl.history(limit=1).flatten()
+    bot.userdata = json.loads(requests.get(msgs[0].attachments[0]).text)
     print("Ready")
     if not bot.pause:
         asyncio.create_task(auto_update())
 
 @bot.event
 async def on_message(message):
+    if message.channel.id != 854008993248051230: return
     await bot.process_commands(message)
 
 @bot.event
