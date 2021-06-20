@@ -589,8 +589,10 @@ async def profile(ctx, *, ign=None):
     user = ""
     for key, value in bot.links.items():
         if value.lower() == username.lower():
-            user = await bot.fetch_user(int(key))
-            user = f"{user.name}#{user.discriminator}"
+            work = bot.userdata.get(str(key), {"incognito": False})["incognito"]
+            if not work:
+                user = await bot.fetch_user(int(key))
+                user = f"{user.name}#{user.discriminator}"
             break
 
     yloc = 191
