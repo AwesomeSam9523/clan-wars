@@ -18,7 +18,7 @@ a_headers = {
     'Upgrade': 'websocket',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36'
 }
-bot = commands.Bot(command_prefix=["cw"+" ", "Cw"+" ", "cW"+" ","CW"+" "], case_insensitive=True)
+bot = commands.Bot(command_prefix=["cw"+" ", "Cw"+" ", "cW"+" ","CW"+" ", "V.", "v."], case_insensitive=True)
 bot.remove_command("help")
 color = 7929797
 sampfp = "https://media.discordapp.net/attachments/854008993248051230/854708889059852288/sam_av.png"
@@ -448,8 +448,8 @@ async def contract(ctx, *, ign=None):
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
-            embed = discord.Embed(description="You aren't linked yet. Use `cw link <ign>` to get linked.\n"
-                                              "Or use `cw contract <ign> to view",
+            embed = discord.Embed(description="You aren't linked yet. Use `v.link <ign>` to get linked.\n"
+                                              "Or use `v.contract <ign> to view",
                                   color=16730441)
             embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
             return await ctx.reply(embed=embed)
@@ -500,8 +500,8 @@ async def profile(ctx, *, ign=None):
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
-            embed = discord.Embed(description="You aren't linked yet. Use `cw link <ign>` to get linked.\n"
-                                              "Or use `cw contract <ign> to view",
+            embed = discord.Embed(description="You aren't linked yet. Use `v.link <ign>` to get linked.\n"
+                                              "Or use `v.contract <ign> to view",
                                   color=16730441)
             embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
             return await ctx.reply(embed=embed)
@@ -646,8 +646,8 @@ async def help(ctx):
     embed=discord.Embed(title="VNTA Clan Wars Bot",
                         description="View below the commands available for use:",
                         color=4849598)
-    embed.add_field(name="`link`", value="Syntax: `cw link <ign>`\nLink account to bot", inline=False)
-    embed.add_field(name="`contract`", value="Syntax: `cw contract [ign]`\nShows clan war contract", inline=False)
+    embed.add_field(name="`link`", value="Syntax: `v.link <ign>`\nLink account to bot", inline=False)
+    embed.add_field(name="`contract`", value="Syntax: `v.contract [ign]`\nShows clan war contract", inline=False)
     embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
     await ctx.send(embed=embed)
 
@@ -687,7 +687,7 @@ async def list_chl(ctx):
     if len(server) == 0: channels = ['> No channels set']
     else: channels = [f'> <#{x}>' for x in server]
     embed = discord.Embed(title=f'{economysuccess} Allowed Channels for the bot:', description='\n'.join(channels), color=embedcolor)
-    embed.set_footer(text='Add a channel using cw set_chl <name>\nRemove a channel using cw del_chl <name>')
+    embed.set_footer(text='Add a channel using v.set_chl <name>\nRemove a channel using v.del_chl <name>')
     await ctx.send(embed=embed)
 
 @bot.command()
