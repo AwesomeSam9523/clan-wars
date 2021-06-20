@@ -758,7 +758,7 @@ async def on_connect():
 
 @bot.event
 async def on_message(message):
-    if message.channel.id != 854008993248051230: return
+    #if message.channel.id != 854008993248051230: return
     await bot.process_commands(message)
 
 @bot.event
