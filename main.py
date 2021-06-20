@@ -38,7 +38,7 @@ embedcolor = 5046208
 success_embed = 5963593
 bot.uptime = time.time()
 bot.reqs = 0
-bot.pause = True
+bot.pause = False
 
 @bot.check
 async def if_allowed(ctx):
