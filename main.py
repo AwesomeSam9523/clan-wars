@@ -462,7 +462,7 @@ async def contract(ctx, *, ign=None):
             embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
             return await ctx.reply(embed=embed)
     else:
-        newign = str(ign).replace('<@', '').replace('>', '')
+        newign = str(ign).replace('<@!', '').replace('>', '')
         if len(newign) == len("537623052775718912"):
             ign = bot.links.get(str(newign))
             work = bot.userdata.get(str(newign), {"incognito": False})["incognito"]
@@ -516,7 +516,7 @@ async def profile(ctx, *, ign=None):
             embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
             return await ctx.reply(embed=embed)
     else:
-        newign = str(ign).replace('<@', '').replace('>', '')
+        newign = str(ign).replace('<@!', '').replace('>', '')
         if len(newign) == len("537623052775718912"):
             ign = bot.links.get(str(newign))
             work = bot.userdata.get(str(ctx.author.id), {"incognito": False})["incognito"]
@@ -758,7 +758,7 @@ async def on_connect():
 
 @bot.event
 async def on_message(message):
-    #if message.channel.id != 854008993248051230: return
+    if message.channel.id != 854008993248051230: return
     await bot.process_commands(message)
 
 @bot.event
