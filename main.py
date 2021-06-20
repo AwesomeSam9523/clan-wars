@@ -485,7 +485,10 @@ async def contract(ctx, *, ign=None):
         return await ctx.reply("User not in VNTA or incorrect IGN!")
     timeplayed = int(con["timeplayed"] / 1000)
     left = datetime.timedelta(seconds=timeplayed)
-    tleft = 10800 - timeplayed
+    if timeplayed > 10800:
+        tleft = 0
+    else:
+        tleft = 10800 - timeplayed
     diff = (timeplayed/10800)
     hours, remainder = divmod(int(timeplayed), 3600)
     minutes, seconds = divmod(remainder, 60)
