@@ -2,6 +2,8 @@ import ssl, msgpack, asyncio, discord, json
 import time, datetime, os, threading, requests
 from prettytable import PrettyTable
 from discord.ext import commands
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
+from io import BytesIO
 
 print("Starting")
 uri = "wss://social.krunker.io/ws"
@@ -36,6 +38,7 @@ embedcolor = 5046208
 success_embed = 5963593
 bot.uptime = time.time()
 bot.reqs = 0
+bot.pause = True
 
 @bot.check
 async def if_allowed(ctx):
@@ -283,6 +286,7 @@ async def spam_protect(userid):
 @bot.command()
 @commands.check(general)
 async def view(channel, via=None, clan=None):
+    if bot.pause: return
     if via == "sam123" and clan is not None:
         pass
     else:
@@ -309,6 +313,7 @@ async def view(channel, via=None, clan=None):
 @commands.check(general)
 @commands.has_permissions(manage_channels=True)
 async def refresh(ctx, what:str=None):
+    if bot.pause: return
     clan = "VNTA"
     if what is None:
         await update_embeds(clan)
@@ -321,6 +326,7 @@ async def refresh(ctx, what:str=None):
 @bot.command()
 @commands.check(general)
 async def end(ctx):
+    if bot.pause: return
     if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
         return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
     clan = "VNTA"
@@ -436,6 +442,7 @@ async def link(ctx, *, ign):
 @bot.command(aliases=["con"])
 @commands.check(general)
 async def contract(ctx, *, ign=None):
+    if bot.pause: return
     if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
         return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
     if ign is None:
@@ -490,8 +497,6 @@ async def contract(ctx, *, ign=None):
 @bot.command(aliases=["p", "pf"])
 @commands.check(general)
 async def profile(ctx, *, ign=None):
-    if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
-        return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
@@ -513,27 +518,127 @@ async def profile(ctx, *, ign=None):
 
     data = requests.get(f"https://kr.vercel.app/api/profile?username={ign}")
     userdata = json.loads(data.text)
-
+    if not userdata["success"]:
+        return await ctx.reply(userdata["error"])
+    userdata = userdata["data"]
+    username = userdata["username"]
     clan = userdata["clan"]
     kills = userdata["kills"]
     deaths = userdata["deaths"]
+    kr = userdata["funds"]
+    date = userdata["createdAt"]
     wins = userdata["wins"]
     score = userdata["score"]
     level = userdata["level"]
-    games = userdata["games"]
-    loses = games - wins
-    chl = userdata["challenge"]
+    played = userdata["games"]
+    loses = played - wins
+    challenge = userdata["challenge"]
     nukes = userdata["stats"]["n"]
     headshots = userdata["stats"]["hs"]
     shots = userdata["stats"]["s"]
     hits = userdata["stats"]["h"]
     timeplayed = int(userdata["timePlayed"]/1000)
+    melee = userdata["stats"]["mk"]
+    wallbangs = userdata["stats"]["wb"]
 
-    mpk = (shots - hits) / kills
-    hsp = (headshots - hits) / kills
-    gpn = games / nukes
-    npd = nukes * 86400 / time
-    kpm = kills * 4 / games
+    mpk = "{:.2f}".format((shots - hits)/kills)
+    hps = "{:.2f}%".format((headshots/hits)*100)
+    gpn = "{:.2f}".format(played/nukes)
+    npd = "{:.2f}".format((nukes*86400) / timeplayed)
+    kpm = "{:.2f}".format((kills * 4) / played)
+    kpg = "{:.2f}".format(kills/played)
+    wl = "{:.2f}".format(wins/loses)
+    kdr = "{:.4f}".format(kills/deaths)
+    spk = "{:.2f}".format(score/kills)
+    avgscore = int(score/played)
+    accuracy = "{:.2f}%".format((hits/shots)*100)
+
+    statsoverlay = Image.open("bgs/stats.png")
+    bgimage = Image.open("bgs/vnta.png")
+    order = [[score, kills, deaths, kr, timeplayed, nukes],
+              [played, wins, loses, wl, kdr, challenge],
+              [mpk, spk, gpn, npd, kpm, kpg],
+              [avgscore, accuracy, headshots, hps, melee, wallbangs]]
+    draw = ImageDraw.Draw(statsoverlay)
+    font = ImageFont.truetype("bgs/font.ttf", 20)
+    font2 = ImageFont.truetype("bgs/font.ttf", 40)
+    font3 = ImageFont.truetype("bgs/font.ttf", 26)
+    shadow = Image.new("RGBA", statsoverlay.size)
+    draw2 = ImageDraw.Draw(shadow)
+    if challenge > 20:
+        fill = (255, 43, 43)
+    elif challenge > 15:
+        fill = (228, 70, 255)
+    elif challenge > 10:
+        fill = (255, 130, 58)
+    else:
+        fill = (222, 222, 222)
+    user = ""
+    for key, value in bot.links.items():
+        if value.lower() == username.lower():
+            user = await bot.fetch_user(int(key))
+            user = f"{user.name}#{user.discriminator}"
+            break
+
+    yloc = 191
+    for row in order:
+        xloc = 104
+        for stat in row:
+            size = font.getsize(str(stat))[0]
+            draw2.text((xloc-(size/2), yloc), str(stat), font=font, fill=(0,0,0))
+            xloc += 214
+        yloc += 119
+    draw2.text((35, 32), str(level), fill=(0,0,0), font=font2)
+
+    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=2))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=4))
+    bgimage = Image.alpha_composite(bgimage, shadow)
+
+    yloc = 191
+    for row in order:
+        xloc = 104
+        for stat in row:
+            size = font.getsize(str(stat))[0]
+            draw.text((xloc - (size / 2), yloc), str(stat), font=font, fill=(222, 222, 222))
+            xloc += 214
+        yloc += 119
+    rank = userdata["clanRank"]
+    if rank == 1:
+        clancolor = (162, 255, 74)
+    elif rank <= 3:
+        clancolor = (50, 50, 50)
+    elif rank <= 10:
+        clancolor = (255, 50, 50)
+    elif rank <= 20:
+        clancolor = (255, 255, 70)
+    elif rank <= 30:
+        clancolor = (224, 64, 255)
+    elif rank <= 50:
+        clancolor = (46, 155, 254)
+    else:
+        clancolor = (180, 180, 180)
+    if clan == "VIP":
+        clancolor = (68, 255, 25)
+    elif clan == "DEV":
+        clancolor = (25, 191, 255)
+    draw.text((35, 32), str(level), fill=fill, font=font2)
+    draw.text((65+font2.getsize(str(level))[0], 32), str(username), fill=(36, 36, 36), font=font2)
+    draw.text((85+font2.getsize(str(level))[0]+font2.getsize(str(username))[0], 32), f"[{clan}]", fill=clancolor, font=font2)
+    draw.text((120, 655), user, font=font3, fill=(36, 36, 36))
+
+    dis_logo = Image.open("bgs/discord.png").resize((70, 70))
+    bgimage.paste(dis_logo, (30, 640), dis_logo)
+
+    bgimage = Image.alpha_composite(bgimage, statsoverlay)
+    enhancer = ImageEnhance.Sharpness(bgimage)
+    bgimage = enhancer.enhance(2)
+    image_bytes = BytesIO()
+    bgimage.save(image_bytes, 'PNG')
+    image_bytes.seek(0)
+    statsoverlay.close()
+    bgimage.close()
+
+    await ctx.send(file=discord.File(image_bytes, filename="profile.png"))
 
 @bot.command()
 @commands.check(general)
@@ -615,7 +720,8 @@ async def on_connect():
     bot.links.update(json.loads(requests.get(msgs[0].attachments[0]).text))
     bot.dev = await bot.fetch_user(771601176155783198)
     print("Ready")
-    asyncio.create_task(auto_update())
+    if not bot.pause:
+        asyncio.create_task(auto_update())
 
 @bot.event
 async def on_message(message):
