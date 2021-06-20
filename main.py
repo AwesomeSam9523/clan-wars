@@ -516,7 +516,6 @@ async def profile(ctx, *, ign=None):
                                       color=error_embed)
                 embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
                 return await ctx.reply(embed=embed)
-    print(1)
     data = requests.get(f"https://kr.vercel.app/api/profile?username={ign}")
     userdata = json.loads(data.text)
     if not userdata["success"]:
@@ -527,7 +526,7 @@ async def profile(ctx, *, ign=None):
     kills = userdata["kills"]
     deaths = userdata["deaths"]
     kr = userdata["funds"]
-    date = userdata["createdAt"].split("T")[0]
+    datestr = userdata["createdAt"].split("T")[0]
     wins = userdata["wins"]
     score = userdata["score"]
     level = userdata["level"]
@@ -541,16 +540,13 @@ async def profile(ctx, *, ign=None):
     timeplayed = int(userdata["timePlayed"]/1000)
     melee = userdata["stats"]["mk"]
     wallbangs = userdata["stats"]["wb"]
-    print(date)
-    #date = datetime.datetime.strptime(date, '%y-%m-%d')
-    '''print(date)
+    date_obj = datetime.datetime.strptime(datestr, '%Y-%m-%d')
     now = datetime.datetime.now()
-    daysplayed = (now-date).days'''
+    daysplayed = (now-date_obj).days
     mpk = "{:.2f}".format((shots - hits)/kills)
     hps = "{:.2f}%".format((headshots/hits)*100)
     gpn = "{:.2f}".format(played/nukes)
-    npd = "{:.2f}".format(nukes/ 1)
-    npd = "Bugged"
+    npd = "{:.2f}".format(nukes/ daysplayed)
     kpg = "{:.2f}".format(kills/played)
     kpm = "{:.2f}".format(float(kpg)/4)
     wl = "{:.2f}".format(wins/loses)
@@ -558,7 +554,6 @@ async def profile(ctx, *, ign=None):
     spk = "{:.2f}".format(score/kills)
     avgscore = int(score/played)
     accuracy = "{:.2f}%".format((hits/shots)*100)
-    print(2)
     statsoverlay = Image.open("bgs/stats.png")
     bgimage = Image.open("bgs/vnta.png")
     order = [[score, kills, deaths, kr, timeplayed, nukes],
@@ -601,7 +596,6 @@ async def profile(ctx, *, ign=None):
     shadow = shadow.filter(ImageFilter.GaussianBlur(radius=2))
     shadow = shadow.filter(ImageFilter.GaussianBlur(radius=4))
     bgimage = Image.alpha_composite(bgimage, shadow)
-    print(3)
     yloc = 191
     for row in order:
         xloc = 104
@@ -635,7 +629,6 @@ async def profile(ctx, *, ign=None):
     draw.text((65+font2.getsize(str(level))[0], 32), str(username), fill=(36, 36, 36), font=font2)
     draw.text((85+font2.getsize(str(level))[0]+font2.getsize(str(username))[0], 32), f"[{clan}]", fill=clancolor, font=font2)
     draw.text((120, 655), user, font=font3, fill=(36, 36, 36))
-    print(4)
     dis_logo = Image.open("bgs/discord.png").resize((70, 70))
     bgimage.paste(dis_logo, (30, 640), dis_logo)
 
@@ -647,7 +640,6 @@ async def profile(ctx, *, ign=None):
     image_bytes.seek(0)
     statsoverlay.close()
     bgimage.close()
-    print(5)
     await ctx.send(file=discord.File(image_bytes, filename="profile.png"))
 
 @bot.command()
@@ -765,7 +757,7 @@ async def on_raw_reaction_add(payload):
         await msg.edit(content=f"{msg.content} (`{state}` by {await bot.fetch_user(payload.user_id)})")
         await msg.clear_reactions()
 
-@bot.event
+#@bot.event
 async def on_command_error(ctx, error):
     pass
 
