@@ -586,7 +586,7 @@ async def profile(ctx, *, ign=None):
         fill = (255, 130, 58)
     else:
         fill = (222, 222, 222)
-    user = ""
+    user = "???"
     for key, value in bot.links.items():
         if value.lower() == username.lower():
             work = bot.userdata.get(str(key), {"incognito": False})["incognito"]
@@ -636,13 +636,13 @@ async def profile(ctx, *, ign=None):
     elif clan == "DEV":
         clancolor = (25, 191, 255)
     elif clan == "VNTA":
-        draw.text((950, 655), "#vantalizing", fill=(36, 36, 36), font=font3)
+        draw.text((960, 655), "#vantalizing", fill=(36, 36, 36), font=font3)
     draw.text((35, 32), str(level), fill=fill, font=font2)
     draw.text((65+font2.getsize(str(level))[0], 32), str(username), fill=(36, 36, 36), font=font2)
     draw.text((85+font2.getsize(str(level))[0]+font2.getsize(str(username))[0], 32), f"[{clan}]", fill=clancolor, font=font2)
     draw.text((120, 655), user, font=font3, fill=(36, 36, 36))
-    dis_logo = Image.open("bgs/discord.png").resize((70, 70))
-    bgimage.paste(dis_logo, (30, 640), dis_logo)
+    dis_logo = Image.open("bgs/discord.png").resize((69, 69))
+    statsoverlay.paste(dis_logo, (30, 639))
 
     bgimage = Image.alpha_composite(bgimage, statsoverlay)
     enhancer = ImageEnhance.Sharpness(bgimage)
@@ -677,6 +677,8 @@ async def help(ctx):
                         color=4849598)
     embed.add_field(name="`link`", value="Syntax: `v.link <ign>`\nLink account to bot", inline=False)
     embed.add_field(name="`contract`", value="Syntax: `v.contract [ign]`\nShows clan war contract", inline=False)
+    embed.add_field(name="`contract`", value="Syntax: `v.pf [ign]`\nShows user profile with gamer stats", inline=False)
+    embed.add_field(name="`contract`", value="Syntax: `v.incognito`\nToggle incognito mode", inline=False)
     embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
     await ctx.send(embed=embed)
 
