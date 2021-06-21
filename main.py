@@ -1139,9 +1139,11 @@ async def on_connect():
     if not bot.pause:
         asyncio.create_task(auto_update())
 
+bot.beta = False
 @bot.event
 async def on_message(message):
-    if message.channel.id != 854008993248051230: return
+    if bot.beta:
+        if message.channel.id != 854008993248051230: return
     await bot.process_commands(message)
 
 @bot.event
