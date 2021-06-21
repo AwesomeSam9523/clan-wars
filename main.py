@@ -27,6 +27,9 @@ bot.refr = {}
 bot.links = {}
 bot.data = {}
 bot.userdata = {}
+bot.bgdata = {}
+bot.unsaved = {}
+bot.already = []
 bot.dev = ""
 economyerror = "❌"
 economysuccess = "✅"
@@ -42,7 +45,7 @@ bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
 
-@bot.check
+#@bot.check
 async def if_allowed(ctx):
     return await check_channel(ctx.channel.id)
 
@@ -290,6 +293,32 @@ async def spam_protect(userid):
             return 'warn'
     else:
         return 'ok'
+
+async def sendnew(ctx, vntadat):
+    curset = f"1. Headings Color- {vntadat['hd']}\n" \
+             f"2. Stats Color- {vntadat['st']}\n" \
+             f"3. Motto Text- {vntadat['mt']}\n" \
+             f"4. Username Color- {vntadat['us']}"
+    embed = discord.Embed(title="⚙️ VNTA Profile Background",
+                          description="Current Settings:\n" \
+                                      f"```less\n{curset}```\n"
+                                      "__Choose the below options to modify the background:__\n\n" \
+                                      "`modify 1` - Change background image\n" \
+                                      "`modify 2` - Change headings color\n" \
+                                      "`modify 3` - Change stats color\n" \
+                                      "`modify 4` - Change background motto\n" \
+                                      "`modify 5` - Change username color",
+                          color=embedcolor)
+    embed.set_image(url="attachment://profile.png")
+    file = await profile(ctx, ign="AwesomeSam", via=True)
+    embed.set_footer(text="Type 'save' to save background\nType 'cancel' to cancel all changes")
+    await ctx.send(embed=embed, file=file)
+
+async def savebgdata():
+    with open("bgdata.json", "w") as f:
+        f.write(json.dumps(bot.bgdata, indent=2))
+    chl = bot.get_channel(854698116255318057)
+    await chl.send(file=discord.File("bgdata.json"))
 
 staffchl = [813447381752348723, 854008993248051230]
 @bot.command()
@@ -576,7 +605,7 @@ async def contract(ctx, *, ign=None):
 
 @bot.command(aliases=["p", "pf"])
 @commands.check(general)
-async def profile(ctx, *, ign=None):
+async def profile(ctx, *, ign=None, via=False):
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
@@ -596,8 +625,19 @@ async def profile(ctx, *, ign=None):
                                       color=error_embed)
                 embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
                 return await ctx.reply(embed=embed)
-    data = requests.get(f"https://kr.vercel.app/api/profile?username={ign}")
-    userdata = json.loads(data.text)
+    bgdata = {}
+    found = False
+    for i in bot.bgdata.keys():
+        if i.lower() == ign.lower():
+            bgdata = bot.bgdata[i]
+            found = True
+            break
+    if not found:
+        bgdata = bot.bgdata["vntasam123"]
+
+    #data = requests.get(f"https://kr.vercel.app/api/profile?username={ign}")
+    #userdata = json.loads(data.text)
+    userdata = {'success': True, 'data': {'username': 'AwesomeSam', 'id': 8570737, 'clan': 'VNTA', 'clanRank': 6, 'kills': 82112, 'deaths': 41107, 'wins': 2871, 'score': 9299165, 'level': 91, 'levelPercentage': {'percent': 48.22, 'current': 98053.89, 'max': 203333.33}, 'games': 5830, 'funds': 3533, 'hacker': False, 'verified': False, 'infected': True, 'partner': 1, 'premium': -17955973000, 'premiumName': 'AwesomeSam', 'timePlayed': 1243629476, 'createdAt': '2019-12-19T07:56:22.000Z', 'stats': {'c': 5, 's': 1348599, 'h': 311836, 'c0': 3845230, 'r2': 3815, 'c1': 1753660, 'c2': 1944840, 'mk': 957, 'c5': 563205, 'c4': 91655, 'c8': 145775, 'c7': 66375, 'r3': 20, 'c12': 107410, 'hs': 49704, 'wb': 586, 'flg': 94, 'c9': 75640, 'c11': 336455, 'c6': 37865, 'c3': 131965, 'abR': 1605354754870, 'n': 34, 'chgP': '19:0,0,30,1000', 'anp': 0, 'c13': 274540, 'r4': 18, 'tk': 71, 'fk': 105, 'tmk': 1081, 'r1': 8, 'ast': 1203, 'ls': 741, 'ad': 57, 'spry': 9, 'sad': 1, 'cad': 1}, 'challenge': 19, 'twitch': 'awesomesamaksh', 'elo': 49.58, 'elo2': 0, 'elo4': None, 'followers': 303, 'following': 70, 'region': 2, 'eventCount': None, 'mods': [], 'maps': [{'name': 'Hell_Parkour', 'id': 119179, 'info': {'t': 1}, 'votes': 30, 'verified': None, 'createdAt': '2021-02-03T07:18:50.000Z', 'creator': 'AwesomeSam'}], 'assets': [], 'skins': []}, 'time': 0.169}
     if not userdata["success"]:
         return await ctx.reply(userdata["error"])
     userdata = userdata["data"]
@@ -636,20 +676,51 @@ async def profile(ctx, *, ign=None):
     spk = "{:.2f}".format(score/kills)
     avgscore = int(score/played)
     accuracy = "{:.2f}%".format((hits/shots)*100)
-    statsoverlay = Image.open("bgs/stats.png")
-    bgimage = Image.open("bgs/vnta.png").crop((0, 0, 1280, 720))
+    statsoverlay = Image.new("RGBA", (1280, 720))
+    borders = Image.open("bgs/borders.png")
+
+    if bgdata["ov"]:
+        overlay = Image.open("bgs/overlay.png")
+        borders.paste(overlay, (0, 0), overlay)
+
+    statsoverlay.paste(borders, (0, 0))
+
+    # ============ DRAWING STARTS ==============
+    order = [["Score", "Kills", "Deaths", "KR", "Playtime", "Nukes"],
+             ["Played", "Won", "Lost", "W/L", "KDR", "Challenge"],
+             ["MPK", "SPK", "GPN", "NPD", "KPM", "KPG"],
+             ["Avg. Score", "Accuracy", "Headshots", "HPS", "Melee", "Wallbangs"]]
+    draw = ImageDraw.Draw(statsoverlay)
+    shadow = Image.new("RGBA", statsoverlay.size)
+    draw2 = ImageDraw.Draw(shadow)
+    font = ImageFont.truetype("bgs/font.ttf", 20)
+    font2 = ImageFont.truetype("bgs/font.ttf", 40)
+    font3 = ImageFont.truetype("bgs/font.ttf", 26)
+    font4 = ImageFont.truetype("bgs/font.ttf", 22)
+
+    yloc = 148
+    for row in order:
+        xloc = 105
+        for stat in row:
+            size = font4.getsize(str(stat))[0]
+            draw2.text((xloc - (size / 2), yloc), str(stat), font=font4, fill=(0, 0, 0))
+            xloc += 214
+        yloc += 119
+
+    yloc = 148
+    for row in order:
+        xloc = 105
+        for stat in row:
+            size = font4.getsize(str(stat))[0]
+            draw.text((xloc - (size / 2), yloc), str(stat), font=font4, fill=tuple(bgdata["hd"]))
+            xloc += 214
+        yloc += 119
+    bgimage = Image.open(f"bgs/{bgdata['file']}").resize((1280, 720))
     bgimage = bgimage.convert("RGBA")
     order = [[score, kills, deaths, kr, timeplayed, nukes],
               [played, wins, loses, wl, kdr, challenge],
               [mpk, spk, gpn, npd, kpm, kpg],
               [avgscore, accuracy, headshots, hps, melee, wallbangs]]
-    draw = ImageDraw.Draw(statsoverlay)
-    font = ImageFont.truetype("bgs/font.ttf", 20)
-    font2 = ImageFont.truetype("bgs/font.ttf", 40)
-    font3 = ImageFont.truetype("bgs/font.ttf", 26)
-    shadow = Image.new("RGBA", statsoverlay.size)
-    draw2 = ImageDraw.Draw(shadow)
-
 
     if challenge > 20:
         fill = (255, 43, 43)
@@ -676,7 +747,7 @@ async def profile(ctx, *, ign=None):
             draw2.text((xloc-(size/2), yloc), str(stat), font=font, fill=(0,0,0))
             xloc += 214
         yloc += 119
-    draw2.text((35, 32), str(level), fill=(0,0,0), font=font2)
+    #draw2.text((35, 32), str(level), fill=(0,0,0), font=font2)
 
     shadow = shadow.filter(ImageFilter.GaussianBlur(radius=2))
     shadow = shadow.filter(ImageFilter.GaussianBlur(radius=4))
@@ -686,7 +757,7 @@ async def profile(ctx, *, ign=None):
         xloc = 104
         for stat in row:
             size = font.getsize(str(stat))[0]
-            draw.text((xloc - (size / 2), yloc), str(stat), font=font, fill=(222, 222, 222))
+            draw.text((xloc - (size / 2), yloc), str(stat), font=font, fill=tuple(bgdata["st"]))
             xloc += 214
         yloc += 119
     rank = userdata["clanRank"]
@@ -708,10 +779,9 @@ async def profile(ctx, *, ign=None):
         clancolor = (68, 255, 25)
     elif clan == "DEV":
         clancolor = (25, 191, 255)
-    elif clan == "VNTA":
-        draw.text((960, 655), "#vantalizing", fill=(36, 36, 36), font=font3)
+    draw.text((1173-font3.getsize(bgdata['mt'])[0], 655), bgdata["mt"], fill=(36, 36, 36), font=font3)
     draw.text((35, 32), str(level), fill=fill, font=font2)
-    draw.text((65+font2.getsize(str(level))[0], 32), str(username), fill=(36, 36, 36), font=font2)
+    draw.text((65+font2.getsize(str(level))[0], 32), str(username), fill=tuple(bgdata["us"]), font=font2)
     draw.text((85+font2.getsize(str(level))[0]+font2.getsize(str(username))[0], 32), f"[{clan}]", fill=clancolor, font=font2)
     draw.text((120, 655), user, font=font3, fill=(36, 36, 36))
     dis_logo = Image.open("bgs/discord.png").resize((69, 69))
@@ -725,7 +795,10 @@ async def profile(ctx, *, ign=None):
     image_bytes.seek(0)
     statsoverlay.close()
     bgimage.close()
-    await ctx.send(file=discord.File(image_bytes, filename="profile.png"))
+    if not via:
+        await ctx.send(file=discord.File(image_bytes, filename="profile.png"))
+    else:
+        return discord.File(image_bytes, filename="profile.png")
 
 @bot.command(aliases=["incog"])
 @commands.check(general)
@@ -747,32 +820,110 @@ async def incognito(ctx):
 async def cbg(ctx):
     if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
         return
-    embed = discord.Embed(title="⚙️ VNTA Profile Background",
-                          description="Upload the image from your PC to set as background.\n"
-                                      "**Dont send a link to the image! Attach the file**",
-                          color=embedcolor)
-    embed.set_footer(text="Recommended Image size: 1280x720n\nType 'cancel' to cancel updating")
-    await ctx.send(embed=embed)
+    if "vntasam123" in bot.already:
+        return await ctx.reply("Someone is already editing this background. Please wait")
+    bot.already.append("vntasam123")
+    bot.unsaved["vntasam123"] = bot.bgdata["vntasam123"]
+    await sendnew(ctx, bot.unsaved["vntasam123"])
     def check(msg):
         return msg.author == ctx.author and msg.channel == ctx.channel
     try:
-        msg = await bot.wait_for("message", check=check, timeout=180)
-        try:
-            if msg.content.lower() == "cancel": return
-            image = msg.attachments[0]
-            r = requests.get(image, stream=True)
-            if r.status_code == 200:
-                r.raw.decode_content = True
-                with open("bgs/vnta.png", 'wb') as f:
-                    shutil.copyfileobj(r.raw, f)
-                await ctx.send(f"{economysuccess} Image updated successfully!")
-            else:
-                await ctx.send(f"Error fetching image, Please contact {bot.dev} for help.")
-        except:
-            return await ctx.send("Bot didnt detect any attachments. Make sure you upload the image from your device!\n"
-                                  "Do `v.cbg` to start over")
+        while True:
+            print(bot.bgdata, bot.unsaved)
+            mainmsg = await bot.wait_for("message", check=check, timeout=180)
+            msgc = mainmsg.content.lower()
+            if msgc == "cancel":
+                bot.already.remove("vntasam123")
+                break
+            elif msgc == "save":
+                bot.bgdata["vntasam123"] = bot.unsaved["vntasam123"]
+                await savebgdata()
+                bot.already.remove("vntasam123")
+                await ctx.send(f"{economysuccess} Saved Successfully!")
+            elif msgc == "modify 1":
+                try:
+                    embed = discord.Embed(description="Upload the image from your PC to set as background.\n"
+                                                      "**Dont send a link to the image! Attach the file**",
+                                          color=embedcolor)
+                    embed.set_footer(text="Recommended Size: 1280x720")
+                    await ctx.send(embed=embed)
+
+                    msg = await bot.wait_for("message", check=check, timeout=180)
+                    try:
+                        image = msg.attachments[0]
+                        r = requests.get(image, stream=True)
+                        if r.status_code == 200:
+                            r.raw.decode_content = True
+                            with open("bgs/vnta.png", 'wb') as f:
+                                shutil.copyfileobj(r.raw, f)
+                            await ctx.send(f"{economysuccess} Image updated successfully!")
+                            await sendnew(ctx, bot.unsaved["vntasam123"])
+                        else:
+                            await ctx.send(f"Error fetching image, Please contact {bot.dev} for help.")
+                    except:
+                        await ctx.send("Bot didnt detect any attachments. Make sure you upload the image from your device!")
+                except asyncio.TimeoutError:
+                    pass
+            elif msgc in ["modify 2", "modify 3", "modify 5"]:
+                try:
+                    embed = discord.Embed(description="Enter the `R, G, B` code for the color.\n"
+                                                      "Trouble choosing? [Click Here](https://htmlcolorcodes.com/)\n"
+                                                      "Hex to RGB? [Click Here](https://www.rapidtables.com/convert/color/hex-to-rgb.html)",
+                                          color=embedcolor)
+                    await ctx.send(embed=embed)
+                    try:
+                        msg = await bot.wait_for("message", check=check, timeout=180)
+                        r, g, b = msg.content.replace(" ", "").split(",")
+                        r = int(r)
+                        g = int(g)
+                        b = int(b)
+                        if (r>255 or r<0) or (g>255 or g<0) or (b>255 or b<0): raise ValueError
+
+                        types = {2: "hd", 3: "st", 5: "us"}
+                        print(bot.bgdata)
+                        print(bot.unsaved)
+                        bot.unsaved["vntasam123"][types[int(msgc[-1])]] = [r, g, b]
+                        await ctx.send("Done!")
+                        print()
+                        print(bot.bgdata)
+                        print(bot.unsaved)
+                        await sendnew(ctx, bot.unsaved["vntasam123"])
+                    except:
+                        await ctx.send("Incorrect `R, G, B` codes. Please retry")
+                except asyncio.TimeoutError:
+                    pass
+            elif msgc == "modify 4":
+                try:
+                    embed = discord.Embed(description="Enter the motto for your background. Make sure it is not NSFW type",
+                                          color=embedcolor)
+                    await ctx.send(embed=embed)
+                    try:
+                        msg = await bot.wait_for("message", check=check, timeout=180)
+                        bot.unsaved["vntasam123"]["mt"] = msg.content
+                        await ctx.send("Done!")
+                        await sendnew(ctx, bot.unsaved["vntasam123"])
+                    except:
+                        await ctx.send(f"Unknown error occured. Pleasr contact {bot.dev}")
+                except asyncio.TimeoutError:
+                    pass
     except asyncio.TimeoutError:
         pass
+
+@bot.command()
+@commands.is_owner()
+async def ov(ctx, *, bgname):
+    bgname = bgname.lower()
+    bgdat = bot.bgdata.get(bgname)
+    if bgdat is None:
+        return await ctx.reply(f"Background `{bgname}` not found!")
+    if bgdat["ov"]:
+        bgdat["ov"] = False
+    else:
+        bgdat["ov"] = True
+
+    bot.bgdata[bgname] = bgdat
+    await savebgdata()
+    await ctx.message.add_reaction(economysuccess)
 
 @bot.command()
 @commands.check(general)
@@ -843,10 +994,8 @@ async def ping(ctx):
     ping = "{:.2f}".format(bot.latency*1000)
     await msg.edit(content=f'Pong! `{ping} ms`')
 
-@bot.event
-async def on_connect():
-    print("Connected")
-    await bot.wait_until_ready()
+@bot.command(aliases=["refresh"])
+async def load_data(ctx=None):
     chl = bot.get_channel(854692793276170280)
     msgs = await chl.history(limit=1).flatten()
     bot.refr = json.loads(msgs[0].content)
@@ -859,6 +1008,16 @@ async def on_connect():
     chl = bot.get_channel(856070919033978932)
     msgs = await chl.history(limit=1).flatten()
     bot.userdata = json.loads(requests.get(msgs[0].attachments[0]).text)
+
+    chl = bot.get_channel(854698116255318057)
+    msgs = await chl.history(limit=1).flatten()
+    bot.bgdata = json.loads(requests.get(msgs[0].attachments[0]).text)
+
+@bot.event
+async def on_connect():
+    print("Connected")
+    await bot.wait_until_ready()
+    await load_data()
     print("Ready")
     if not bot.pause:
         asyncio.create_task(auto_update())
