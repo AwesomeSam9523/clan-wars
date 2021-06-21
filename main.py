@@ -252,7 +252,7 @@ async def update_embeds(clan):
             i.timestamp = datetime.datetime.utcnow()
             await actlist[count].edit(embed=i)
     else:
-        return await view(channel, "sam123", clan)
+        return await view(channel, via="sam123", clan=clan)
 
     if len(data["expired"]) == len(actlist):
         for i in data["expired"]:
@@ -261,7 +261,7 @@ async def update_embeds(clan):
             i.timestamp = datetime.datetime.utcnow()
             await explist[count].edit(embed=i)
     else:
-        return await view(channel, "sam123", clan)
+        return await view(channel, via="sam123", clan=clan)
 
 async def update_links():
     with open("links.json", "w") as f:
@@ -291,17 +291,31 @@ async def spam_protect(userid):
     else:
         return 'ok'
 
+staffchl = [813447381752348723, 854008993248051230]
 @bot.command()
 @commands.check(general)
-async def view(channel, via=None, clan=None):
-    if bot.pause: return
+async def view(channel, clan=None, via=None):
+    if bot.pause: return await channel.send("⚠ ️Maintainence Update. Please retry later")
     if via == "sam123" and clan is not None:
         pass
     else:
         if not any(allow in [role.id for role in channel.author.roles] for allow in accepted):
             return await channel.reply("Only VNTA members are given the exclusive rights to use the bot.")
+        if clan is not None:
+            if not any(allow in [role.id for role in channel.author.roles] for allow in staff):
+                print("not qual")
+                clan = "VNTA"
+            else:
+                if channel.channel.id not in staffchl:
+                    return await channel.reply(f"For security reasons, this command cannot be used in a public channel.\n"
+                                           f"Please go to {' or '.join([x.mention for x in [bot.get_channel(y) for y in staffchl]])}.")
+        else:
+            clan = "VNTA"
+        if channel.channel.id not in [813437673926557736, 813447381752348723, 854008993248051230]:
+            return await channel.reply(
+                "Please go to <#813437673926557736> or <#813447381752348723> to use `v.view` or `v.end`")
         channel = channel.channel
-    data = await embed_view("VNTA")
+    data = await embed_view(clan)
     maybeupdate = {}
     for i in data.keys():
         em = data[i]
@@ -321,24 +335,35 @@ async def view(channel, via=None, clan=None):
 @commands.check(general)
 @commands.has_permissions(manage_channels=True)
 async def refresh(ctx, what:str=None):
-    if bot.pause: return
+    if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
     clan = "VNTA"
     if what is None:
         await update_embeds(clan)
         await ctx.message.add_reaction("✅")
     elif what == "setup":
-        await view(ctx.channel, "sam123", clan)
+        await view(ctx.channel, via="sam123", clan=clan)
         chl = bot.get_channel(854692793276170280)
         await chl.send(str(json.dumps(bot.refr)))
 
+staff = [813441664617939004, 855793126958170122, 853997809212588073]
 @bot.command()
 @commands.check(general)
-async def end(ctx):
-    if bot.pause: return
+async def end(ctx, clan=None):
+    if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
     if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
         return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
-    clan = "VNTA"
-    data = await getdata("VNTA")
+    if clan is not None:
+        if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
+            clan = "VNTA"
+        else:
+            if ctx.channel.id not in staffchl:
+                return await ctx.reply(f"For security reasons, this command cannot be used in a public channel.\n"
+                                       f"Please go to {' or '.join([x.mention for x in [bot.get_channel(y) for y in staffchl]])}.")
+    else:
+        clan = "VNTA"
+    if ctx.channel.id not in [813437673926557736, 813447381752348723, 854008993248051230]:
+        return await ctx.reply("Please go to <#813437673926557736> or <#813447381752348723> to use `v.view` or `v.end`")
+    data = await getdata(clan)
     data = data["data"]["members"]
     active = PrettyTable()
     active.field_names = ["Player Name", "Kills", "Estd. Kills", "Time Played"]
@@ -430,8 +455,7 @@ async def test(ctx):
     guild = await bot.fetch_guild(719946380285837322)
     print(guild.roles)
     for role in guild.roles:
-        if "VNTA" in role.name:
-            print(role.id, role.name)
+        print(role.id, role.name)
 
 bot.pendings = {}
 @bot.command()
@@ -450,7 +474,7 @@ async def link(ctx, *, ign):
 @bot.command(aliases=["con"])
 @commands.check(general)
 async def contract(ctx, *, ign=None):
-    if bot.pause: return
+    if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
     if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
         return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
     if ign is None:
