@@ -30,6 +30,7 @@ bot.userdata = {}
 bot.bgdata = {}
 bot.unsaved = {}
 bot.already = []
+bot.vntapeeps = []
 bot.dev = ""
 economyerror = "❌"
 economysuccess = "✅"
@@ -635,9 +636,9 @@ async def profile(ctx, *, ign=None, via=False):
     if not found:
         bgdata = bot.bgdata["vntasam123"]
 
-    data = requests.get(f"https://kr.vercel.app/api/profile?username={ign}")
-    userdata = json.loads(data.text)
-    #userdata = {'success': True, 'data': {'username': 'AwesomeSam', 'id': 8570737, 'clan': 'VNTA', 'clanRank': 6, 'kills': 82112, 'deaths': 41107, 'wins': 2871, 'score': 9299165, 'level': 91, 'levelPercentage': {'percent': 48.22, 'current': 98053.89, 'max': 203333.33}, 'games': 5830, 'funds': 3533, 'hacker': False, 'verified': False, 'infected': True, 'partner': 1, 'premium': -17955973000, 'premiumName': 'AwesomeSam', 'timePlayed': 1243629476, 'createdAt': '2019-12-19T07:56:22.000Z', 'stats': {'c': 5, 's': 1348599, 'h': 311836, 'c0': 3845230, 'r2': 3815, 'c1': 1753660, 'c2': 1944840, 'mk': 957, 'c5': 563205, 'c4': 91655, 'c8': 145775, 'c7': 66375, 'r3': 20, 'c12': 107410, 'hs': 49704, 'wb': 586, 'flg': 94, 'c9': 75640, 'c11': 336455, 'c6': 37865, 'c3': 131965, 'abR': 1605354754870, 'n': 34, 'chgP': '19:0,0,30,1000', 'anp': 0, 'c13': 274540, 'r4': 18, 'tk': 71, 'fk': 105, 'tmk': 1081, 'r1': 8, 'ast': 1203, 'ls': 741, 'ad': 57, 'spry': 9, 'sad': 1, 'cad': 1}, 'challenge': 19, 'twitch': 'awesomesamaksh', 'elo': 49.58, 'elo2': 0, 'elo4': None, 'followers': 303, 'following': 70, 'region': 2, 'eventCount': None, 'mods': [], 'maps': [{'name': 'Hell_Parkour', 'id': 119179, 'info': {'t': 1}, 'votes': 30, 'verified': None, 'createdAt': '2021-02-03T07:18:50.000Z', 'creator': 'AwesomeSam'}], 'assets': [], 'skins': []}, 'time': 0.169}
+    #data = requests.get(f"https://kr.vercel.app/api/profile?username={ign}")
+    #userdata = json.loads(data.text)
+    userdata = {'success': True, 'data': {'username': 'AwesomeSam', 'id': 8570737, 'clan': 'VNTA', 'clanRank': 6, 'kills': 82112, 'deaths': 41107, 'wins': 2871, 'score': 9299165, 'level': 91, 'levelPercentage': {'percent': 48.22, 'current': 98053.89, 'max': 203333.33}, 'games': 5830, 'funds': 3533, 'hacker': False, 'verified': False, 'infected': True, 'partner': 1, 'premium': -17955973000, 'premiumName': 'AwesomeSam', 'timePlayed': 1243629476, 'createdAt': '2019-12-19T07:56:22.000Z', 'stats': {'c': 5, 's': 1348599, 'h': 311836, 'c0': 3845230, 'r2': 3815, 'c1': 1753660, 'c2': 1944840, 'mk': 957, 'c5': 563205, 'c4': 91655, 'c8': 145775, 'c7': 66375, 'r3': 20, 'c12': 107410, 'hs': 49704, 'wb': 586, 'flg': 94, 'c9': 75640, 'c11': 336455, 'c6': 37865, 'c3': 131965, 'abR': 1605354754870, 'n': 34, 'chgP': '19:0,0,30,1000', 'anp': 0, 'c13': 274540, 'r4': 18, 'tk': 71, 'fk': 105, 'tmk': 1081, 'r1': 8, 'ast': 1203, 'ls': 741, 'ad': 57, 'spry': 9, 'sad': 1, 'cad': 1}, 'challenge': 19, 'twitch': 'awesomesamaksh', 'elo': 49.58, 'elo2': 0, 'elo4': None, 'followers': 303, 'following': 70, 'region': 2, 'eventCount': None, 'mods': [], 'maps': [{'name': 'Hell_Parkour', 'id': 119179, 'info': {'t': 1}, 'votes': 30, 'verified': None, 'createdAt': '2021-02-03T07:18:50.000Z', 'creator': 'AwesomeSam'}], 'assets': [], 'skins': []}, 'time': 0.169}
     if not userdata["success"]:
         return await ctx.reply(userdata["error"])
     userdata = userdata["data"]
@@ -896,12 +897,118 @@ async def cbg(ctx):
                 try:
                     embed = discord.Embed(description="Enter the motto for your background. Make sure it is not NSFW type",
                                           color=embedcolor)
+                    embed.set_footer(text="Type 'default' to remove")
                     await ctx.send(embed=embed)
                     try:
                         msg = await bot.wait_for("message", check=check, timeout=180)
-                        bot.unsaved["vntasam123"]["mt"] = msg.content
+                        if msg.content.lower() != "default":
+                            bot.unsaved["vntasam123"]["mt"] = msg.content
+                        else:
+                            bot.unsaved["vntasam123"]["mt"] = ""
                         await ctx.send("Done!")
                         await sendnew(ctx, bot.unsaved["vntasam123"])
+                    except:
+                        await ctx.send(f"Unknown error occured. Pleasr contact {bot.dev}")
+                except asyncio.TimeoutError:
+                    pass
+    except asyncio.TimeoutError:
+        pass
+
+@bot.command()
+@commands.check(general)
+async def pbg(ctx):
+    return
+    if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
+        return
+    ign = bot.links.get(str(ctx.author.id))
+    if ign is None:
+        return await ctx.reply("You need to be linked to get a custom background")
+
+    if ign not in bot.vntapeeps:
+        return await ctx.send("Only VNTA members can use this command")
+
+    if ign in bot.already:
+        return await ctx.reply("Someone is already editing this background. Please wait")
+    bot.already.append(ign)
+    defign = {}
+    bot.unsaved[ign] = bot.bgdata.setdefault(ign, defign)
+    await sendnew(ctx, bot.unsaved[ign])
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
+    try:
+        while True:
+            mainmsg = await bot.wait_for("message", check=check, timeout=180)
+            msgc = mainmsg.content.lower()
+            if msgc == "cancel":
+                bot.already.remove(ign)
+                break
+            elif msgc == "save":
+                bot.bgdata[ign] = bot.unsaved[ign]
+                await savebgdata()
+                bot.already.remove(ign)
+                await ctx.send(f"{economysuccess} Saved Successfully!")
+            elif msgc == "modify 1":
+                try:
+                    embed = discord.Embed(description="Upload the image from your PC to set as background.\n"
+                                                      "**Dont send a link to the image! Attach the file**",
+                                          color=embedcolor)
+                    embed.set_footer(text="Recommended Size: 1280x720")
+                    await ctx.send(embed=embed)
+
+                    msg = await bot.wait_for("message", check=check, timeout=180)
+                    try:
+                        image = msg.attachments[0]
+                        r = requests.get(image, stream=True)
+                        if r.status_code == 200:
+                            r.raw.decode_content = True
+                            count = len(os.listdir("bgs/p/"))
+                            with open(f"bgs/p/{bot.bgdata[ign]['file']}", 'wb') as f:
+                                shutil.copyfileobj(r.raw, f)
+                            await ctx.send(f"{economysuccess} Image updated successfully!")
+                            await sendnew(ctx, bot.unsaved[ign])
+                        else:
+                            await ctx.send(f"Error fetching image, Please contact {bot.dev} for help.")
+                    except:
+                        await ctx.send("Bot didnt detect any attachments. Make sure you upload the image from your device!")
+                except asyncio.TimeoutError:
+                    pass
+            elif msgc in ["modify 2", "modify 3", "modify 5"]:
+                try:
+                    embed = discord.Embed(description="Enter the `R, G, B` code for the color.\n"
+                                                      "Trouble choosing? [Click Here](https://htmlcolorcodes.com/)\n"
+                                                      "Hex to RGB? [Click Here](https://www.rapidtables.com/convert/color/hex-to-rgb.html)",
+                                          color=embedcolor)
+                    await ctx.send(embed=embed)
+                    try:
+                        msg = await bot.wait_for("message", check=check, timeout=180)
+                        r, g, b = msg.content.replace(" ", "").split(",")
+                        r = int(r)
+                        g = int(g)
+                        b = int(b)
+                        if (r>255 or r<0) or (g>255 or g<0) or (b>255 or b<0): raise ValueError
+
+                        types = {2: "hd", 3: "st", 5: "us"}
+                        bot.unsaved[ign][types[int(msgc[-1])]] = [r, g, b]
+                        await ctx.send("Done!")
+                        await sendnew(ctx, bot.unsaved[ign])
+                    except:
+                        await ctx.send("Incorrect `R, G, B` codes. Please retry")
+                except asyncio.TimeoutError:
+                    pass
+            elif msgc == "modify 4":
+                try:
+                    embed = discord.Embed(description="Enter the motto for your background. Make sure it is not NSFW type",
+                                          color=embedcolor)
+                    embed.set_footer(text="Type 'default' to remove")
+                    await ctx.send(embed=embed)
+                    try:
+                        msg = await bot.wait_for("message", check=check, timeout=180)
+                        if msg.content.lower() != "default":
+                            bot.unsaved[ign]["mt"] = msg.content
+                        else:
+                            bot.unsaved[ign]["mt"] = ""
+                        await ctx.send("Done!")
+                        await sendnew(ctx, bot.unsaved[ign])
                     except:
                         await ctx.send(f"Unknown error occured. Pleasr contact {bot.dev}")
                 except asyncio.TimeoutError:
@@ -994,6 +1101,15 @@ async def ping(ctx):
     ping = "{:.2f}".format(bot.latency*1000)
     await msg.edit(content=f'Pong! `{ping} ms`')
 
+@bot.command()
+@commands.is_owner()
+async def load_peeps(ctx=None):
+    a = requests.get("https://kr.vercel.app/api/clan?clan=vnta")
+    data = json.loads(a.text)
+    bot.vntapeeps.clear()
+    for i in data["data"]["members"]:
+        bot.vntapeeps.append(i["username"].lower())
+
 @bot.command(aliases=["ref"])
 async def load_data(ctx=None):
     chl = bot.get_channel(854692793276170280)
@@ -1018,13 +1134,14 @@ async def on_connect():
     print("Connected")
     await bot.wait_until_ready()
     await load_data()
+    await load_peeps()
     print("Ready")
     if not bot.pause:
         asyncio.create_task(auto_update())
 
 @bot.event
 async def on_message(message):
-    #if message.channel.id != 854008993248051230: return
+    if message.channel.id != 854008993248051230: return
     await bot.process_commands(message)
 
 @bot.event
