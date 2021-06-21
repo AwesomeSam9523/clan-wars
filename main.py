@@ -926,6 +926,11 @@ async def main(ctx, *, ign):
         return await ctx.send("You have no accounts linked. Use `v.link <ign>` to link an account first")
     if ign.lower() not in [x.lower() for x in d["all"]]:
         return await ctx.send("This account isnt linked to you")
+    d["main"] = ign.lower()
+    bot.links[str(ctx.author.id)] = d
+    await update_links()
+    embed=discord.Embed(description=f"{economysuccess} Done! `{ign}` is now your main account", color=success_embed)
+    await ctx.reply(embed=embed)
 
 @bot.command()
 @commands.check(general)
