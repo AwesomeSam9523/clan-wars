@@ -461,8 +461,6 @@ bot.pendings = {}
 @bot.command()
 @commands.check(general)
 async def link(ctx, *, ign):
-    if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
-        return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
     staff = bot.get_channel(855450311808122951)
     a = await staff.send(f"{ctx.author.mention} wants to link with {ign}")
     await a.add_reaction("✅")
