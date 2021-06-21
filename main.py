@@ -994,7 +994,7 @@ async def ping(ctx):
     ping = "{:.2f}".format(bot.latency*1000)
     await msg.edit(content=f'Pong! `{ping} ms`')
 
-@bot.command(aliases=["refresh"])
+@bot.command(aliases=["ref"])
 async def load_data(ctx=None):
     chl = bot.get_channel(854692793276170280)
     msgs = await chl.history(limit=1).flatten()
