@@ -405,6 +405,7 @@ async def end(ctx, clan=None):
         for j in active._rows:
             if j[2] == finallist[i - 1]:
                 mylist = j
+                active._rows.remove(j)
                 mylist.insert(0, f"{i}.")
                 activefinal.add_row(mylist)
     del active
@@ -831,7 +832,7 @@ async def on_connect():
 
 @bot.event
 async def on_message(message):
-    #if message.channel.id != 854008993248051230: return
+    if message.channel.id != 854008993248051230: return
     await bot.process_commands(message)
 
 @bot.event
