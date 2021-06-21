@@ -633,6 +633,8 @@ async def profile(ctx, *, ign=None, via=False):
                 embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
                 return await ctx.reply(embed=embed)
             ign = ign["main"]
+    if type(ign) == dict:
+        ign = ign["main"]
     bgdata = {}
     found = False
     for i in bot.bgdata.keys():
@@ -640,9 +642,17 @@ async def profile(ctx, *, ign=None, via=False):
             bgdata = bot.bgdata[i]
             found = True
             break
+    if via:
+        for i in bot.unsaved.keys():
+            if i.lower() == ign.lower():
+                newbgdata = bot.unsaved[i]
+                if os.path.exists(f"bgs/{newbgdata['file']}"):
+                    bgdata = newbgdata
+                    found = True
+                    break
     if not found:
         bgdata = bot.bgdata["vntasam123"]
-
+    print(bgdata)
     data = requests.get(f"https://kr.vercel.app/api/profile?username={ign}")
     userdata = json.loads(data.text)
     #userdata = {'success': True, 'data': {'username': 'AwesomeSam', 'id': 8570737, 'clan': 'VNTA', 'clanRank': 6, 'kills': 82112, 'deaths': 41107, 'wins': 2871, 'score': 9299165, 'level': 91, 'levelPercentage': {'percent': 48.22, 'current': 98053.89, 'max': 203333.33}, 'games': 5830, 'funds': 3533, 'hacker': False, 'verified': False, 'infected': True, 'partner': 1, 'premium': -17955973000, 'premiumName': 'AwesomeSam', 'timePlayed': 1243629476, 'createdAt': '2019-12-19T07:56:22.000Z', 'stats': {'c': 5, 's': 1348599, 'h': 311836, 'c0': 3845230, 'r2': 3815, 'c1': 1753660, 'c2': 1944840, 'mk': 957, 'c5': 563205, 'c4': 91655, 'c8': 145775, 'c7': 66375, 'r3': 20, 'c12': 107410, 'hs': 49704, 'wb': 586, 'flg': 94, 'c9': 75640, 'c11': 336455, 'c6': 37865, 'c3': 131965, 'abR': 1605354754870, 'n': 34, 'chgP': '19:0,0,30,1000', 'anp': 0, 'c13': 274540, 'r4': 18, 'tk': 71, 'fk': 105, 'tmk': 1081, 'r1': 8, 'ast': 1203, 'ls': 741, 'ad': 57, 'spry': 9, 'sad': 1, 'cad': 1}, 'challenge': 19, 'twitch': 'awesomesamaksh', 'elo': 49.58, 'elo2': 0, 'elo4': None, 'followers': 303, 'following': 70, 'region': 2, 'eventCount': None, 'mods': [], 'maps': [{'name': 'Hell_Parkour', 'id': 119179, 'info': {'t': 1}, 'votes': 30, 'verified': None, 'createdAt': '2021-02-03T07:18:50.000Z', 'creator': 'AwesomeSam'}], 'assets': [], 'skins': []}, 'time': 0.169}
@@ -950,8 +960,14 @@ async def pbg(ctx):
     if ign in bot.already:
         return await ctx.reply("Someone is already editing this background. Please wait")
     bot.already.append(ign)
-    defign = {}
-    bot.unsaved[ign] = copy.copy(bot.bgdata.setdefault(ign, defign))
+    count = len(os.listdir("bgs/p"))+1
+    defign = {"file":f"p/bg_{count}.png",
+              "hd":[0,0,0],
+              "st":[222, 222, 222],
+              "mt":"",
+              "us":[30, 30, 36],
+              "ov":True}
+    bot.unsaved[ign] = copy.copy(bot.bgdata.get(ign, defign))
     await sendnew(ctx, bot.unsaved[ign])
     def check(msg):
         return msg.author == ctx.author and msg.channel == ctx.channel
@@ -981,14 +997,14 @@ async def pbg(ctx):
                         r = requests.get(image, stream=True)
                         if r.status_code == 200:
                             r.raw.decode_content = True
-                            count = len(os.listdir("bgs/p/"))
-                            with open(f"bgs/p/{bot.bgdata[ign]['file']}", 'wb') as f:
+                            with open(f"bgs/{bot.unsaved[ign]['file']}", 'wb') as f:
                                 shutil.copyfileobj(r.raw, f)
                             await ctx.send(f"{economysuccess} Image updated successfully!")
                             await sendnew(ctx, bot.unsaved[ign])
                         else:
                             await ctx.send(f"Error fetching image, Please contact {bot.dev} for help.")
-                    except:
+                    except Exception as e:
+                        print(e)
                         await ctx.send("Bot didnt detect any attachments. Make sure you upload the image from your device!")
                 except asyncio.TimeoutError:
                     pass
