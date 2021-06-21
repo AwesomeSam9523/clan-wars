@@ -516,6 +516,7 @@ async def contract(ctx, *, ign=None):
                                   color=16730441)
             embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
             return await ctx.reply(embed=embed)
+        ign = ign["main"]
     else:
         newign = str(ign).replace('<@!', '').replace('>', '')
         if len(newign) == len("537623052775718912"):
@@ -527,7 +528,8 @@ async def contract(ctx, *, ign=None):
                                       color=error_embed)
                 embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
                 return await ctx.reply(embed=embed)
-    ign = ign["main"]
+            ign = ign["main"]
+
     data = await getdata("VNTA")
     data = data["data"]["members"]
     found = False
@@ -618,6 +620,7 @@ async def profile(ctx, *, ign=None, via=False):
                                   color=16730441)
             embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
             return await ctx.reply(embed=embed)
+        ign = ign["main"]
     else:
         newign = str(ign).replace('<@!', '').replace('>', '')
         if len(newign) == len("537623052775718912"):
@@ -629,7 +632,7 @@ async def profile(ctx, *, ign=None, via=False):
                                       color=error_embed)
                 embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
                 return await ctx.reply(embed=embed)
-    ign = ign["main"]
+            ign = ign["main"]
     bgdata = {}
     found = False
     for i in bot.bgdata.keys():
