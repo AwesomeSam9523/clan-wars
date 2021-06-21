@@ -660,7 +660,7 @@ async def profile(ctx, *, ign=None, via=False):
     challenge = userdata["challenge"]
     if challenge is None: challenge = 0
     else: challenge = int(challenge) + 1
-    nukes = userdata["stats"]["n"]
+    nukes = userdata["stats"].get("n", 0)
     headshots = userdata["stats"].get("hs", 0)
     shots = userdata["stats"].get("s", 0)
     hits = userdata["stats"].get("h", 0)
