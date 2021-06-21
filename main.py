@@ -1037,6 +1037,17 @@ async def pbg(ctx):
         pass
 
 @bot.command()
+@commands.check(general)
+async def alts(ctx):
+    d = bot.links.get(str(ctx.author.id))
+    if d is None:
+        return await ctx.send("You have no accounts linked. Use `v.link <ign>` to link an account first")
+    altslist = "\n".join(d["all"])
+    s = f"```css\n{altslist}```"
+    embed= discord.Embed(title="Linked Accounts", description=s, color=embedcolor)
+    await ctx.send(embed=embed)
+
+@bot.command()
 @commands.is_owner()
 async def ov(ctx, *, bgname):
     bgname = bgname.lower()
@@ -1062,6 +1073,7 @@ async def help(ctx):
     embed.add_field(name="`contract`", value="Syntax: `v.contract [ign]`\nShows clan war contract", inline=False)
     embed.add_field(name="`contract`", value="Syntax: `v.pf [ign]`\nShows user profile with gamer stats", inline=False)
     embed.add_field(name="`incognito`", value="Syntax: `v.incognito`\nToggle incognito mode", inline=False)
+    embed.add_field(name="`alts`", value="Syntax: `v.alts`\nShows all linked accounts", inline=False)
     embed.add_field(name="`main`", value="Syntax: `v.main <ign>`\nMake an account your main account", inline=False)
     embed.add_field(name="`pbg`", value="Syntax: `v.pbg`\nCustomize your background", inline=False)
     embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
