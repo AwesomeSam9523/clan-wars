@@ -1,3 +1,4 @@
+import copy
 import ssl, msgpack, asyncio, discord, json
 import time, datetime, os, threading, requests, shutil
 from prettytable import PrettyTable
@@ -45,8 +46,9 @@ success_embed = 5963593
 bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
+bot.beta = False
 
-#@bot.check
+@bot.check
 async def if_allowed(ctx):
     return await check_channel(ctx.channel.id)
 
@@ -481,12 +483,12 @@ accepted = [813786315530305536, 813527378088951809, 813527377736761384, 81345241
 @bot.command()
 @commands.is_owner()
 async def test(ctx):
-    if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
-        return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
-    guild = await bot.fetch_guild(719946380285837322)
-    print(guild.roles)
-    for role in guild.roles:
-        print(role.id, role.name)
+    copy_d = copy.copy(bot.links)
+    for i in copy_d.keys():
+        user = copy_d[i]
+        newd = {"main":user, "all":[user]}
+        bot.links[i] = newd
+    await update_links()
 
 bot.pendings = {}
 @bot.command()
@@ -525,6 +527,7 @@ async def contract(ctx, *, ign=None):
                                       color=error_embed)
                 embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
                 return await ctx.reply(embed=embed)
+    ign = ign["main"]
     data = await getdata("VNTA")
     data = data["data"]["members"]
     found = False
@@ -626,6 +629,7 @@ async def profile(ctx, *, ign=None, via=False):
                                       color=error_embed)
                 embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
                 return await ctx.reply(embed=embed)
+    ign = ign["main"]
     bgdata = {}
     found = False
     for i in bot.bgdata.keys():
@@ -733,7 +737,7 @@ async def profile(ctx, *, ign=None, via=False):
         fill = (36, 36, 36)
     user = "???"
     for key, value in bot.links.items():
-        if value.lower() == username.lower():
+        if value["main"].lower() == username.lower():
             work = bot.userdata.get(str(key), {"incognito": False})["incognito"]
             if not work:
                 user = await bot.fetch_user(int(key))
@@ -824,7 +828,7 @@ async def cbg(ctx):
     if "vntasam123" in bot.already:
         return await ctx.reply("Someone is already editing this background. Please wait")
     bot.already.append("vntasam123")
-    bot.unsaved["vntasam123"] = bot.bgdata["vntasam123"]
+    bot.unsaved["vntasam123"] = copy.copy(bot.bgdata["vntasam123"])
     await sendnew(ctx, bot.unsaved["vntasam123"])
     def check(msg):
         return msg.author == ctx.author and msg.channel == ctx.channel
@@ -917,13 +921,12 @@ async def cbg(ctx):
 @bot.command()
 @commands.check(general)
 async def pbg(ctx):
-    return
     if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
         return
     ign = bot.links.get(str(ctx.author.id))
     if ign is None:
         return await ctx.reply("You need to be linked to get a custom background")
-
+    ign = ign["main"]
     if ign not in bot.vntapeeps:
         return await ctx.send("Only VNTA members can use this command")
 
@@ -931,7 +934,7 @@ async def pbg(ctx):
         return await ctx.reply("Someone is already editing this background. Please wait")
     bot.already.append(ign)
     defign = {}
-    bot.unsaved[ign] = bot.bgdata.setdefault(ign, defign)
+    bot.unsaved[ign] = copy.copy(bot.bgdata.setdefault(ign, defign))
     await sendnew(ctx, bot.unsaved[ign])
     def check(msg):
         return msg.author == ctx.author and msg.channel == ctx.channel
@@ -1041,7 +1044,9 @@ async def help(ctx):
     embed.add_field(name="`link`", value="Syntax: `v.link <ign>`\nLink account to bot", inline=False)
     embed.add_field(name="`contract`", value="Syntax: `v.contract [ign]`\nShows clan war contract", inline=False)
     embed.add_field(name="`contract`", value="Syntax: `v.pf [ign]`\nShows user profile with gamer stats", inline=False)
-    embed.add_field(name="`contract`", value="Syntax: `v.incognito`\nToggle incognito mode", inline=False)
+    embed.add_field(name="`incognito`", value="Syntax: `v.incognito`\nToggle incognito mode", inline=False)
+    embed.add_field(name="`main`", value="Syntax: `v.main <ign>`\nMake an account your main account", inline=False)
+    embed.add_field(name="`pbg`", value="Syntax: `v.pbg`\nCustomize your background", inline=False)
     embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
     await ctx.send(embed=embed)
 
@@ -1136,10 +1141,9 @@ async def on_connect():
     await load_data()
     await load_peeps()
     print("Ready")
-    if not bot.pause:
+    if not bot.pause or not bot.beta:
         asyncio.create_task(auto_update())
 
-bot.beta = False
 @bot.event
 async def on_message(message):
     if bot.beta:
