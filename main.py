@@ -313,7 +313,7 @@ async def sendnew(ctx, vntadat):
                                       "`modify 5` - Change username color",
                           color=embedcolor)
     embed.set_image(url="attachment://profile.png")
-    file = await profile(ctx, ign="AwesomeSam", via=True)
+    file = await profile(ctx, ign={"main":"AwesomeSam"}, via=True)
     embed.set_footer(text="Type 'save' to save background\nType 'cancel' to cancel all changes")
     await ctx.send(embed=embed, file=file)
 
@@ -1169,7 +1169,9 @@ async def on_raw_reaction_add(payload):
             userd = bot.pendings[payload.message_id]
             user = userd[0]
             user = await bot.fetch_user(user)
-            bot.links[str(user.id)] = userd[1]
+            t = bot.links.get(str(user.id), {"main":userd[1], "all":[]})
+            t["all"].append(userd[1])
+            bot.links[str(user.id)] = t
             state= "Accepted"
             await update_links()
             await user.send(f"✅ Your request to link with `{userd[1]}` is accepted!")
