@@ -832,7 +832,7 @@ async def on_connect():
 
 @bot.event
 async def on_message(message):
-    if message.channel.id != 854008993248051230: return
+    #if message.channel.id != 854008993248051230: return
     await bot.process_commands(message)
 
 @bot.event
@@ -858,7 +858,8 @@ async def on_raw_reaction_add(payload):
             state= "Accepted"
             await update_links()
             await user.send(f"✅ Your request to link with `{userd[1]}` is accepted!")
-        chl = await bot.fetch_channel(payload.channel_id)
+        bot.pendings.pop(payload.message_id)
+        chl = bot.get_channel(payload.channel_id)
         msg = await chl.fetch_message(payload.message_id)
         await msg.edit(content=f"{msg.content} (`{state}` by {await bot.fetch_user(payload.user_id)})")
         await msg.clear_reactions()
