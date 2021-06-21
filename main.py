@@ -512,7 +512,7 @@ async def contract(ctx, *, ign=None):
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
             embed = discord.Embed(description="You aren't linked yet. Use `v.link <ign>` to get linked.\n"
-                                              "Or use `v.contract <ign> to view",
+                                              "Or use `v.contract <ign>` to view",
                                   color=16730441)
             embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
             return await ctx.reply(embed=embed)
@@ -616,7 +616,7 @@ async def profile(ctx, *, ign=None, via=False):
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
             embed = discord.Embed(description="You aren't linked yet. Use `v.link <ign>` to get linked.\n"
-                                              "Or use `v.contract <ign> to view",
+                                              "Or use `v.pf <ign>` to view",
                                   color=16730441)
             embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
             return await ctx.reply(embed=embed)
