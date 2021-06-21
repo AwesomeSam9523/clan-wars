@@ -1,5 +1,5 @@
 import ssl, msgpack, asyncio, discord, json
-import time, datetime, os, threading, requests
+import time, datetime, os, threading, requests, shutil
 from prettytable import PrettyTable
 from discord.ext import commands
 from discord.ext.commands import *
@@ -637,7 +637,8 @@ async def profile(ctx, *, ign=None):
     avgscore = int(score/played)
     accuracy = "{:.2f}%".format((hits/shots)*100)
     statsoverlay = Image.open("bgs/stats.png")
-    bgimage = Image.open("bgs/vnta.png")
+    bgimage = Image.open("bgs/vnta.png").crop((0, 0, 1280, 720))
+    bgimage = bgimage.convert("RGBA")
     order = [[score, kills, deaths, kr, timeplayed, nukes],
               [played, wins, loses, wl, kdr, challenge],
               [mpk, spk, gpn, npd, kpm, kpg],
@@ -743,6 +744,38 @@ async def incognito(ctx):
 
 @bot.command()
 @commands.check(general)
+async def cbg(ctx):
+    if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
+        return
+    embed = discord.Embed(title="⚙️ VNTA Profile Background",
+                          description="Upload the image from your PC to set as background.\n"
+                                      "**Dont send a link to the image! Attach the file**",
+                          color=embedcolor)
+    embed.set_footer(text="Recommended Image size: 1280x720n\nType 'cancel' to cancel updating")
+    await ctx.send(embed=embed)
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=180)
+        try:
+            if msg.content.lower() == "cancel": return
+            image = msg.attachments[0]
+            r = requests.get(image, stream=True)
+            if r.status_code == 200:
+                r.raw.decode_content = True
+                with open("bgs/vnta.png", 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+                await ctx.send(f"{economysuccess} Image updated successfully!")
+            else:
+                await ctx.send(f"Error fetching image, Please contact {bot.dev} for help.")
+        except:
+            return await ctx.send("Bot didnt detect any attachments. Make sure you upload the image from your device!\n"
+                                  "Do `v.cbg` to start over")
+    except asyncio.TimeoutError:
+        pass
+
+@bot.command()
+@commands.check(general)
 async def help(ctx):
     embed=discord.Embed(title="VNTA Clan Wars Bot",
                         description="View below the commands available for use:",
@@ -832,7 +865,7 @@ async def on_connect():
 
 @bot.event
 async def on_message(message):
-    #if message.channel.id != 854008993248051230: return
+    if message.channel.id != 854008993248051230: return
     await bot.process_commands(message)
 
 @bot.event
