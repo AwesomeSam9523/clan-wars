@@ -361,7 +361,8 @@ async def sendnew(ctx, vntadat, ign):
     curset = f"1. Headings Color- {vntadat['hd']}\n" \
              f"2. Stats Color- {vntadat['st']}\n" \
              f"3. Motto Text- {vntadat['mt']}\n" \
-             f"4. Username Color- {vntadat['us']}"
+             f"4. Username Color- {vntadat['us']}\n" \
+             f"5. Bottom Text Color- {vntadat.get('bt', [0,0,0])}"
     embed = discord.Embed(title="⚙️ VNTA Profile Background",
                           description="Current Settings:\n" \
                                       f"```less\n{curset}```\n"
@@ -370,7 +371,8 @@ async def sendnew(ctx, vntadat, ign):
                                       "`modify 2` - Change headings color\n" \
                                       "`modify 3` - Change stats color\n" \
                                       "`modify 4` - Change background motto\n" \
-                                      "`modify 5` - Change username color",
+                                      "`modify 5` - Change username color\n"
+                                      "`modify 6` - Change bottom text color",
                           color=embedcolor)
     embed.set_image(url="attachment://profile.png")
     file = await profile(ctx, ign={"main":ign}, via=True)
@@ -873,11 +875,11 @@ async def profile(ctx, *, ign=None, via=False):
         clancolor = (68, 255, 25)
     elif clan == "DEV":
         clancolor = (25, 191, 255)
-    draw.text((1173-font3.getsize(bgdata['mt'])[0], 655), bgdata["mt"], fill=(36, 36, 36), font=font3)
+    draw.text((1173-font3.getsize(bgdata['mt'])[0], 655), bgdata["mt"], fill=tuple(bgdata.get("bt", [0,0,0])), font=font3)
     draw.text((35, 32), str(level), fill=fill, font=font2)
     draw.text((65+font2.getsize(str(level))[0], 32), str(username), fill=tuple(bgdata["us"]), font=font2)
     draw.text((85+font2.getsize(str(level))[0]+font2.getsize(str(username))[0], 32), f"[{clan}]", fill=clancolor, font=font2)
-    draw.text((120, 655), user, font=font3, fill=(36, 36, 36))
+    draw.text((120, 655), user, font=font3, fill=tuple(bgdata.get("bt", [0,0,0])))
     dis_logo = Image.open("bgs/discord.png").resize((69, 69))
     statsoverlay.paste(dis_logo, (30, 639))
 
@@ -957,14 +959,14 @@ async def cbg(ctx):
                                 file=discord.File(f"bgs/{ctx.author.id}.png", filename=f"{ctx.author.id}.png"))
                             bot.unsaved["vntasam123"]["file"] = bgfile.attachments[0].url
                             await ctx.send(f"Done!")
-                            await sendnew(ctx, bot.unsaved["vntasam123"])
+                            await sendnew(ctx, bot.unsaved["vntasam123"], "AwesomeSam")
                         else:
                             await ctx.send(f"Error fetching image, Please contact {bot.dev} for help.")
                     except:
                         await ctx.send("Bot didnt detect any attachments. Make sure you upload the image from your device!")
                 except asyncio.TimeoutError:
                     pass
-            elif msgc in ["modify 2", "modify 3", "modify 5"]:
+            elif msgc in ["modify 2", "modify 3", "modify 5", "modify 6"]:
                 try:
                     embed = discord.Embed(description="Enter the `R, G, B` code for the color.\n"
                                                       "Trouble choosing? [Click Here](https://htmlcolorcodes.com/)\n"
@@ -979,7 +981,7 @@ async def cbg(ctx):
                         b = int(b)
                         if (r>255 or r<0) or (g>255 or g<0) or (b>255 or b<0): raise ValueError
 
-                        types = {2: "hd", 3: "st", 5: "us"}
+                        types = {2: "hd", 3: "st", 5: "us", 6:"bt"}
                         print(bot.bgdata)
                         print(bot.unsaved)
                         bot.unsaved["vntasam123"][types[int(msgc[-1])]] = [r, g, b]
@@ -987,7 +989,7 @@ async def cbg(ctx):
                         print()
                         print(bot.bgdata)
                         print(bot.unsaved)
-                        await sendnew(ctx, bot.unsaved["vntasam123"])
+                        await sendnew(ctx, bot.unsaved["vntasam123"], "AwesomeSam")
                     except:
                         await ctx.send("Incorrect `R, G, B` codes. Please retry")
                 except asyncio.TimeoutError:
@@ -1005,7 +1007,7 @@ async def cbg(ctx):
                         else:
                             bot.unsaved["vntasam123"]["mt"] = ""
                         await ctx.send("Done!")
-                        await sendnew(ctx, bot.unsaved["vntasam123"])
+                        await sendnew(ctx, bot.unsaved["vntasam123"], "AwesomeSam")
                     except:
                         await ctx.send(f"Unknown error occured. Pleasr contact {bot.dev}")
                 except asyncio.TimeoutError:
@@ -1038,8 +1040,9 @@ async def pbg(ctx, *, ign=None):
     if ign is None:
         return await ctx.reply("You need to be linked to get a custom background")
     ign = ign["main"]
-    if (ign.lower() not in bot.vntapeeps) or (ign.lower() not in bot.excl):
-        return await ctx.send("Only VNTA clan members or people with exculsive permission from developer can use this command")
+    if (ign.lower() not in bot.vntapeeps):
+        if ign.lower() not in bot.excl:
+            return await ctx.send("Only VNTA clan members or people with exculsive permission from developer can use this command")
 
     if ign in bot.already:
         return await ctx.reply("Someone is already editing this background. Please wait")
@@ -1059,6 +1062,7 @@ async def pbg(ctx, *, ign=None):
             mainmsg = await bot.wait_for("message", check=check, timeout=180)
             msgc = mainmsg.content.lower()
             if msgc == "cancel":
+                await mainmsg.add_reaction(economysuccess)
                 bot.already.remove(ign)
                 break
             elif msgc == "save":
@@ -1096,7 +1100,7 @@ async def pbg(ctx, *, ign=None):
                         await ctx.send("Bot didnt detect any attachments. Make sure you upload the image from your device!")
                 except asyncio.TimeoutError:
                     pass
-            elif msgc in ["modify 2", "modify 3", "modify 5"]:
+            elif msgc in ["modify 2", "modify 3", "modify 5", "modify 6"]:
                 try:
                     embed = discord.Embed(description="Enter the `R, G, B` code for the color.\n"
                                                       "Trouble choosing? [Click Here](https://htmlcolorcodes.com/)\n"
@@ -1111,7 +1115,7 @@ async def pbg(ctx, *, ign=None):
                         b = int(b)
                         if (r>255 or r<0) or (g>255 or g<0) or (b>255 or b<0): raise ValueError
 
-                        types = {2: "hd", 3: "st", 5: "us"}
+                        types = {2: "hd", 3: "st", 5: "us", 6:"bt"}
                         bot.unsaved[ign][types[int(msgc[-1])]] = [r, g, b]
                         await ctx.send("Done!")
                         await sendnew(ctx, bot.unsaved[ign], ign)
