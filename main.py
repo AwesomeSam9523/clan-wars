@@ -677,6 +677,7 @@ async def contract(ctx, *, ign=None):
 @bot.command(aliases=["p", "pf"])
 @commands.check(general)
 async def profile(ctx, *, ign=None, via=False):
+    if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
@@ -914,6 +915,7 @@ async def incognito(ctx):
 @bot.command()
 @commands.check(general)
 async def cbg(ctx):
+    if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
     if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
         return
     if "vntasam123" in bot.already:
@@ -1032,6 +1034,7 @@ async def main(ctx, *, ign):
 @bot.command()
 @commands.check(general)
 async def pbg(ctx, *, ign=None):
+    if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
     if ign is not None and ctx.author.id in devs:
         print("Dev edit-", ign)
         ign = {"main":ign}
