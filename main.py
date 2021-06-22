@@ -59,9 +59,7 @@ bot.help_json = {
         "desc": "Shows wars in embed form"
       },
     "v.end": {
-"aliases": [
-          "None"
-        ],
+        "aliases": ["None"],
         "usage": "v.end",
         "desc": "Shows estimated war kills of everyone in embed form"
     },
@@ -1009,8 +1007,6 @@ async def main(ctx, *, ign):
 @bot.command()
 @commands.check(general)
 async def pbg(ctx):
-    if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
-        return
     ign = bot.links.get(str(ctx.author.id))
     if ign is None:
         return await ctx.reply("You need to be linked to get a custom background")
