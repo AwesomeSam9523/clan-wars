@@ -48,6 +48,58 @@ bot.reqs = 0
 bot.pause = False
 bot.beta = False
 
+bot.help_json = {
+    "Wars": {
+      "category": "Wars",
+      "v.view": {
+        "aliases": [
+          "None"
+        ],
+        "usage": "v.view",
+        "desc": "Shows wars in embed form"
+      },
+    "v.end": {
+"aliases": [
+          "None"
+        ],
+        "usage": "v.end",
+        "desc": "Shows estimated war kills of everyone in embed form"
+    },
+    "v.contract":{
+        "aliases":["con"],
+        "usage":"v.contract [ign]",
+        "desc":"Shows clan wars contract"
+    }
+    }, "Profile":{
+        "category":"Profile",
+        "v.profile":{
+            "aliases":["p", "pf"],
+            "usage":"v.profile [ign]",
+            "desc":"Shows profile"
+        },
+        "v.link":{
+            "aliases":["None"],
+            "usage":"v.link [ign]",
+            "desc":"Links your account to bot"
+        },
+        "v.pbg":{
+            "aliases":["None"],
+            "usage":"v.pbg",
+            "desc":"Customize your background"
+        },
+        "v.main":{
+            "aliases":["None"],
+            "usage":"v.main <ign>",
+            "desc":"Sets that account as your main account"
+        },
+        "v.alts":{
+            "aliases":["None"],
+            "usage":"v.alts",
+            "desc":"View all linked accounts"
+        }
+    }
+}
+
 #@bot.check
 async def if_allowed(ctx):
     return await check_channel(ctx.channel.id)
@@ -484,10 +536,11 @@ accepted = [813786315530305536, 813527378088951809, 813527377736761384, 81345241
 @commands.is_owner()
 async def test(ctx):
     copy_d = copy.copy(bot.links)
+    new = {}
     for i in copy_d.keys():
-        user = copy_d[i]
-        newd = {"main":user, "all":[user]}
-        bot.links[i] = newd
+        new[i] = copy_d[i]["main"]
+    bot.links.clear()
+    bot.links = new
     await update_links()
 
 bot.pendings = {}
@@ -646,7 +699,7 @@ async def profile(ctx, *, ign=None, via=False):
         for i in bot.unsaved.keys():
             if i.lower() == ign.lower():
                 newbgdata = bot.unsaved[i]
-                if os.path.exists(f"bgs/{newbgdata['file']}"):
+                if newbgdata["file"] != "":
                     bgdata = newbgdata
                     found = True
                     break
@@ -733,7 +786,12 @@ async def profile(ctx, *, ign=None, via=False):
             draw.text((xloc - (size / 2), yloc), str(stat), font=font4, fill=tuple(bgdata["hd"]))
             xloc += 214
         yloc += 119
-    bgimage = Image.open(f"bgs/{bgdata['file']}").resize((1280, 720))
+    r = requests.get(bgdata["file"], stream=True)
+    if r.status_code == 200:
+        r.raw.decode_content = True
+        with open(f"bgs/{ctx.author.id}.png", 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+    bgimage = Image.open(f"bgs/{ctx.author.id}.png").resize((1280, 720))
     bgimage = bgimage.convert("RGBA")
     order = [[score, kills, deaths, kr, timeplayed, nukes],
               [played, wins, loses, wl, kdr, challenge],
@@ -872,9 +930,12 @@ async def cbg(ctx):
                         r = requests.get(image, stream=True)
                         if r.status_code == 200:
                             r.raw.decode_content = True
-                            with open("bgs/vnta.png", 'wb') as f:
+                            with open(f"bgs/{ctx.author.id}.png", 'wb') as f:
                                 shutil.copyfileobj(r.raw, f)
-                            await ctx.send(f"{economysuccess} Image updated successfully!")
+                            bgfile = await bot.get_channel(856723935357173780).send(
+                                file=discord.File(f"bgs/{ctx.author.id}.png", filename=f"{ctx.author.id}.png"))
+                            bot.unsaved["vntasam123"]["file"] = bgfile.attachments[0].url
+                            await ctx.send(f"Done!")
                             await sendnew(ctx, bot.unsaved["vntasam123"])
                         else:
                             await ctx.send(f"Error fetching image, Please contact {bot.dev} for help.")
@@ -960,8 +1021,7 @@ async def pbg(ctx):
     if ign in bot.already:
         return await ctx.reply("Someone is already editing this background. Please wait")
     bot.already.append(ign)
-    count = len(os.listdir("bgs/p"))+1
-    defign = {"file":f"p/bg_{count}.png",
+    defign = {"file":"",
               "hd":[0,0,0],
               "st":[222, 222, 222],
               "mt":"",
@@ -997,9 +1057,11 @@ async def pbg(ctx):
                         r = requests.get(image, stream=True)
                         if r.status_code == 200:
                             r.raw.decode_content = True
-                            with open(f"bgs/{bot.unsaved[ign]['file']}", 'wb') as f:
+                            with open(f"bgs/{ctx.author.id}.png", 'wb') as f:
                                 shutil.copyfileobj(r.raw, f)
-                            await ctx.send(f"{economysuccess} Image updated successfully!")
+                            bgfile = await bot.get_channel(856723935357173780).send(file=discord.File(f"bgs/{ctx.author.id}.png", filename=f"{ctx.author.id}.png"))
+                            bot.unsaved[ign]["file"] = bgfile.attachments[0].url
+                            await ctx.send(f"Done!")
                             await sendnew(ctx, bot.unsaved[ign])
                         else:
                             await ctx.send(f"Error fetching image, Please contact {bot.dev} for help.")
@@ -1054,8 +1116,11 @@ async def pbg(ctx):
 
 @bot.command()
 @commands.check(general)
-async def alts(ctx):
-    d = bot.links.get(str(ctx.author.id))
+async def alts(ctx, mem:discord.Member=None):
+    if id is None:
+        d = bot.links.get(str(ctx.author.id))
+    else:
+        d = bot.links.get(str(mem.id))
     if d is None:
         return await ctx.send("You have no accounts linked. Use `v.link <ign>` to link an account first")
     altslist = "\n".join(d["all"])
@@ -1081,19 +1146,72 @@ async def ov(ctx, *, bgname):
 
 @bot.command()
 @commands.check(general)
-async def help(ctx):
-    embed=discord.Embed(title="VNTA Clan Wars Bot",
-                        description="View below the commands available for use:",
-                        color=4849598)
-    embed.add_field(name="`link`", value="Syntax: `v.link <ign>`\nLink account to bot", inline=False)
-    embed.add_field(name="`contract`", value="Syntax: `v.contract [ign]`\nShows clan war contract", inline=False)
-    embed.add_field(name="`contract`", value="Syntax: `v.pf [ign]`\nShows user profile with gamer stats", inline=False)
-    embed.add_field(name="`incognito`", value="Syntax: `v.incognito`\nToggle incognito mode", inline=False)
-    embed.add_field(name="`alts`", value="Syntax: `v.alts`\nShows all linked accounts", inline=False)
-    embed.add_field(name="`main`", value="Syntax: `v.main <ign>`\nMake an account your main account", inline=False)
-    embed.add_field(name="`pbg`", value="Syntax: `v.pbg`\nCustomize your background", inline=False)
-    embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
-    await ctx.send(embed=embed)
+async def help(ctx, specify=None):
+    embed = discord.Embed(color=embedcolor,
+                          description=f'To get help on a command, use `v.help <command name>`')
+    embed.set_author(name='Help')
+    embed.set_footer(text='Bot developed by AwesomeSam#7985', icon_url=sampfp)
+    if specify is None:
+        for j in bot.help_json:
+            mylist = []
+            max_l = 0
+            for i in bot.help_json[j].keys():
+                if i == "category": continue
+                info = bot.help_json[j][i]['usage']
+                print(info)
+                cmdl = len(info.split(' ')[0])
+                if cmdl > max_l:
+                    max_l = cmdl
+                mylist.append(info)
+            finallist = []
+            for cmds in mylist:
+                splitted = cmds.split(' ')
+                first = splitted[0]
+                first = first + ' '*(max_l-len(first))
+                splitted.pop(0)
+                splitted.insert(0, first)
+                finallist.append(' '.join(splitted))
+            content = '\n'.join(finallist)
+            embed.add_field(name=f'**● __{j}__**', value=f'```less\n{content}```', inline=False)
+        embed.add_field(name='\u200b', value=f'`<>` and `[]` are **not** required while using commands\n\n'
+                                             f'Syntax: `<>` = Required `[]` = Optional')
+        try:
+            await ctx.author.send(embed=embed)
+            embed = discord.Embed(title=f'{economysuccess} You received a mail!', color=success_embed)
+            await ctx.reply(embed=embed)
+        except:
+            await ctx.send(embed=embed)
+        return
+    x = bot.help_json.values()
+    notfound = True
+    for i in x:
+        for j in i.keys():
+            if j == 'category':
+                continue
+            available = []
+            available.append(j[2:])
+            info = i[j]
+
+            for k in info['aliases']:
+                available.append(k)
+            if specify.lower() in available:
+                alias_list = [f'{q}' for q in info['aliases']]
+
+                for aliases in alias_list:
+                    if aliases[0:2] != 'v.':
+                        if aliases == 'None': continue
+                        alias_list.remove(aliases)
+                        aliases = 'v.' + aliases
+                        alias_list.insert(0, aliases)
+                embed = discord.Embed(color=embedcolor, title=f'Command: {j[2:]}', description=info['desc']+f'\n\n**Category:** `{i["category"]}`\n**Usage:** `{info["usage"]}`')
+                embed.add_field(name='Aliases', value='```less\n'+'\n'.join(alias_list)+'```', inline=False)
+                embed.set_footer(text='Syntax: <> = required, [] = optional')
+                notfound = False
+                await ctx.send(embed=embed)
+                break
+    if notfound:
+        embed = discord.Embed(description=f'{economyerror} No help found or command doesn\'t exist!', color=error_embed)
+        await ctx.send(embed=embed)
 
 @bot.command(aliases=['add_chl'])
 @commands.check(general)
@@ -1215,6 +1333,9 @@ async def on_raw_reaction_add(payload):
             user = userd[0]
             user = await bot.fetch_user(user)
             t = bot.links.get(str(user.id), {"main":userd[1], "all":[]})
+            t["all"] = list(set(t["all"]))
+            if userd[1] in t["all"]:
+                return await user.send(f"You are already linked with `{userd[1]}`")
             t["all"].append(userd[1])
             bot.links[str(user.id)] = t
             state= "Accepted"
