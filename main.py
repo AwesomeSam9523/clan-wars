@@ -32,6 +32,8 @@ bot.bgdata = {}
 bot.unsaved = {}
 bot.already = []
 bot.vntapeeps = []
+bot.excl = []
+bot.dcmds = []
 bot.dev = ""
 economyerror = "❌"
 economysuccess = "✅"
@@ -101,6 +103,14 @@ bot.help_json = {
 #@bot.check
 async def if_allowed(ctx):
     return await check_channel(ctx.channel.id)
+
+@bot.check
+async def if_enabled(ctx):
+    if ctx.command.name in bot.dcmds:
+        await ctx.reply("Command disabled at the moment. Please retry later")
+        return False
+    else:
+        return True
 
 async def check_channel(chlid):
     server = await get_admin()
@@ -347,7 +357,7 @@ async def spam_protect(userid):
     else:
         return 'ok'
 
-async def sendnew(ctx, vntadat):
+async def sendnew(ctx, vntadat, ign):
     curset = f"1. Headings Color- {vntadat['hd']}\n" \
              f"2. Stats Color- {vntadat['st']}\n" \
              f"3. Motto Text- {vntadat['mt']}\n" \
@@ -363,7 +373,7 @@ async def sendnew(ctx, vntadat):
                                       "`modify 5` - Change username color",
                           color=embedcolor)
     embed.set_image(url="attachment://profile.png")
-    file = await profile(ctx, ign={"main":"AwesomeSam"}, via=True)
+    file = await profile(ctx, ign={"main":ign}, via=True)
     embed.set_footer(text="Type 'save' to save background\nType 'cancel' to cancel all changes")
     await ctx.send(embed=embed, file=file)
 
@@ -518,6 +528,7 @@ async def end(ctx, clan=None):
 async def evaluate(ctx, *, expression):
     try:
         await ctx.reply(eval(expression))
+        await ctx.message.add_reaction(economysuccess)
     except Exception as e:
         await ctx.reply(f'```\n{e}```')
 
@@ -525,7 +536,8 @@ async def evaluate(ctx, *, expression):
 @commands.is_owner()
 async def execute(ctx, *, expression):
     try:
-        exec(expression.replace('```', ''))
+        exec(expression)
+        await ctx.message.add_reaction(economysuccess)
     except Exception as e:
         await ctx.reply(f'Command:```py\n{expression}```\nOutput:```\n{e}```')
 
@@ -663,7 +675,6 @@ async def contract(ctx, *, ign=None):
 @bot.command(aliases=["p", "pf"])
 @commands.check(general)
 async def profile(ctx, *, ign=None, via=False):
-    return await ctx.reply("Disabled for the moment")
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
@@ -785,12 +796,20 @@ async def profile(ctx, *, ign=None, via=False):
             draw.text((xloc - (size / 2), yloc), str(stat), font=font4, fill=tuple(bgdata["hd"]))
             xloc += 214
         yloc += 119
-    r = requests.get(bgdata["file"], stream=True)
-    if r.status_code == 200:
-        r.raw.decode_content = True
-        with open(f"bgs/{ctx.author.id}.png", 'wb') as f:
-            shutil.copyfileobj(r.raw, f)
-    bgimage = Image.open(f"bgs/{ctx.author.id}.png").resize((1280, 720))
+    if bgdata["file"] == "":
+        bgdata["file"] = bot.bgdata["vntasam123"]["file"]
+    try:
+        r = requests.get(bgdata["file"], stream=True)
+        if r.status_code == 200:
+            r.raw.decode_content = True
+            with open(f"bgs/{ctx.author.id}.png", 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+        else: raise ValueError
+        bgimage = Image.open(f"bgs/{ctx.author.id}.png").resize((1280, 720))
+    except:
+        bot.bgdata[ign]["file"] = ""
+        await savebgdata()
+        return await ctx.send(f"Background Corrupted. It is auto-removed. Please set again using `v.pbg`")
     bgimage = bgimage.convert("RGBA")
     order = [[score, kills, deaths, kr, timeplayed, nukes],
               [played, wins, loses, wl, kdr, challenge],
@@ -895,12 +914,11 @@ async def incognito(ctx):
 async def cbg(ctx):
     if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
         return
-    return await ctx.reply("Disabled for the moment")
     if "vntasam123" in bot.already:
         return await ctx.reply("Someone is already editing this background. Please wait")
     bot.already.append("vntasam123")
     bot.unsaved["vntasam123"] = copy.copy(bot.bgdata["vntasam123"])
-    await sendnew(ctx, bot.unsaved["vntasam123"])
+    await sendnew(ctx, bot.unsaved["vntasam123"], "AwesomeSam")
     def check(msg):
         return msg.author == ctx.author and msg.channel == ctx.channel
     try:
@@ -926,7 +944,10 @@ async def cbg(ctx):
 
                     msg = await bot.wait_for("message", check=check, timeout=180)
                     try:
-                        image = msg.attachments[0]
+                        image = msg.attachments[0].url
+                        if image[-3:].lower() != "png":
+                            await ctx.send(f"{ctx.author.mention} The image should be `.PNG` file only!")
+                            continue
                         r = requests.get(image, stream=True)
                         if r.status_code == 200:
                             r.raw.decode_content = True
@@ -1008,14 +1029,17 @@ async def main(ctx, *, ign):
 
 @bot.command()
 @commands.check(general)
-async def pbg(ctx):
-    return await ctx.reply("Disabled for the moment")
-    ign = bot.links.get(str(ctx.author.id))
+async def pbg(ctx, *, ign=None):
+    if ign is not None and ctx.author.id in devs:
+        print("Dev edit-", ign)
+        ign = {"main":ign}
+    else:
+        ign = bot.links.get(str(ctx.author.id))
     if ign is None:
         return await ctx.reply("You need to be linked to get a custom background")
     ign = ign["main"]
-    if ign.lower() not in bot.vntapeeps:
-        return await ctx.send("Only VNTA members can use this command")
+    if (ign.lower() not in bot.vntapeeps) or (ign.lower() not in bot.excl):
+        return await ctx.send("Only VNTA clan members or people with exculsive permission from developer can use this command")
 
     if ign in bot.already:
         return await ctx.reply("Someone is already editing this background. Please wait")
@@ -1027,7 +1051,7 @@ async def pbg(ctx):
               "us":[30, 30, 36],
               "ov":True}
     bot.unsaved[ign] = copy.copy(bot.bgdata.get(ign, defign))
-    await sendnew(ctx, bot.unsaved[ign])
+    await sendnew(ctx, bot.unsaved[ign], ign)
     def check(msg):
         return msg.author == ctx.author and msg.channel == ctx.channel
     try:
@@ -1052,7 +1076,10 @@ async def pbg(ctx):
 
                     msg = await bot.wait_for("message", check=check, timeout=180)
                     try:
-                        image = msg.attachments[0]
+                        image = msg.attachments[0].url
+                        if image[-3:].lower() != "png":
+                            await ctx.send(f"{ctx.author.mention} The image should be `.PNG` file only!")
+                            continue
                         r = requests.get(image, stream=True)
                         if r.status_code == 200:
                             r.raw.decode_content = True
@@ -1061,7 +1088,7 @@ async def pbg(ctx):
                             bgfile = await bot.get_channel(856723935357173780).send(file=discord.File(f"bgs/{ctx.author.id}.png", filename=f"{ctx.author.id}.png"))
                             bot.unsaved[ign]["file"] = bgfile.attachments[0].url
                             await ctx.send(f"Done!")
-                            await sendnew(ctx, bot.unsaved[ign])
+                            await sendnew(ctx, bot.unsaved[ign], ign)
                         else:
                             await ctx.send(f"Error fetching image, Please contact {bot.dev} for help.")
                     except Exception as e:
@@ -1087,7 +1114,7 @@ async def pbg(ctx):
                         types = {2: "hd", 3: "st", 5: "us"}
                         bot.unsaved[ign][types[int(msgc[-1])]] = [r, g, b]
                         await ctx.send("Done!")
-                        await sendnew(ctx, bot.unsaved[ign])
+                        await sendnew(ctx, bot.unsaved[ign], ign)
                     except:
                         await ctx.send("Incorrect `R, G, B` codes. Please retry")
                 except asyncio.TimeoutError:
@@ -1105,13 +1132,13 @@ async def pbg(ctx):
                         else:
                             bot.unsaved[ign]["mt"] = ""
                         await ctx.send("Done!")
-                        await sendnew(ctx, bot.unsaved[ign])
+                        await sendnew(ctx, bot.unsaved[ign], ign)
                     except:
                         await ctx.send(f"Unknown error occured. Pleasr contact {bot.dev}")
                 except asyncio.TimeoutError:
                     pass
     except asyncio.TimeoutError:
-        pass
+        bot.already.remove(ign)
 
 @bot.command()
 @commands.check(general)
