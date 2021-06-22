@@ -663,6 +663,7 @@ async def contract(ctx, *, ign=None):
 @bot.command(aliases=["p", "pf"])
 @commands.check(general)
 async def profile(ctx, *, ign=None, via=False):
+    return await ctx.reply("Disabled for the moment")
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
@@ -894,6 +895,7 @@ async def incognito(ctx):
 async def cbg(ctx):
     if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
         return
+    return await ctx.reply("Disabled for the moment")
     if "vntasam123" in bot.already:
         return await ctx.reply("Someone is already editing this background. Please wait")
     bot.already.append("vntasam123")
@@ -1007,6 +1009,7 @@ async def main(ctx, *, ign):
 @bot.command()
 @commands.check(general)
 async def pbg(ctx):
+    return await ctx.reply("Disabled for the moment")
     ign = bot.links.get(str(ctx.author.id))
     if ign is None:
         return await ctx.reply("You need to be linked to get a custom background")
