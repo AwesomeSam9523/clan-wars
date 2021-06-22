@@ -1011,7 +1011,7 @@ async def pbg(ctx):
     if ign is None:
         return await ctx.reply("You need to be linked to get a custom background")
     ign = ign["main"]
-    if ign not in bot.vntapeeps:
+    if ign.lower() not in bot.vntapeeps:
         return await ctx.send("Only VNTA members can use this command")
 
     if ign in bot.already:
