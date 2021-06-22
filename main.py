@@ -100,7 +100,7 @@ bot.help_json = {
     }
 }
 
-#@bot.check
+@bot.check
 async def if_allowed(ctx):
     return await check_channel(ctx.channel.id)
 
