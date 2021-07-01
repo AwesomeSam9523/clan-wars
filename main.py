@@ -48,6 +48,7 @@ success_embed = 5963593
 bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
+bot.cwpause = True
 bot.beta = False
 
 bot.help_json = {
@@ -444,6 +445,11 @@ staff = [813441664617939004, 855793126958170122, 853997809212588073]
 @commands.check(general)
 async def end(ctx, clan=None):
     if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
+    if bot.cwpause:
+        embed = discord.Embed(title="Wars Break",
+                              description="Clan wars are not currently running. Please use this command after wars start!",
+                              colour=error_embed)
+        return await ctx.reply(embed=embed)
     if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
         return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
     if clan is not None:
@@ -571,6 +577,11 @@ async def link(ctx, *, ign):
 @commands.check(general)
 async def contract(ctx, *, ign=None):
     if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
+    if bot.cwpause:
+        embed = discord.Embed(title="Wars Break",
+                              description="Clan wars are not currently running. Please use this command after wars start!",
+                              colour=error_embed)
+        return await ctx.reply(embed=embed)
     if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
         return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
     if ign is None:
@@ -1338,7 +1349,7 @@ async def on_connect():
     await load_peeps()
     print("Ready")
     if not bot.pause or not bot.beta:
-        asyncio.create_task(auto_update())
+        if not bot.cwpause: asyncio.create_task(auto_update())
 
 @bot.event
 async def on_message(message):
