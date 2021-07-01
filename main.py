@@ -1005,14 +1005,17 @@ async def cbg(ctx):
                     pass
             elif msgc in ["modify 2", "modify 3", "modify 5", "modify 6"]:
                 try:
-                    embed = discord.Embed(description="Enter the `R, G, B` code for the color.\n"
-                                                      "Trouble choosing? [Click Here](https://htmlcolorcodes.com/)\n"
-                                                      "Hex to RGB? [Click Here](https://www.rapidtables.com/convert/color/hex-to-rgb.html)",
+                    embed = discord.Embed(description="Enter the `R, G, B` code or `#Hex` value of the color.\n"
+                                                      "Trouble choosing? [Click Here](https://htmlcolorcodes.com/)\n",
                                           color=embedcolor)
                     await ctx.send(embed=embed)
                     try:
                         msg = await bot.wait_for("message", check=check, timeout=180)
-                        r, g, b = msg.content.replace(" ", "").split(",")
+                        if msg.content[0] == "#":
+                            h = msg.content.lower().lstrip('#')
+                            r, g, b = tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+                        else:
+                            r, g, b = msg.content.replace(" ", "").split(",")
                         r = int(r)
                         g = int(g)
                         b = int(b)
@@ -1028,7 +1031,7 @@ async def cbg(ctx):
                         print(bot.unsaved)
                         await sendnew(ctx, bot.unsaved["vntasam123"], "AwesomeSam")
                     except:
-                        await ctx.send("Incorrect `R, G, B` codes. Please retry")
+                        await ctx.send("Incorrect `R, G, B` / `#Hex` code. Please retry")
                 except asyncio.TimeoutError:
                     pass
             elif msgc == "modify 4":
@@ -1140,14 +1143,17 @@ async def pbg(ctx, *, ign=None):
                     pass
             elif msgc in ["modify 2", "modify 3", "modify 5", "modify 6"]:
                 try:
-                    embed = discord.Embed(description="Enter the `R, G, B` code for the color.\n"
-                                                      "Trouble choosing? [Click Here](https://htmlcolorcodes.com/)\n"
-                                                      "Hex to RGB? [Click Here](https://www.rapidtables.com/convert/color/hex-to-rgb.html)",
+                    embed = discord.Embed(description="Enter the `R, G, B` code or `#Hex` value of the color.\n"
+                                                      "Trouble choosing? [Click Here](https://htmlcolorcodes.com/)\n",
                                           color=embedcolor)
                     await ctx.send(embed=embed)
                     try:
                         msg = await bot.wait_for("message", check=check, timeout=180)
-                        r, g, b = msg.content.replace(" ", "").split(",")
+                        if msg.content[0] == "#":
+                            h = msg.content.lower().lstrip('#')
+                            r, g, b = tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+                        else:
+                            r, g, b = msg.content.replace(" ", "").split(",")
                         r = int(r)
                         g = int(g)
                         b = int(b)
@@ -1158,7 +1164,7 @@ async def pbg(ctx, *, ign=None):
                         await ctx.send("Done!")
                         await sendnew(ctx, bot.unsaved[ign], ign)
                     except:
-                        await ctx.send("Incorrect `R, G, B` codes. Please retry")
+                        await ctx.send("Incorrect `R, G, B` / `#Hex` code. Please retry")
                 except asyncio.TimeoutError:
                     pass
             elif msgc == "modify 4":
