@@ -32,7 +32,7 @@ bot.bgdata = {}
 bot.unsaved = {}
 bot.already = []
 bot.vntapeeps = []
-bot.excl = []
+bot.excl = [671436261482823763]
 bot.dcmds = []
 bot.dev = ""
 economyerror = "❌"
@@ -1289,8 +1289,9 @@ async def help(ctx, specify=None):
 
 @bot.command(aliases=['add_chl'])
 @commands.check(general)
-@commands.has_permissions(manage_channels=True)
 async def set_chl(ctx, channel:discord.TextChannel):
+    if ctx.message.author.permissions_in(ctx.message.channel).manage_channels or ctx.author.id in devs: pass
+    else: return
     server = await get_admin()
     if channel.id in server:
         embed = discord.Embed(description=f'{economyerror} {channel.mention} is already in list of registered channels!', color=error_embed)
@@ -1304,8 +1305,9 @@ async def set_chl(ctx, channel:discord.TextChannel):
 
 @bot.command(aliases=['rem_chl', 'remove_chl', 'delete_chl'])
 @commands.check(general)
-@commands.has_permissions(manage_channels=True)
 async def del_chl(ctx, channel:discord.TextChannel):
+    if ctx.message.author.permissions_in(ctx.message.channel).manage_channels or ctx.author.id in devs: pass
+    else: return
     server = await get_admin()
     if channel.id not in server:
         embed = discord.Embed(description=f'{economyerror} {channel.mention} not in list of registered channels!', color=error_embed)
@@ -1317,8 +1319,9 @@ async def del_chl(ctx, channel:discord.TextChannel):
 
 @bot.command(aliases=['show_chl'])
 @commands.check(general)
-@commands.has_permissions(manage_channels=True)
 async def list_chl(ctx):
+    if ctx.message.author.permissions_in(ctx.message.channel).manage_channels or ctx.author.id in devs: pass
+    else: return
     server = await get_admin()
     if len(server) == 0: channels = ['> No channels set']
     else: channels = [f'> <#{x}>' for x in server]
@@ -1328,8 +1331,9 @@ async def list_chl(ctx):
 
 @bot.command()
 @commands.check(general)
-@commands.has_permissions(manage_channels=True)
 async def reset_chl(ctx):
+    if ctx.message.author.permissions_in(ctx.message.channel).manage_channels or ctx.author.id in devs: pass
+    else: return
     server = await get_admin()
     embed = discord.Embed(title=f'{economysuccess} Done', description='Cleared Successfully!', color=embedcolor)
     await close_admin(server)
