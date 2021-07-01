@@ -1,5 +1,5 @@
 import copy
-import ssl, msgpack, asyncio, discord, json
+import ssl, msgpack, asyncio, discord, json, sys
 import time, datetime, os, threading, requests, shutil, psutil
 from prettytable import PrettyTable
 from discord.ext import commands
@@ -430,6 +430,24 @@ async def view(channel, clan=None, via=None):
         maybeupdate["chl"] = channel.id
         bot.refr[clan] = maybeupdate
         await update_embeds(clan)
+
+@bot.command()
+@commands.is_owner()
+async def sizes(ctx):
+    def sizeof_fmt(num, suffix='B'):
+        for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
+            if abs(num) < 1024.0:
+                return "%3.1f %s%s" % (num, unit, suffix)
+            num /= 1024.0
+        return "%.1f %s%s" % (num, 'Yi', suffix)
+
+    allsizes = ""
+    for name, size in sorted(((name, sys.getsizeof(value)) for name, value in globals().items()),
+                             key=lambda x: -x[1])[:10]:
+        allsizes += "{:>30}: {:>8}".format(name, sizeof_fmt(size))
+    with open("sizes.txt", "w") as f:
+        f.write(allsizes)
+    await ctx.reply(file=discord.File("sizes.txt"))
 
 @bot.command()
 @commands.check(general)
