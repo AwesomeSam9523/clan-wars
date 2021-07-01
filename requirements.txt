@@ -3,3 +3,4 @@ discord~=1.0.1
 requests~=2.25.1
 prettytable~=2.1.0
 pillow
+psutil

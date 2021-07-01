@@ -1,6 +1,6 @@
 import copy
 import ssl, msgpack, asyncio, discord, json
-import time, datetime, os, threading, requests, shutil
+import time, datetime, os, threading, requests, shutil, psutil
 from prettytable import PrettyTable
 from discord.ext import commands
 from discord.ext.commands import *
@@ -975,7 +975,7 @@ async def cbg(ctx):
                 await ctx.send(f"{economysuccess} Saved Successfully!")
             elif msgc == "modify 1":
                 try:
-                    embed = discord.Embed(description="Upload the image from your PC to set as background.\n"
+                    embed = discord.Embed(description="Upload the `PNG/GIF` file from your PC to set as background.\n"
                                                       "**Dont send a link to the image! Attach the file**",
                                           color=embedcolor)
                     embed.set_footer(text="Recommended Size: 1280x720")
@@ -1113,7 +1113,7 @@ async def pbg(ctx, *, ign=None):
                 await ctx.send(f"{economysuccess} Saved Successfully!")
             elif msgc == "modify 1":
                 try:
-                    embed = discord.Embed(description="Upload the image from your PC to set as background.\n"
+                    embed = discord.Embed(description="Upload the `PNG/GIF` file from your PC to set as background.\n"
                                                       "**Dont send a link to the image! Attach the file**",
                                           color=embedcolor)
                     embed.set_footer(text="Recommended Size: 1280x720")
