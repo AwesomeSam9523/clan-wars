@@ -4,7 +4,7 @@ import time, datetime, os, threading, requests, shutil
 from prettytable import PrettyTable
 from discord.ext import commands
 from discord.ext.commands import *
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageSequence
 from io import BytesIO
 
 print("Starting")
@@ -375,7 +375,7 @@ async def sendnew(ctx, vntadat, ign):
                                       "`modify 5` - Change username color\n"
                                       "`modify 6` - Change bottom text color",
                           color=embedcolor)
-    embed.set_image(url="attachment://profile.png")
+    embed.set_image(url=f"attachment://profile.{vntadat['file'].lower()[-3:]}")
     file = await profile(ctx, ign={"main":ign}, via=True)
     embed.set_footer(text="Type 'save' to save background\nType 'cancel' to cancel all changes")
     await ctx.send(embed=embed, file=file)
@@ -819,17 +819,19 @@ async def profile(ctx, *, ign=None, via=False):
         bgdata["file"] = bot.bgdata["vntasam123"]["file"]
     try:
         r = requests.get(bgdata["file"], stream=True)
+        imgtype = bgdata['file'].lower()[-3:]
         if r.status_code == 200:
             r.raw.decode_content = True
-            with open(f"bgs/{ctx.author.id}.png", 'wb') as f:
+            with open(f"bgs/{ctx.author.id}.{imgtype}", 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
         else: raise ValueError
-        bgimage = Image.open(f"bgs/{ctx.author.id}.png").resize((1280, 720))
+        bgimage = Image.open(f"bgs/{ctx.author.id}.{imgtype}")
     except:
         bot.bgdata[ign]["file"] = ""
         await savebgdata()
         return await ctx.send(f"Background Corrupted. It is auto-removed. Please set again using `v.pbg`")
-    bgimage = bgimage.convert("RGBA")
+    if imgtype == "png":
+        bgimage = bgimage.convert("RGBA").resize((1280, 720))
     order = [[score, kills, deaths, kr, timeplayed, nukes],
               [played, wins, loses, wl, kdr, challenge],
               [mpk, spk, gpn, npd, kpm, kpg],
@@ -864,7 +866,15 @@ async def profile(ctx, *, ign=None, via=False):
 
     shadow = shadow.filter(ImageFilter.GaussianBlur(radius=2))
     shadow = shadow.filter(ImageFilter.GaussianBlur(radius=4))
-    bgimage = Image.alpha_composite(bgimage, shadow)
+    frm = []
+    if imgtype == "png":
+        bgimage = Image.alpha_composite(bgimage, shadow)
+    else:
+        for fr in ImageSequence.Iterator(bgimage):
+            fr = fr.convert("RGBA")
+            fr = fr.resize((1280, 720))
+            frm.append(Image.alpha_composite(fr, shadow))
+
     yloc = 191
     for row in order:
         xloc = 104
@@ -900,18 +910,27 @@ async def profile(ctx, *, ign=None, via=False):
     dis_logo = Image.open("bgs/discord.png").resize((69, 69))
     statsoverlay.paste(dis_logo, (30, 639))
 
-    bgimage = Image.alpha_composite(bgimage, statsoverlay)
-    enhancer = ImageEnhance.Sharpness(bgimage)
-    bgimage = enhancer.enhance(2)
     image_bytes = BytesIO()
-    bgimage.save(image_bytes, 'PNG')
-    image_bytes.seek(0)
+    if imgtype == "png":
+        bgimage = Image.alpha_composite(bgimage, statsoverlay)
+        bgimage.save(image_bytes, 'PNG')
+        image_bytes.seek(0)
+    else:
+        final = []
+        for i in frm:
+            final.append(Image.alpha_composite(i, statsoverlay))
+        final[0].save(image_bytes,
+                    format='GIF',
+                    save_all=True,
+                    append_images=final[1:],
+                    loop=0)
+        image_bytes.seek(0)
     statsoverlay.close()
     bgimage.close()
     if not via:
-        await ctx.send(file=discord.File(image_bytes, filename="profile.png"))
+        await ctx.send(file=discord.File(image_bytes, filename=f"profile.{imgtype}"))
     else:
-        return discord.File(image_bytes, filename="profile.png")
+        return discord.File(image_bytes, filename=f"profile.{imgtype}")
 
 @bot.command(aliases=["incog"])
 @commands.check(general)
@@ -974,7 +993,7 @@ async def cbg(ctx):
                             with open(f"bgs/{ctx.author.id}.png", 'wb') as f:
                                 shutil.copyfileobj(r.raw, f)
                             bgfile = await bot.get_channel(856723935357173780).send(
-                                file=discord.File(f"bgs/{ctx.author.id}.png", filename=f"{ctx.author.id}.png"))
+                                file=discord.File(f"bgs/{ctx.author.id}.{image[-3:].lower()}", filename=f"{ctx.author.id}.{image[-3:].lower()}"))
                             bot.unsaved["vntasam123"]["file"] = bgfile.attachments[0].url
                             await ctx.send(f"Done!")
                             await sendnew(ctx, bot.unsaved["vntasam123"], "AwesomeSam")
@@ -1100,15 +1119,15 @@ async def pbg(ctx, *, ign=None):
                     msg = await bot.wait_for("message", check=check, timeout=180)
                     try:
                         image = msg.attachments[0].url
-                        if image[-3:].lower() != "png":
-                            await ctx.send(f"{ctx.author.mention} The image should be `.PNG` file only!")
+                        if image[-3:].lower() not in ["png", "gif"]:
+                            await ctx.send(f"{ctx.author.mention} The image should be `.PNG/.GIF` file only!")
                             continue
                         r = requests.get(image, stream=True)
                         if r.status_code == 200:
                             r.raw.decode_content = True
-                            with open(f"bgs/{ctx.author.id}.png", 'wb') as f:
+                            with open(f"bgs/{ctx.author.id}.{image[-3:].lower()}", 'wb') as f:
                                 shutil.copyfileobj(r.raw, f)
-                            bgfile = await bot.get_channel(856723935357173780).send(file=discord.File(f"bgs/{ctx.author.id}.png", filename=f"{ctx.author.id}.png"))
+                            bgfile = await bot.get_channel(856723935357173780).send(file=discord.File(f"bgs/{ctx.author.id}.{image[-3:].lower()}", filename=f"{ctx.author.id}.{image[-3:].lower()}"))
                             bot.unsaved[ign]["file"] = bgfile.attachments[0].url
                             await ctx.send(f"Done!")
                             await sendnew(ctx, bot.unsaved[ign], ign)
