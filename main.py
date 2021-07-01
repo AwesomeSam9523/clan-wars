@@ -391,6 +391,11 @@ staffchl = [813447381752348723, 854008993248051230]
 @commands.check(general)
 async def view(channel, clan=None, via=None):
     if bot.pause: return await channel.send("⚠ ️Maintainence Update. Please retry later")
+    if bot.cwpause:
+        embed = discord.Embed(title="Wars Break",
+                              description="Clan wars are not currently running. Please use this command after wars start!",
+                              colour=error_embed)
+        return await channel.reply(embed=embed)
     if via == "sam123" and clan is not None:
         pass
     else:
@@ -960,8 +965,8 @@ async def cbg(ctx):
                     msg = await bot.wait_for("message", check=check, timeout=180)
                     try:
                         image = msg.attachments[0].url
-                        if image[-3:].lower() != "png":
-                            await ctx.send(f"{ctx.author.mention} The image should be `.PNG` file only!")
+                        if image[-3:].lower() not in ["png", "gif"]:
+                            await ctx.send(f"{ctx.author.mention} The image should be `.PNG/.GIF` file only!")
                             continue
                         r = requests.get(image, stream=True)
                         if r.status_code == 200:
