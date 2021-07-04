@@ -588,8 +588,11 @@ bot.pendings = {}
 @bot.command()
 @commands.check(general)
 async def link(ctx, *, ign):
-    staff = bot.get_channel(855450311808122951)
-    a = await staff.send(f"{ctx.author.mention} wants to link with {ign}")
+    d = bot.links.get(str(ctx.author.id), [])
+    if ign.lower() in [x.lower for x in d]:
+        return await ctx.send("You already have this account linked")
+    staffchl = bot.get_channel(855450311808122951)
+    a = await staffchl.send(f"{ctx.author.mention} wants to link with {ign}")
     await a.add_reaction("✅")
     await a.add_reaction("❌")
     bot.pendings[a.id] = (ctx.author.id, str(ign))
@@ -752,7 +755,6 @@ async def profile(ctx, *, ign=None, via=False):
                     break
     if not found:
         bgdata = bot.bgdata["vntasam123"]
-    print(bgdata)
     data = requests.get(f"https://kr.vercel.app/api/profile?username={ign}")
     if data.status_code != 200:
         embed = discord.Embed(title=f"{economyerror} Error",
@@ -1216,13 +1218,17 @@ async def pbg(ctx, *, ign=None):
 @bot.command()
 @commands.check(general)
 async def alts(ctx, mem:discord.Member=None):
-    if id is None:
+    if mem is None:
         d = bot.links.get(str(ctx.author.id))
     else:
         d = bot.links.get(str(mem.id))
     if d is None:
         return await ctx.send("You have no accounts linked. Use `v.link <ign>` to link an account first")
-    altslist = "\n".join(d["all"])
+    else:
+        work = bot.userdata.get(str(mem.id), {"incognito": False})["incognito"]
+        if work and ctx.author.id != int(mem.id):
+            return await ctx.send("You have no accounts linked. Use `v.link <ign>` to link an account first")
+    altslist = "\n".join(list(set(d["all"])))
     s = f"```css\n{altslist}```"
     embed= discord.Embed(title="Linked Accounts", description=s, color=embedcolor)
     await ctx.send(embed=embed)
