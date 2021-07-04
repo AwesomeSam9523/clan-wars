@@ -1219,13 +1219,15 @@ async def pbg(ctx, *, ign=None):
 @commands.check(general)
 async def alts(ctx, mem:discord.Member=None):
     if mem is None:
+        aut = ctx.author
         d = bot.links.get(str(ctx.author.id))
     else:
+        aut = mem
         d = bot.links.get(str(mem.id))
     if d is None:
         return await ctx.send("You have no accounts linked. Use `v.link <ign>` to link an account first")
     else:
-        work = bot.userdata.get(str(mem.id), {"incognito": False})["incognito"]
+        work = bot.userdata.get(str(aut.id), {"incognito": False})["incognito"]
         if work and ctx.author.id != int(mem.id):
             return await ctx.send("You have no accounts linked. Use `v.link <ign>` to link an account first")
     altslist = "\n".join(list(set(d["all"])))
