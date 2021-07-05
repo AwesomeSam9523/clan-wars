@@ -20,7 +20,9 @@ a_headers = {
     'Upgrade': 'websocket',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36'
 }
-bot = commands.Bot(command_prefix=["cw"+" ", "Cw"+" ", "cW"+" ","CW"+" ", "V.", "v."], case_insensitive=True)
+intents = discord.Intents.default() 
+intents.members = True
+bot = commands.Bot(command_prefix=["V.", "v."], case_insensitive=True, intents=intents)
 bot.remove_command("help")
 color = 7929797
 sampfp = "https://media.discordapp.net/attachments/854008993248051230/854708889059852288/sam_av.png"
@@ -34,7 +36,8 @@ bot.already = []
 bot.vntapeeps = []
 bot.excl = [671436261482823763]
 bot.dcmds = []
-bot.dev = ""
+bot.dev = bot.get_user(771601176155783198)
+bot.linkinglogs = bot.get_channel(861463678179999784)
 economyerror = "❌"
 economysuccess = "✅"
 disregarded = []
@@ -80,8 +83,13 @@ bot.help_json = {
         },
         "v.link":{
             "aliases":["None"],
-            "usage":"v.link [ign]",
+            "usage":"v.link <ign>",
             "desc":"Links your account to bot"
+        },
+        "v.unlink":{
+            "aliases":["None"],
+            "usage":"v.unlink <ign>",
+            "desc":"Unlinks your account from bot"
         },
         "v.pbg":{
             "aliases":["None"],
@@ -97,6 +105,39 @@ bot.help_json = {
             "aliases":["None"],
             "usage":"v.alts",
             "desc":"View all linked accounts"
+        }
+    },
+    "Staff": {
+        "category":"Staff",
+        "v.cbg":{
+            "aliases":["None"],
+            "usage":"v.cbg",
+            "desc":"Edit clan background"
+        },
+        "v.forcelink":{
+            "aliases":["fl", "forcel", "flink"],
+            "usage":"v.forcelink @user <ign>",
+            "desc":"Force link a user with an account"
+        },
+        "e.set_chl": {
+            "aliases": ["add_chl"],
+            "usage": "e.set_chl <#channel>",
+            "desc": "Allows the bot to respond in that channel",
+        },
+        "v.del_chl": {
+            "aliases": ["delete_chl", "rem_chl", "remove_chl"],
+            "usage": "e.del_chl <#channel>",
+            "desc": "Disallows the bot to respond in that channel",
+        },
+        "v.list_chl": {
+            "aliases": ["show_chl"],
+            "usage": "e.list_chl",
+            "desc": "Lists all the channels where the bot is allowed to respond",
+        },
+        "v.reset_chl": {
+            "aliases": ["None"],
+            "usage": "e.reset_chl",
+            "desc": "Clears all the configuration and makes the bot to respond again in **all** the channels",
         }
     }
 }
@@ -386,6 +427,16 @@ async def savebgdata():
     chl = bot.get_channel(854698116255318057)
     await chl.send(file=discord.File("bgdata.json"))
 
+async def linklog(ign, user, t, accby=None, force=False, linkedby=None):
+    if t == "l":
+        embed = discord.Embed(description=f"`{user}` got linked with `{ign}`", colour=success_embed)
+        if force: embed.set_footer(text=f"Force-Linked By: {linkedby}")
+        else: embed.set_footer(text=f"Accepted by: {accby}")
+    else:
+        embed = discord.Embed(description=f"`{user}` got unlinked with `{ign}`", colour=error_embed)
+    embed.footer.timestamp = datetime.datetime.utcnow()
+    await bot.linkinglogs.send(embed=embed)
+
 staffchl = [813447381752348723, 854008993248051230]
 @bot.command()
 @commands.check(general)
@@ -598,6 +649,42 @@ async def link(ctx, *, ign):
     bot.pendings[a.id] = (ctx.author.id, str(ign))
     embed = discord.Embed(description=f"Link request submitted to staff successfully!", color=success_embed)
     await ctx.reply(embed=embed)
+
+@bot.command(aliases=["fl", "forcel", "flink"])
+@commands.check(general)
+async def forcelink(ctx, user:discord.Member, *, ign):
+    if ctx.author.id not in staff+devs: return
+
+    t = bot.links.get(str(user.id), {"main": ign, "all": []})
+    t["all"] = list(set(t["all"]))
+    if ign.lower() in [x.lower() for x in t["all"]]:
+        return await ctx.reply(f"User is already linked with `{ign}`")
+    t["all"].append(ign)
+    bot.links[str(user.id)] = t
+    await update_links()
+    await user.send(f"✅ You were force-linked with `{ign}`.\n"
+                    f"If this seems incorrect, you can unlink using `v.unlink {ign}` and report the issue to {bot.dev.mention}")
+    await ctx.reply("Done")
+    await linklog(ign, user, "l", force=True, linkedby=ctx.author)
+
+@bot.command()
+@commands.check(general)
+async def unlink(ctx, *, ign):
+    if ctx.author.id not in staff+devs: return
+
+    t = bot.links.get(str(ctx.author.id), {"main": ign, "all": []})
+    t["all"] = list(set(t["all"]))
+    found = False
+    for i in t["all"]:
+        if i.lower() == ign.lower():
+            t["all"].remove(i)
+            found = True
+            break
+    if not found: return await ctx.reply("You can only unlink the accounts which are linked to you")
+    bot.links[str(ctx.author.id)] = t
+    await update_links()
+    await ctx.send(f"✅ You are unlinked with `{ign}`")
+    await linklog(ign, ctx.author, "ul")
 
 @bot.command(aliases=["con"])
 @commands.check(general)
@@ -877,7 +964,7 @@ async def profile(ctx, *, ign=None, via=False):
         if value["main"].lower() == username.lower():
             work = bot.userdata.get(str(key), {"incognito": False})["incognito"]
             if not work:
-                user = await bot.fetch_user(int(key))
+                user = bot.get_user(int(key))
                 user = f"{user.name}#{user.discriminator}"
             break
 
@@ -1101,13 +1188,18 @@ async def main(ctx, *, ign):
 async def pbg(ctx, *, ign=None):
     if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
     if ign is not None and ctx.author.id in devs:
-        print("Dev edit-", ign)
         ign = {"main":ign}
     else:
         ign = bot.links.get(str(ctx.author.id))
     if ign is None:
         return await ctx.reply("You need to be linked to get a custom background")
     ign = ign["main"]
+    if len(bot.vntapeeps) == 0:
+        embed = discord.Embed(title=f"{economyerror} Error",
+                              description="API didnt respond in time",
+                              color=error_embed)
+        embed.set_footer(text="Please try again later")
+        return await ctx.send(embed=embed)
     if (ign.lower() not in bot.vntapeeps):
         if ign.lower() not in bot.excl:
             return await ctx.send("Only VNTA clan members or people with exculsive permission from developer can use this command")
@@ -1398,7 +1490,6 @@ async def load_data(ctx=None):
     chl = bot.get_channel(854721559359913994)
     msgs = await chl.history(limit=1).flatten()
     bot.links.update(json.loads(requests.get(msgs[0].attachments[0]).text))
-    bot.dev = await bot.fetch_user(771601176155783198)
 
     chl = bot.get_channel(856070919033978932)
     msgs = await chl.history(limit=1).flatten()
@@ -1415,6 +1506,8 @@ async def on_connect():
     await load_data()
     await load_peeps()
     print("Ready")
+    bot.dev = bot.get_user(771601176155783198)
+    bot.linkinglogs = bot.get_channel(861463678179999784)
     if not bot.pause or not bot.beta:
         if not bot.cwpause: asyncio.create_task(auto_update())
 
@@ -1436,17 +1529,15 @@ async def on_raw_reaction_add(payload):
         if str(payload.emoji) == "❌":
             userd = bot.pendings[payload.message_id]
             user = userd[0]
-            user = await bot.fetch_user(user)
+            user = bot.get_user(user)
             await user.send(f"❌ Your request to link with `{userd[1]}` is denied!")
             state= "Denied"
         else:
             userd = bot.pendings[payload.message_id]
             user = userd[0]
-            user = await bot.fetch_user(user)
+            user = bot.get_user(user)
             t = bot.links.get(str(user.id), {"main":userd[1], "all":[]})
             t["all"] = list(set(t["all"]))
-            if userd[1] in t["all"]:
-                return await user.send(f"You are already linked with `{userd[1]}`")
             t["all"].append(userd[1])
             bot.links[str(user.id)] = t
             state= "Accepted"
@@ -1455,8 +1546,9 @@ async def on_raw_reaction_add(payload):
         bot.pendings.pop(payload.message_id)
         chl = bot.get_channel(payload.channel_id)
         msg = await chl.fetch_message(payload.message_id)
-        await msg.edit(content=f"{msg.content} (`{state}` by {await bot.fetch_user(payload.user_id)})")
+        await msg.edit(content=f"{msg.content} (`{state}` by {bot.get_user(payload.user_id)})")
         await msg.clear_reactions()
+        await linklog(userd[1], user, "l", bot.get_user(payload.user_id))
 
 #@bot.event
 async def on_command_error(ctx, error):
