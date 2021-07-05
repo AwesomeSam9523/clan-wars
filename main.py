@@ -1547,7 +1547,7 @@ async def on_raw_reaction_add(payload):
         chl = bot.get_channel(payload.channel_id)
         msg = await chl.fetch_message(payload.message_id)
         await msg.edit(content=f"{msg.content} (`{state}` by {bot.get_user(payload.user_id)})")
-        await msg.clear_reactions()
+        #await msg.clear_reactions()
         await linklog(userd[1], user, "l", bot.get_user(payload.user_id))
 
 #@bot.event
