@@ -455,11 +455,10 @@ async def savebgdata():
     chl = bot.get_channel(854698116255318057)
     await chl.send(file=discord.File("bgdata.json"))
 
-async def linklog(ign, user, t, accby=None, force=False, linkedby=None):
+async def linklog(ign, user, t, linkedby=None):
     if t == "l":
         embed = discord.Embed(description=f"`{user}` got linked with `{ign}`", colour=success_embed)
-        if force: embed.set_footer(text=f"Force-Linked By: {linkedby}")
-        else: embed.set_footer(text=f"Accepted by: {accby}")
+        if linkedby is not None: embed.set_footer(text=f"Force-Linked By: {linkedby}")
     else:
         embed = discord.Embed(description=f"`{user}` got unlinked with `{ign}`", colour=error_embed)
     embed.footer.timestamp = datetime.datetime.utcnow()
@@ -715,7 +714,7 @@ async def forcelink(ctx, user:discord.Member, *, ign):
     await user.send(f"✅ You were force-linked with `{ign}`.\n"
                     f"If this seems incorrect, you can unlink using `v.unlink {ign}` and report the issue to {bot.dev.mention}")
     await ctx.reply("Done")
-    await linklog(ign, user, "l", force=True, linkedby=ctx.author)
+    await linklog(ign=ign, user=user, t="l", linkedby=ctx.author)
 
 @bot.command()
 @commands.check(general)
@@ -741,7 +740,7 @@ async def unlink(ctx, *, ign):
     else: bot.links[str(ctx.author.id)] = t
     await update_links()
     await ctx.send(f"✅ You are unlinked with `{ign}`")
-    await linklog(ign, ctx.author, "ul")
+    await linklog(ign=ign, user=ctx.author, t="ul")
 
 @bot.command(aliases=["con"])
 @commands.check(general)
@@ -1256,7 +1255,7 @@ async def pbg(ctx, *, ign=None):
         ign = bot.links.get(str(ctx.author.id))
     if ign is None:
         return await ctx.reply("You need to be linked to get a custom background")
-    ign = ign["main"]
+    ign = ign["main"].lower()
     if bot.apidown:
         embed = discord.Embed(title=f"{economyerror} Error",
                               description="API didnt respond in time",
@@ -1904,15 +1903,14 @@ async def on_raw_reaction_add(payload):
             if oldflag != userd[2]:
                 return await chan.send(f"{user.mention} The flag change wasn't detected. Make sure to stick to the end of the match\n"
                                        f"Retry using `v.link {userdata['data']['username']}`")
-            t = bot.links.get(str(user.id), {"main":userd[1], "all":[]})
+            t = bot.links.get(str(user.id), {"main":userdata['data']['username'], "all":[]})
             t["all"] = list(set(t["all"]))
-            t["all"].append(userd[1])
+            t["all"].append(userdata['data']['username'])
             bot.links[str(user.id)] = t
-            state= "Accepted"
             await update_links()
             await chan.send(f"{user.mention} {economysuccess} You are successfully linked with `{userdata['data']['username']}`!")
+            await linklog(ign=userdata['data']['username'], user=user, t="l")
         bot.pendings.pop(payload.message_id)
-        await linklog(userd[1], user, "l", bot.get_user(payload.user_id))
     if str(payload.emoji) == "🔒":
         if payload.message_id in bot.refr.get("opent", []):
             tchl = bot.get_channel(payload.channel_id)
