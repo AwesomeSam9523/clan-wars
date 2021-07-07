@@ -731,7 +731,7 @@ async def unlink(ctx, *, ign):
             t["all"].remove(i)
             if t["main"].lower() == ign.lower():
                 if len(t["all"]) != 0:
-                    t["main"] == t["all"][0]
+                    t["main"] = t["all"][0]
                 else:
                     totalunlink = True
             found = True
