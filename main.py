@@ -321,7 +321,7 @@ async def general(ctx):
 
 async def close_admin():
     chl = bot.get_channel(854692793276170280)
-    with open("admin.json", "r") as f:
+    with open("admin.json", "w") as f:
         f.write(json.dumps(bot.refr))
     await chl.send(file=discord.File("admin.json"))
 bot.score = 0
