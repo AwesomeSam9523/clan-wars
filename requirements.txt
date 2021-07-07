@@ -1,6 +1,6 @@
 msgpack~=1.0.2
-discord~=1.0.1
 requests~=2.25.1
 prettytable~=2.1.0
 pillow
 psutil
+git+https://github.com/AwesomeSam9523/discord.py

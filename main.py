@@ -1,5 +1,4 @@
-import copy
-import ssl, msgpack, asyncio, discord, json, sys
+import ssl, msgpack, asyncio, discord, json, sys, random, copy
 import time, datetime, os, threading, requests, shutil, psutil
 from prettytable import PrettyTable
 from discord.ext import commands
@@ -44,6 +43,7 @@ disregarded = []
 warn1 = []
 warn2 = []
 devs = [771601176155783198]
+bot.interlist = []
 usercmds = {}
 error_embed = 16730441
 embedcolor = 5046208
@@ -52,7 +52,8 @@ bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
 bot.cwpause = True
-bot.beta = False
+bot.beta = True
+bot.apidown = False
 
 bot.help_json = {
     "Wars": {
@@ -144,6 +145,7 @@ bot.help_json = {
 
 @bot.check
 async def if_allowed(ctx):
+    if bot.apidown: await load_peeps()
     return await check_channel(ctx.channel.id)
 
 @bot.check
@@ -317,10 +319,11 @@ async def general(ctx):
         toreturn= False
     return toreturn
 
-async def close_admin(a):
-    bot.refr["719946380285837322"] = a
+async def close_admin():
     chl = bot.get_channel(854692793276170280)
-    await chl.send(json.dumps(bot.refr))
+    with open("admin.json", "r") as f:
+        f.write(json.dumps(bot.refr))
+    await chl.send(file=discord.File("admin.json"))
 
 async def updateuserdata():
     chl = bot.get_channel(856070919033978932)
@@ -437,6 +440,11 @@ async def linklog(ign, user, t, accby=None, force=False, linkedby=None):
     embed.footer.timestamp = datetime.datetime.utcnow()
     await bot.linkinglogs.send(embed=embed)
 
+async def timeout(user):
+    bot.interlist.append(user.id)
+    await asyncio.sleep(3600)
+    bot.interlist.remove(user.id)
+
 staffchl = [813447381752348723, 854008993248051230]
 @bot.command()
 @commands.check(general)
@@ -511,8 +519,7 @@ async def refresh(ctx, what:str=None):
         await ctx.message.add_reaction("✅")
     elif what == "setup":
         await view(ctx.channel, via="sam123", clan=clan)
-        chl = bot.get_channel(854692793276170280)
-        await chl.send(str(json.dumps(bot.refr)))
+        await close_admin()
 
 staff = [813441664617939004, 855793126958170122, 853997809212588073]
 @bot.command()
@@ -1194,7 +1201,7 @@ async def pbg(ctx, *, ign=None):
     if ign is None:
         return await ctx.reply("You need to be linked to get a custom background")
     ign = ign["main"]
-    if len(bot.vntapeeps) == 0:
+    if bot.apidown:
         embed = discord.Embed(title=f"{economyerror} Error",
                               description="API didnt respond in time",
                               color=error_embed)
@@ -1424,7 +1431,8 @@ async def set_chl(ctx, channel:discord.TextChannel):
     server.append(channel.id)
     if ctx.channel.id not in server:
         server.append(ctx.channel.id)
-    await close_admin(server)
+    bot.refr["719946380285837322"] = server
+    await close_admin()
     embed = discord.Embed(description=f'{economysuccess} {channel.mention} added to list of registered channels successfully!', color=success_embed)
     await ctx.send(embed=embed)
 
@@ -1438,7 +1446,8 @@ async def del_chl(ctx, channel:discord.TextChannel):
         embed = discord.Embed(description=f'{economyerror} {channel.mention} not in list of registered channels!', color=error_embed)
         return await ctx.send(embed=embed)
     server.remove(channel.id)
-    await close_admin(server)
+    bot.refr["719946380285837322"] = server
+    await close_admin()
     embed = discord.Embed(description=f'{economysuccess} {channel.mention} removed from list of registered channels successfully!', color=success_embed)
     await ctx.send(embed=embed)
 
@@ -1461,7 +1470,8 @@ async def reset_chl(ctx):
     else: return
     server = await get_admin()
     embed = discord.Embed(title=f'{economysuccess} Done', description='Cleared Successfully!', color=embedcolor)
-    await close_admin(server)
+    bot.refr["719946380285837322"] = server
+    await close_admin()
     embed.set_footer(text='Add a channel using e.set_chl <name>\nRemove a channel using e.del_chl <name>')
     await ctx.send(embed=embed)
 
@@ -1476,6 +1486,10 @@ async def ping(ctx):
 @commands.is_owner()
 async def load_peeps(ctx=None):
     a = requests.get("https://kr.vercel.app/api/clan?clan=vnta")
+    if a.status_code != 200:
+        bot.apidown = True
+        return
+    bot.apidown = False
     data = json.loads(a.text)
     bot.vntapeeps.clear()
     for i in data["data"]["members"]:
@@ -1485,7 +1499,8 @@ async def load_peeps(ctx=None):
 async def load_data(ctx=None):
     chl = bot.get_channel(854692793276170280)
     msgs = await chl.history(limit=1).flatten()
-    bot.refr = json.loads(msgs[0].content)
+    bot.refr = json.loads(requests.get(msgs[0].attachments[0]).text)
+    #bot.refr = json.loads(msgs[0].content)
 
     chl = bot.get_channel(854721559359913994)
     msgs = await chl.history(limit=1).flatten()
@@ -1498,6 +1513,198 @@ async def load_data(ctx=None):
     chl = bot.get_channel(854698116255318057)
     msgs = await chl.history(limit=1).flatten()
     bot.bgdata = json.loads(requests.get(msgs[0].attachments[0]).text)
+
+@bot.command(aliases=["app"])
+@commands.is_owner()
+async def application(ctx):
+    view = discord.ui.View(timeout=None)
+
+    item1 = discord.ui.Button(style=discord.ButtonStyle.blurple, label="Pubstomper", custom_id="pubs", emoji="<:smg:861873439421235220>")
+    item2 = discord.ui.Button(style=discord.ButtonStyle.green, label="Clan Wars", custom_id="wars", emoji="<:bowman:861873349121802251>")
+    item3 = discord.ui.Button(style=discord.ButtonStyle.grey, label="Competitive", custom_id="comp", emoji="<:ak:861873538134573056>")
+    item4 = discord.ui.Button(style=discord.ButtonStyle.red, label="Content Creation", custom_id="cc", emoji="<:trooper:861873482576953385>")
+    view.add_item(item=item1)
+    view.add_item(item=item2)
+    view.add_item(item=item3)
+    view.add_item(item=item4)
+    embed = discord.Embed(title="VNTA Applications",
+                          description="Click on the button below to start the application process!",
+                          color=localembed)
+    await ctx.send(view=view, embed=embed)
+localembed = 16734606
+
+@bot.event
+async def on_interaction(interaction):
+    intype = interaction.data["custom_id"]
+    eval(f"asyncio.create_task({intype}(interaction))")
+
+async def pubs(data):
+    if data.user.id in bot.interlist:
+        a = await data.response.send_message("You recently applied before. Please wait before re-applying", ephemeral=True)
+        return
+    try:
+        await data.user.send("Welcome to VNTA Applications Process! Please follow the instructions below to submit your application")
+        a = await data.response.send_message("Application process started in DMs", ephemeral=True)
+    except Exception as e:
+        print(e)
+        return await data.response.send_message("Please open your DMs for starting the process", ephemeral=True)
+    user = data.user
+    if str(user.id) not in bot.links:
+        await user.send("You are not linked to VNTA bot. Please go to <#845682300967714831> and type `v.link <your ign>`.\n"
+                        "After linking, you can restart this process from <#845682300570304546>")
+        return
+    ign = bot.links.get(str(user.id))['main']
+    embed = discord.Embed(title="Account",
+                          description=f"You are applying for your account- `{ign}`.\n"
+                                      f"**Type `c` to confirm.**",
+                          colour=localembed)
+    embed.set_footer(text="The bot takes your main account to consideration.\nSet it using 'v.main <ign>'")
+    await user.send(embed=embed)
+    def check(msg):
+        return msg.author == user and msg.guild is None
+
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=180)
+        res = msg.content.lower()
+        if res == "c":
+            asyncio.create_task(timeout(user))
+        else:
+            return await user.send("Application Aborted")
+    except asyncio.TimeoutError:
+        await user.send("You didnt reply in time.")
+
+    fetch = await user.send("Fetching Stats, Hang on..")
+    data = requests.get(f"https://kr.vercel.app/api/profile?username={ign}")
+    if data.status_code != 200:
+        embed = discord.Embed(title=f"{economyerror} Error",
+                              description="Failed to fetch automatically: API didnt respond in time",
+                              color=error_embed)
+        await fetch.edit(embed=embed)
+        # Manual
+    else:
+        userdata = json.loads(data.text)
+        userdata = userdata["data"]
+        username = userdata["username"]
+        clan = userdata["clan"]
+        kills = userdata["kills"]
+        deaths = userdata["deaths"]
+        kr = userdata["funds"]
+        datestr = userdata["createdAt"].split("T")[0]
+        wins = userdata["wins"]
+        score = userdata["score"]
+        level = userdata["level"]
+        played = userdata["games"]
+        loses = played - wins
+        challenge = userdata["challenge"]
+        if challenge is None: challenge = 0
+        else: challenge = int(challenge) + 1
+        nukes = userdata["stats"].get("n", 0)
+        headshots = userdata["stats"].get("hs", 0)
+        shots = userdata["stats"].get("s", 0)
+        hits = userdata["stats"].get("h", 0)
+        timeplayed = int(userdata["timePlayed"] / 1000)
+        melee = userdata["stats"].get("mk", 0)
+        wallbangs = userdata["stats"].get("wb", 0)
+        date_obj = datetime.datetime.strptime(datestr, '%Y-%m-%d')
+        now = datetime.datetime.now()
+        daysplayed = (now - date_obj).days
+        mpk = "{:.2f}".format((shots - hits) / kills)
+        hps = "{:.2f}%".format((headshots / hits) * 100)
+        gpn = "{:.2f}".format(played / nukes)
+        npd = "{:.2f}".format(nukes / daysplayed)
+        kpg = "{:.2f}".format(kills / played)
+        kpm = "{:.2f}".format(float(kpg) / 4)
+        if loses == 0: loses = 1
+        wl = "{:.2f}".format(wins / loses)
+        kdr = "{:.4f}".format(kills / deaths)
+        spk = "{:.2f}".format(score / kills)
+        avgscore = int(score / played)
+        accuracy = "{:.2f}%".format((hits / shots) * 100)
+        scoreweek = int((score/daysplayed)/7)
+
+        score = 0
+        economysuccess = "✔️"
+        embed = discord.Embed(title=f"{username}", color=localembed)
+        if level >= 60:
+            mark = economysuccess
+            score += 1
+        else: mark = economyerror
+        embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
+
+        if float(kdr) >= 4:
+            mark = economysuccess
+            score += 1
+        else: mark = economyerror
+        embed.add_field(name=f"\\{mark} KDR", value=str(kdr), inline=False)
+
+        if float(kpg) >= 16:
+            mark = economysuccess
+            score += 1
+        else: mark = economyerror
+        embed.add_field(name=f"\\{mark} KPG", value=str(kpg), inline=False)
+
+        if nukes >= 100:
+            mark = economysuccess
+            score += 1
+        else: mark = economyerror
+        embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
+
+        if scoreweek >= 100000:
+            mark = economysuccess
+            score += 1
+        else: mark = economyerror
+        embed.add_field(name=f"\\{mark} Score/week", value=str(scoreweek), inline=False)
+        p = False
+        if bot.score != 0: score = bot.score
+        if score == 5:
+            res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
+            p = True
+        elif 3 <= score <= 4:
+            res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
+            p = True
+        else:
+            res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
+        embed.add_field(name="Result", value=res, inline=False)
+        rescode = hex(random.randint(1000, 9999))
+        if p:
+            embed.add_field(name="What to do now?", value=f"Head over to <#845682300967714831>, and type `v.result {rescode}`.\n"
+                                                          "A new ticket will be opened with your result posted."
+                                                          " The staff will guide you after that.", inline=False)
+        embed.set_footer(text="#vantalizing")
+        embed.set_thumbnail(url="https://images-ext-2.discordapp.net/external/l8ile3RBeJ7FZELTOiecL6LMUQz5qmExL8ELzQFuEag/https/media.discordapp.net/attachments/817374020810178583/838450855648690226/vnta_logo_png.png")
+        await fetch.edit(embed=embed, content=None)
+
+async def cc(data):
+    try:
+        await data.user.send("You clicked 'Content Creator'")
+        await data.response.send_message("Application process started in DMs", ephemeral=True)
+    except:
+        return await data.response.send_message("Please open your DMs for starting the process", ephemeral=True)
+
+async def comp(data):
+    try:
+        await data.user.send("You clicked 'Competitive'")
+        await data.response.send_message("Application process started in DMs", ephemeral=True)
+    except:
+        return await data.response.send_message("Please open your DMs for starting the process", ephemeral=True)
+
+async def wars(data):
+    try:
+        await data.user.send("You clicked 'Clan Wars'")
+        await data.response.send_message("Application process started in DMs", ephemeral=True)
+    except:
+        return await data.response.send_message("Please open your DMs for starting the process", ephemeral=True)
+
+@bot.command()
+@commands.is_owner()
+async def emoji(ctx, link, name):
+    r = requests.get(link, stream=True)
+    if r.status_code == 200:
+        r.raw.decode_content = True
+        a = r.content
+        """with open(f"{name}.png", 'wb') as f:
+            shutil.copyfileobj(r.raw, f)"""
+        await ctx.guild.create_custom_emoji(name=name, image=a)
 
 @bot.event
 async def on_connect():
@@ -1514,7 +1721,7 @@ async def on_connect():
 @bot.event
 async def on_message(message):
     if bot.beta:
-        if message.channel.id != 854008993248051230: return
+        if message.channel.id not in [854008993248051230, 853973674309582868]: return
     await bot.process_commands(message)
 
 @bot.event
