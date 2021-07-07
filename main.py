@@ -52,7 +52,7 @@ bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
 bot.cwpause = True
-bot.beta = True
+bot.beta = False
 bot.apidown = False
 
 bot.help_json = {
@@ -146,7 +146,8 @@ bot.help_json = {
 @bot.check
 async def if_allowed(ctx):
     if bot.apidown: await load_peeps()
-    return await check_channel(ctx.channel.id)
+    if bot.beta: return True
+    else: return await check_channel(ctx.channel.id)
 
 @bot.check
 async def if_enabled(ctx):
