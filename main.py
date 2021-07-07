@@ -1868,6 +1868,7 @@ async def on_raw_reaction_add(payload):
         chan = bot.get_channel(payload.channel_id)
         userd = bot.pendings[payload.message_id]
         user = userd[0]
+        if payload.user_id != userd[0]: return
         user = bot.get_user(user)
         if str(payload.emoji) == "❌":
             await chan.send(f"{user.mention} Link request was cancelled..")
