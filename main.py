@@ -1539,9 +1539,10 @@ async def application(ctx):
                           color=localembed)
     await ctx.send(view=view, embed=embed)
 localembed = 16734606
-
+bot.nor = []
 @bot.event
 async def on_interaction(interaction):
+    if interaction.channel.id not in bot.nor: return
     intype = interaction.data["custom_id"]
     eval(f"asyncio.create_task({intype}(interaction))")
 
@@ -1550,7 +1551,8 @@ async def pubs(data):
         a = await data.response.send_message("You recently applied before. Please wait before re-applying", ephemeral=True)
         return
     try:
-        await data.user.send("Welcome to VNTA Applications Process! Please follow the instructions below to submit your application")
+        test = await data.user.send("Welcome to VNTA Applications Process! Please follow the instructions below to submit your application")
+        await test.delete()
         a = await data.response.send_message("Application process started in DMs", ephemeral=True)
     except Exception as e:
         print(e)
@@ -1672,9 +1674,10 @@ async def pubs(data):
         else:
             res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
         embed.add_field(name="Result", value=res, inline=False)
-        rescode = hex(random.randint(1000, 9999))
+        rescode = hex(random.randint(1000, 9999)).lower()
         allapps = bot.refr.setdefault("apps", [])
         allapps.append({rescode:{"kdr":kdr, "level":level, "kpg":kpg, "username":username, "nukes":nukes, "scoreweek":scoreweek}})
+        bot.refr["apps"] = allapps
         await close_admin()
         if p:
             embed.add_field(name="What to do now?", value=f"Head over to <#845682300967714831>, and type `v.result {rescode}`.\n"
@@ -1715,6 +1718,80 @@ async def emoji(ctx, link, name):
         """with open(f"{name}.png", 'wb') as f:
             shutil.copyfileobj(r.raw, f)"""
         await ctx.guild.create_custom_emoji(name=name, image=a)
+
+async def result(ctx, code):
+    apps = bot.refr.get("apps", [])
+    if code.lower() not in [x for x in apps]:
+        return await ctx.reply("Invalid Code")
+
+    guild = ctx.guild
+    overwrites = {
+        guild.default_role: discord.PermissionOverwrite(read_messages=False),
+        guild.me: discord.PermissionOverwrite(read_messages=True),
+        guild.get_role(853997809212588073): discord.PermissionOverwrite(read_messages=True)
+    }
+    num = len(apps) + 1
+    channel = await guild.create_text_channel(f'application-{num}', overwrites=overwrites,
+                                              category=bot.get_channel(853973632153944064))
+    score = 0
+    economysuccess = "✔️"
+    userapp = {}
+    for i in apps.items():
+        if i[0] == code.lower():
+            userapp = i[1]
+            break
+    level = userapp["level"]
+    kdr = userapp["kdr"]
+    kpg = userapp["kpg"]
+    nukes = userapp["nukes"]
+    scoreweek = userapp["scoreweek"]
+
+    embed = discord.Embed(title=userapp["username"], colour=localembed)
+    if level >= 60:
+        mark = economysuccess
+        score += 1
+    else:
+        mark = economyerror
+    embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
+
+    if float(kdr) >= 4:
+        mark = economysuccess
+        score += 1
+    else:
+        mark = economyerror
+    embed.add_field(name=f"\\{mark} KDR", value=str(kdr), inline=False)
+
+    if float(kpg) >= 16:
+        mark = economysuccess
+        score += 1
+    else:
+        mark = economyerror
+    embed.add_field(name=f"\\{mark} KPG", value=str(kpg), inline=False)
+
+    if nukes >= 100:
+        mark = economysuccess
+        score += 1
+    else:
+        mark = economyerror
+    embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
+
+    if scoreweek >= 100000:
+        mark = economysuccess
+        score += 1
+    else:
+        mark = economyerror
+    embed.add_field(name=f"\\{mark} Score/week", value=str(scoreweek), inline=False)
+    p = False
+    if bot.score != 0: score = bot.score
+    if score == 5:
+        res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
+        p = True
+    elif 3 <= score <= 4:
+        res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
+        p = True
+    else:
+        res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
+    await channel.send(f"{ctx.author.mention} Please wait for a staff to respond.", embed=embed)
 
 @bot.event
 async def on_connect():
