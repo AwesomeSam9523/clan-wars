@@ -7,21 +7,43 @@ from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageSeq
 from io import BytesIO
 
 print("Starting")
-uri = "wss://social.krunker.io/ws"
-a_headers = {
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Cache-Control': 'no-cache',
-    'Connection': 'Upgrade',
-    "Host": "krunker_social.krunker.io",
-    "Origin": "https://krunker.io",
-    'Pragma': 'no-cache',
-    'Upgrade': 'websocket',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36'
-}
-intents = discord.Intents.default() 
+intents = discord.Intents.default()
 intents.members = True
-bot = commands.Bot(command_prefix=["V.", "v."], case_insensitive=True, intents=intents)
+class PersistentViewBot(commands.Bot):
+    def __init__(self):
+        super().__init__(command_prefix=["V.", "v."], case_insensitive=True, intents=intents)
+        self.persistent_views_added = False
+
+    async def on_ready(self):
+        if not self.persistent_views_added:
+            self.add_view(PersistentView())
+            self.persistent_views_added = True
+
+class PersistentView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(style=discord.ButtonStyle.blurple, label="Pubstomper", custom_id="pubs_",
+                              emoji="<:smg:861873439421235220>")
+    async def pubsb(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await pubs(interaction)
+
+    @discord.ui.button(style=discord.ButtonStyle.green, label="Clan Wars", custom_id="wars_",
+                              emoji="<:bowman:861873349121802251>")
+    async def warsb(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await wars(interaction)
+
+    @discord.ui.button(style=discord.ButtonStyle.grey, label="Competitive", custom_id="comp_",
+                              emoji="<:ak:861873538134573056>")
+    async def compb(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await comp(interaction)
+
+    @discord.ui.button(style=discord.ButtonStyle.red, label="Content Creation", custom_id="cc_",
+                              emoji="<:trooper:861873482576953385>")
+    async def ccb(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await cc(interaction)
+
+bot = PersistentViewBot()
 bot.remove_command("help")
 color = 7929797
 sampfp = "https://media.discordapp.net/attachments/854008993248051230/854708889059852288/sam_av.png"
@@ -52,7 +74,7 @@ bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
 bot.cwpause = True
-bot.beta = False
+bot.beta = True
 bot.apidown = False
 
 bot.help_json = {
@@ -325,7 +347,7 @@ async def close_admin():
     with open("admin.json", "w") as f:
         f.write(json.dumps(bot.refr))
     await chl.send(file=discord.File("admin.json"))
-bot.score = 0
+bot.score = 4
 async def updateuserdata():
     chl = bot.get_channel(856070919033978932)
     with open("userdata.json", "w") as f:
@@ -1489,69 +1511,28 @@ async def ping(ctx):
     ping = "{:.2f}".format(bot.latency*1000)
     await msg.edit(content=f'Pong! `{ping} ms`')
 
-@bot.command()
-@commands.is_owner()
-async def load_peeps(ctx=None):
-    a = requests.get("https://kr.vercel.app/api/clan?clan=vnta")
-    if a.status_code != 200:
-        bot.apidown = True
-        return
-    bot.apidown = False
-    data = json.loads(a.text)
-    bot.vntapeeps.clear()
-    for i in data["data"]["members"]:
-        bot.vntapeeps.append(i["username"].lower())
-
-@bot.command(aliases=["ref"])
-async def load_data(ctx=None):
-    chl = bot.get_channel(854692793276170280)
-    msgs = await chl.history(limit=1).flatten()
-    bot.refr = json.loads(requests.get(msgs[0].attachments[0]).text)
-    #bot.refr = json.loads(msgs[0].content)
-
-    chl = bot.get_channel(854721559359913994)
-    msgs = await chl.history(limit=1).flatten()
-    bot.links.update(json.loads(requests.get(msgs[0].attachments[0]).text))
-
-    chl = bot.get_channel(856070919033978932)
-    msgs = await chl.history(limit=1).flatten()
-    bot.userdata = json.loads(requests.get(msgs[0].attachments[0]).text)
-
-    chl = bot.get_channel(854698116255318057)
-    msgs = await chl.history(limit=1).flatten()
-    bot.bgdata = json.loads(requests.get(msgs[0].attachments[0]).text)
-
 @bot.command(aliases=["app"])
 @commands.is_owner()
 async def application(ctx):
-    view = discord.ui.View(timeout=None)
-
-    item1 = discord.ui.Button(style=discord.ButtonStyle.blurple, label="Pubstomper", custom_id="pubs", emoji="<:smg:861873439421235220>")
-    item2 = discord.ui.Button(style=discord.ButtonStyle.green, label="Clan Wars", custom_id="wars", emoji="<:bowman:861873349121802251>")
-    item3 = discord.ui.Button(style=discord.ButtonStyle.grey, label="Competitive", custom_id="comp", emoji="<:ak:861873538134573056>")
-    item4 = discord.ui.Button(style=discord.ButtonStyle.red, label="Content Creation", custom_id="cc", emoji="<:trooper:861873482576953385>")
-    view.add_item(item=item1)
-    view.add_item(item=item2)
-    view.add_item(item=item3)
-    view.add_item(item=item4)
     embed = discord.Embed(title="VNTA Applications",
                           description="Click on the button below to start the application process!",
                           color=localembed)
-    await ctx.send(view=view, embed=embed)
+    await ctx.send(view=PersistentView(), embed=embed)
+
 localembed = 16734606
 bot.nor = []
-@bot.event
+#@bot.event
 async def on_interaction(interaction):
-    if interaction.channel.id not in bot.nor: return
+    #if interaction.channel.id not in bot.nor: return
     intype = interaction.data["custom_id"]
-    eval(f"asyncio.create_task({intype}(interaction))")
+    eval(f"asyncio.create_task({intype.split('_')[0]}(interaction))")
 
 async def pubs(data):
     if data.user.id in bot.interlist:
         a = await data.response.send_message("You recently applied before. Please wait before re-applying", ephemeral=True)
         return
     try:
-        test = await data.user.send("Welcome to VNTA Applications Process! Please follow the instructions below to submit your application")
+        test = await data.user.send("DM Testing")
         await test.delete()
         a = await data.response.send_message("Application process started in DMs", ephemeral=True)
     except Exception as e:
@@ -1563,8 +1544,9 @@ async def pubs(data):
                         "After linking, you can restart this process from <#845682300570304546>")
         return
     ign = bot.links.get(str(user.id))['main']
-    embed = discord.Embed(title="Account",
-                          description=f"You are applying for your account- `{ign}`.\n"
+    embed = discord.Embed(title="Pubstomper Application",
+                          description=f"Welcome to VNTA Application Process! Please follow the steps below for a smooth & troublefree experience\n"
+                                      f"You are applying for your account- `{ign}`.\n"
                                       f"**Type `c` to confirm.**",
                           colour=localembed)
     embed.set_footer(text="The bot takes your main account to consideration.\nSet it using 'v.main <ign>'")
@@ -1719,27 +1701,36 @@ async def emoji(ctx, link, name):
             shutil.copyfileobj(r.raw, f)"""
         await ctx.guild.create_custom_emoji(name=name, image=a)
 
+@bot.command()
+@commands.check(general)
 async def result(ctx, code):
     apps = bot.refr.get("apps", [])
-    if code.lower() not in [x for x in apps]:
-        return await ctx.reply("Invalid Code")
-
+    found = False
+    userapp = {}
+    for j in apps:
+        for i in j.items():
+            if i[0] == code.lower():
+                userapp = i[1]
+                found = True
+                break
+        if found:
+            apps.remove(j)
+            break
+    if not found: return await ctx.reply("Invalid code or ticket already opened")
+    await ctx.message.delete()
     guild = ctx.guild
     overwrites = {
         guild.default_role: discord.PermissionOverwrite(read_messages=False),
-        guild.me: discord.PermissionOverwrite(read_messages=True),
-        guild.get_role(853997809212588073): discord.PermissionOverwrite(read_messages=True)
+        guild.get_role(853997809212588073): discord.PermissionOverwrite(read_messages=True),
+        bot.get_user(ctx.author.id): discord.PermissionOverwrite(read_messages=True)
     }
-    num = len(apps) + 1
-    channel = await guild.create_text_channel(f'application-{num}', overwrites=overwrites,
+    num = bot.refr.setdefault("appcount", 0)
+    channel = await guild.create_text_channel(f'open-appl-{num+1}', overwrites=overwrites,
                                               category=bot.get_channel(853973632153944064))
+    bot.refr["appcount"] = num + 1
     score = 0
     economysuccess = "✔️"
-    userapp = {}
-    for i in apps.items():
-        if i[0] == code.lower():
-            userapp = i[1]
-            break
+
     level = userapp["level"]
     kdr = userapp["kdr"]
     kpg = userapp["kpg"]
@@ -1781,17 +1772,53 @@ async def result(ctx, code):
     else:
         mark = economyerror
     embed.add_field(name=f"\\{mark} Score/week", value=str(scoreweek), inline=False)
-    p = False
     if bot.score != 0: score = bot.score
     if score == 5:
         res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
-        p = True
     elif 3 <= score <= 4:
         res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
-        p = True
     else:
         res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
-    await channel.send(f"{ctx.author.mention} Please wait for a staff to respond.", embed=embed)
+    embed.add_field(name="Result", value=res)
+    embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
+    msg = await channel.send(f"{ctx.author.mention} Please wait for a staff to respond.", embed=embed)
+    opent = bot.refr.setdefault("opent", [])
+    opent.append(msg.id)
+    bot.refr["opent"] = opent
+    await msg.add_reaction("🔒")
+    await close_admin()
+
+@bot.command()
+@commands.is_owner()
+async def load_peeps(ctx=None):
+    a = requests.get("https://kr.vercel.app/api/clan?clan=vnta")
+    if a.status_code != 200:
+        bot.apidown = True
+        return
+    bot.apidown = False
+    data = json.loads(a.text)
+    bot.vntapeeps.clear()
+    for i in data["data"]["members"]:
+        bot.vntapeeps.append(i["username"].lower())
+
+@bot.command(aliases=["ref"])
+async def load_data(ctx=None):
+    chl = bot.get_channel(854692793276170280)
+    msgs = await chl.history(limit=1).flatten()
+    bot.refr = json.loads(requests.get(msgs[0].attachments[0]).text)
+    #bot.refr = json.loads(msgs[0].content)
+
+    chl = bot.get_channel(854721559359913994)
+    msgs = await chl.history(limit=1).flatten()
+    bot.links.update(json.loads(requests.get(msgs[0].attachments[0]).text))
+
+    chl = bot.get_channel(856070919033978932)
+    msgs = await chl.history(limit=1).flatten()
+    bot.userdata = json.loads(requests.get(msgs[0].attachments[0]).text)
+
+    chl = bot.get_channel(854698116255318057)
+    msgs = await chl.history(limit=1).flatten()
+    bot.bgdata = json.loads(requests.get(msgs[0].attachments[0]).text)
 
 @bot.event
 async def on_connect():
@@ -1808,12 +1835,13 @@ async def on_connect():
 @bot.event
 async def on_message(message):
     if bot.beta:
-        if message.channel.id not in [854008993248051230, 853973674309582868]: return
+        if message.channel.id not in [854008993248051230, 853973674309582868, 862265264838410241]: return
     await bot.process_commands(message)
 
 @bot.event
 async def on_raw_reaction_add(payload):
     if payload.user_id == 853971223682482226: return
+
     if str(payload.emoji) == "🗑️" and payload.user_id == 771601176155783198:
         chl = await bot.fetch_channel(payload.channel_id)
         msg = await chl.fetch_message(payload.message_id)
@@ -1843,6 +1871,33 @@ async def on_raw_reaction_add(payload):
         await msg.edit(content=f"{msg.content} (`{state}` by {bot.get_user(payload.user_id)})")
         #await msg.clear_reactions()
         await linklog(userd[1], user, "l", bot.get_user(payload.user_id))
+    if str(payload.emoji) == "🔒":
+        if payload.message_id in bot.refr.get("opent", []):
+            tchl = bot.get_channel(payload.channel_id)
+            guild = bot.get_guild(payload.guild_id)
+            overwrites = {
+                guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                guild.get_role(853997809212588073): discord.PermissionOverwrite(read_messages=True)
+            }
+            await tchl.edit(name=f"{tchl.name.replace('open', 'closed')}", overwrites=overwrites)
+            embed = discord.Embed(title="Ticket Closed",
+                                  description="React with ⛔ to delete the channel",
+                                  colour=localembed)
+            clsd = await tchl.send(embed=embed)
+            await clsd.add_reaction("⛔")
+            oldclsd = bot.refr.setdefault("closet", [])
+            oldclsd.append(clsd.id)
+            bot.refr["closet"] = oldclsd
+            new = bot.refr["opent"]
+            new.remove(payload.message_id)
+            bot.refr["opent"] = new
+            await close_admin()
+    if str(payload.emoji) == "⛔":
+        if payload.message_id in bot.refr.get("closet", []):
+            tchl = bot.get_channel(payload.channel_id)
+            await tchl.send("Deleting in 5 secs...")
+            await asyncio.sleep(5)
+            await tchl.delete()
 
 #@bot.event
 async def on_command_error(ctx, error):

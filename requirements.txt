@@ -3,4 +3,4 @@ requests~=2.25.1
 prettytable~=2.1.0
 pillow
 psutil
-git+https://github.com/AwesomeSam9523/discord.py
+git+https://github.com/Rapptz/discord.py
