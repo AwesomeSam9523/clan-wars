@@ -324,7 +324,7 @@ async def close_admin():
     with open("admin.json", "r") as f:
         f.write(json.dumps(bot.refr))
     await chl.send(file=discord.File("admin.json"))
-
+bot.score = 0
 async def updateuserdata():
     chl = bot.get_channel(856070919033978932)
     with open("userdata.json", "w") as f:
@@ -1422,8 +1422,10 @@ async def help(ctx, specify=None):
 @bot.command(aliases=['add_chl'])
 @commands.check(general)
 async def set_chl(ctx, channel:discord.TextChannel):
-    if ctx.message.author.permissions_in(ctx.message.channel).manage_channels or ctx.author.id in devs: pass
-    else: return
+    if ctx.message.author.guild_permissions.manage_channels or ctx.author.id in devs:
+        pass
+    else:
+        return
     server = await get_admin()
     if channel.id in server:
         embed = discord.Embed(description=f'{economyerror} {channel.mention} is already in list of registered channels!', color=error_embed)
@@ -1439,8 +1441,10 @@ async def set_chl(ctx, channel:discord.TextChannel):
 @bot.command(aliases=['rem_chl', 'remove_chl', 'delete_chl'])
 @commands.check(general)
 async def del_chl(ctx, channel:discord.TextChannel):
-    if ctx.message.author.permissions_in(ctx.message.channel).manage_channels or ctx.author.id in devs: pass
-    else: return
+    if ctx.message.author.guild_permissions.manage_channels or ctx.author.id in devs:
+        pass
+    else:
+        return
     server = await get_admin()
     if channel.id not in server:
         embed = discord.Embed(description=f'{economyerror} {channel.mention} not in list of registered channels!', color=error_embed)
@@ -1454,8 +1458,10 @@ async def del_chl(ctx, channel:discord.TextChannel):
 @bot.command(aliases=['show_chl'])
 @commands.check(general)
 async def list_chl(ctx):
-    if ctx.message.author.permissions_in(ctx.message.channel).manage_channels or ctx.author.id in devs: pass
-    else: return
+    if ctx.message.author.guild_permissions.manage_channels or ctx.author.id in devs:
+        pass
+    else:
+        return
     server = await get_admin()
     if len(server) == 0: channels = ['> No channels set']
     else: channels = [f'> <#{x}>' for x in server]
@@ -1466,7 +1472,7 @@ async def list_chl(ctx):
 @bot.command()
 @commands.check(general)
 async def reset_chl(ctx):
-    if ctx.message.author.permissions_in(ctx.message.channel).manage_channels or ctx.author.id in devs: pass
+    if ctx.message.author.guild_permissions.manage_channels or ctx.author.id in devs: pass
     else: return
     server = await get_admin()
     embed = discord.Embed(title=f'{economysuccess} Done', description='Cleared Successfully!', color=embedcolor)
@@ -1666,6 +1672,9 @@ async def pubs(data):
             res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
         embed.add_field(name="Result", value=res, inline=False)
         rescode = hex(random.randint(1000, 9999))
+        allapps = bot.refr.setdefault("apps", [])
+        allapps.append({rescode:{"kdr":kdr, "level":level, "kpg":kpg, "username":username, "nukes":nukes, "scoreweek":scoreweek}})
+        await close_admin()
         if p:
             embed.add_field(name="What to do now?", value=f"Head over to <#845682300967714831>, and type `v.result {rescode}`.\n"
                                                           "A new ticket will be opened with your result posted."
