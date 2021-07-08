@@ -543,7 +543,8 @@ async def exec_rem(rem, userid):
     embed.set_author(name=user.name, icon_url=user.avatar.url)
     embed.set_thumbnail(
         url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
-    await user.send(embed=embed)
+    try: await user.send(embed=embed)
+    except: await bot.get_channel(rem["chl"]).send(f"{user.mention}", embed=embed)
     await close_admin()
 
 @bot.command()
@@ -1928,7 +1929,7 @@ async def reminder(ctx, action=None, *args):
                                           "**Commands:**\n"
                                           "`v.rem add`  (for interactive setup)\n"
                                           "`v.rem show` (view all active reminders)\n"
-                                          "`v.rem del  <reminder-id>` (delete reminder)\n"
+                                          "`v.rem del <reminder-id>` (delete reminder)\n"
                                           "`v.rem del -a`             (delete all reminders)\n"
                                           "\n"
                                           "**For a quick reminder:** `v.remindme <time> [desc]`\n"
@@ -2005,7 +2006,7 @@ async def reminder(ctx, action=None, *args):
             bot.refr["rems_c"] = remid + 1
             allrems = bot.refr.setdefault("rems", {})
             autrems = allrems.setdefault(str(ctx.author.id), [])
-            autrems.append({"tadd":time.time(), "desc":desc, "time":secs, "id":remid+1})
+            autrems.append({"tadd":time.time(), "desc":desc, "time":secs, "id":remid+1, "chl":ctx.channel})
             allrems[str(ctx.author.id)] = autrems
             bot.refr["rems"] = allrems
             await msg_.delete()
