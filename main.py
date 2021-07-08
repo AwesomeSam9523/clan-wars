@@ -1,10 +1,11 @@
 import ssl, msgpack, asyncio, discord, json, sys, random, copy
-import time, datetime, os, threading, requests, shutil, psutil
+import time, datetime, os, threading, requests, shutil, psutil, functools
 from prettytable import PrettyTable
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.ext.commands import *
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageSequence
 from io import BytesIO
+from concurrent.futures import ThreadPoolExecutor
 
 print("Starting")
 intents = discord.Intents.default()
@@ -119,6 +120,19 @@ bot.help_json = {
             "desc":"View all linked accounts"
         }
     },
+    "Utility":{
+        "category":"Utility",
+        "v.reminder":{
+            "usage":"v.reminder",
+            "desc":"Set/Delete a reminder",
+            "aliases":["reminders", "rem", "rems"]
+        },
+        "v.remindme":{
+            "usage":"v.remindme <time> [desc]",
+            "desc":"Quick Reminder",
+            "aliases":["None"]
+        }
+    },
     "Staff": {
         "category":"Staff",
         "v.cbg":{
@@ -160,7 +174,7 @@ warn2 = []
 devs = [771601176155783198]
 staffchl = [813447381752348723, 854008993248051230]
 flags_list = [['Afghanistan', 'af', 0], ['Albania', 'al', 1], ['Algeria', 'dz', 2], ['American Samoa', 'as', 3], ['Andorra', 'ad', 4], ['Angola', 'ao', 5], ['Anguilla', 'ai', 6], ['Antarctica', 'aq', 7], ['Antigua and Barbuda', 'ag', 8], ['Argentina', 'ar', 9], ['Armenia', 'am', 10], ['Aruba', 'aw', 11], ['Australia', 'au', 12], ['Austria', 'at', 13], ['Azerbaijan', 'az', 14], ['Bahamas', 'bs', 15], ['Bahrain', 'bh', 16], ['Bangladesh', 'bd', 17], ['Barbados', 'bb', 18], ['Belarus', 'by', 19], ['Belgium', 'be', 20], ['Belize', 'bz', 21], ['Benin', 'bj', 22], ['Bermuda', 'bm', 23], ['Bhutan', 'bt', 24], ['Bolivia', 'bo', 25], ['Bosnia and Herzegovina', 'ba', 26], ['Botswana', 'bw', 27], ['Brazil', 'br', 28], ['British Indian Ocean Territory', 'io', 29], ['British Virgin Islands', 'vg', 30], ['Brunei', 'bn', 31], ['Bulgaria', 'bg', 32], ['Burkina Faso', 'bf', 33], ['Burundi', 'bi', 34], ['Cambodia', 'kh', 35], ['Cameroon', 'cm', 36], ['Canada', 'ca', 37], ['Cape Verde', 'cv', 38], ['Cayman Islands', 'ky', 39], ['Central African Republic', 'cf', 40], ['Chad', 'td', 41], ['Chile', 'cl', 42], ['China', 'cn', 43], ['Christmas Island', 'cx', 44], ['Cocos Islands', 'cc', 45], ['Colombia', 'co', 46], ['Comoros', 'km', 47], ['Cook Islands', 'ck', 48], ['Costa Rica', 'cr', 49], ['Croatia', 'hr', 50], ['Cuba', 'cu', 51], ['Curacao', 'cw', 52], ['Cyprus', 'cy', 53], ['Czech Republic', 'cz', 54], ['Democratic Republic of the Congo', 'cd', 55], ['Denmark', 'dk', 56], ['Djibouti', 'dj', 57], ['Dominica', 'dm', 58], ['Dominican Republic', 'do', 59], ['East Timor', 'tl', 60], ['Ecuador', 'ec', 61], ['Egypt', 'eg', 62], ['El Salvador', 'sv', 63], ['Equatorial Guinea', 'gq', 64], ['Eritrea', 'er', 65], ['Estonia', 'ee', 66], ['Ethiopia', 'et', 67], ['Falkland Islands', 'fk', 68], ['Faroe Islands', 'fo', 69], ['Fiji', 'fj', 70], ['Finland', 'fi', 71], ['France', 'fr', 72], ['French Polynesia', 'pf', 73], ['Gabon', 'ga', 74], ['Gambia', 'gm', 75], ['Georgia', 'ge', 76], ['Germany', 'de', 77], ['Ghana', 'gh', 78], ['Gibraltar', 'gi', 79], ['Greece', 'gr', 80], ['Greenland', 'gl', 81], ['Grenada', 'gd', 82], ['Guam', 'gu', 83], ['Guatemala', 'gt', 84], ['Guernsey', 'gg', 85], ['Guinea', 'gn', 86], ['Guinea-Bissau', 'gw', 87], ['Guyana', 'gy', 88], ['Haiti', 'ht', 89], ['Honduras', 'hn', 90], ['Hong Kong', 'hk', 91], ['Hungary', 'hu', 92], ['Iceland', 'is', 93], ['India', 'in', 94], ['Indonesia', 'id', 95], ['Iran', 'ir', 96], ['Iraq', 'iq', 97], ['Ireland', 'ie', 98], ['Isle of Man', 'im', 99], ['Israel', 'il', 100], ['Italy', 'it', 101], ['Ivory Coast', 'ci', 102], ['Jamaica', 'jm', 103], ['Japan', 'jp', 104], ['Jersey', 'je', 105], ['Jordan', 'jo', 106], ['Kazakhstan', 'kz', 107], ['Kenya', 'ke', 108], ['Kiribati', 'ki', 109], ['Kosovo', 'xk', 110], ['Kuwait', 'kw', 111], ['Kyrgyzstan', 'kg', 112], ['Laos', 'la', 113], ['Latvia', 'lv', 114], ['Lebanon', 'lb', 115], ['Lesotho', 'ls', 116], ['Liberia', 'lr', 117], ['Libya', 'ly', 118], ['Liechtenstein', 'li', 119], ['Lithuania', 'lt', 120], ['Luxembourg', 'lu', 121], ['Macau', 'mo', 122], ['Macedonia', 'mk', 123], ['Madagascar', 'mg', 124], ['Malawi', 'mw', 125], ['Malaysia', 'my', 126], ['Maldives', 'mv', 127], ['Mali', 'ml', 128], ['Malta', 'mt', 129], ['Marshall Islands', 'mh', 130], ['Mauritania', 'mr', 131], ['Mauritius', 'mu', 132], ['Mayotte', 'yt', 133], ['Mexico', 'mx', 134], ['Micronesia', 'fm', 135], ['Moldova', 'md', 136], ['Monaco', 'mc', 137], ['Mongolia', 'mn', 138], ['Montenegro', 'me', 139], ['Montserrat', 'ms', 140], ['Morocco', 'ma', 141], ['Mozambique', 'mz', 142], ['Myanmar', 'mm', 143], ['Namibia', 'na', 144], ['Nauru', 'nr', 145], ['Nepal', 'np', 146], ['Netherlands', 'nl', 147], ['Netherlands Antilles', 'an', 148], ['New Caledonia', 'nc', 149], ['New Zealand', 'nz', 150], ['Nicaragua', 'ni', 151], ['Niger', 'ne', 152], ['Nigeria', 'ng', 153], ['Niue', 'nu', 154], ['North Korea', 'kp', 155], ['Northern Mariana Islands', 'mp', 156], ['Norway', 'no', 157], ['Oman', 'om', 158], ['Pakistan', 'pk', 159], ['Palau', 'pw', 160], ['Palestine', 'ps', 161], ['Panama', 'pa', 162], ['Papua New Guinea', 'pg', 163], ['Paraguay', 'py', 164], ['Peru', 'pe', 165], ['Philippines', 'ph', 166], ['Pitcairn', 'pn', 167], ['Poland', 'pl', 168], ['Portugal', 'pt', 169], ['Puerto Rico', 'pr', 170], ['Qatar', 'qa', 171], ['Republic of the Congo', 'cg', 172], ['Reunion', 're', 173], ['Romania', 'ro', 174], ['Russia', 'ru', 175], ['Rwanda', 'rw', 176], ['Saint Barthelemy', 'bl', 177], ['Saint Helena', 'sh', 178], ['Saint Kitts and Nevis', 'kn', 179], ['Saint Lucia', 'lc', 180], ['Saint Martin', 'mf', 181], ['Saint Pierre and Miquelon', 'pm', 182], ['Saint Vincent and the Grenadines', 'vc', 183], ['Samoa', 'ws', 184], ['San Marino', 'sm', 185], ['Sao Tome and Principe', 'st', 186], ['Saudi Arabia', 'sa', 187], ['Senegal', 'sn', 188], ['Serbia', 'rs', 189], ['Seychelles', 'sc', 190], ['Sierra Leone', 'sl', 191], ['Singapore', 'sg', 192], ['Sint Maarten', 'sx', 193], ['Slovakia', 'sk', 194], ['Slovenia', 'si', 195], ['Solomon Islands', 'sb', 196], ['Somalia', 'so', 197], ['South Africa', 'za', 198], ['South Korea', 'kr', 199], ['South Sudan', 'ss', 200], ['Spain', 'es', 201], ['Sri Lanka', 'lk', 202], ['Sudan', 'sd', 203], ['Suriname', 'sr', 204], ['Svalbard and Jan Mayen', 'sj', 205], ['Swaziland', 'sz', 206], ['Sweden', 'se', 207], ['Switzerland', 'ch', 208], ['Syria', 'sy', 209], ['Taiwan', 'tw', 210], ['Tajikistan', 'tj', 211], ['Tanzania', 'tz', 212], ['Thailand', 'th', 213], ['Togo', 'tg', 214], ['Tokelau', 'tk', 215], ['Tonga', 'to', 216], ['Trinidad and Tobago', 'tt', 217], ['Tunisia', 'tn', 218], ['Turkey', 'tr', 219], ['Turkmenistan', 'tm', 220], ['Turks and Caicos Islands', 'tc', 221], ['Tuvalu', 'tv', 222], ['U.S. Virgin Islands', 'vi', 223], ['Uganda', 'ug', 224], ['Ukraine', 'ua', 225], ['United Arab Emirates', 'ae', 226], ['United Kingdom', 'gb', 227], ['United States', 'us', 228], ['Uruguay', 'uy', 229], ['Uzbekistan', 'uz', 230], ['Vanuatu', 'vu', 231], ['Vatican', 'va', 232], ['Venezuela', 've', 233], ['Vietnam', 'vn', 234], ['Wallis and Futuna', 'wf', 235], ['Western Sahara', 'eh', 236], ['Yemen', 'ye', 237], ['Zambia', 'zm', 238], ['Zimbabwe', 'zw', 239]]
-staff = [813441664617939004, 855793126958170122, 853997809212588073]
+staff = [813441664617939004, 855793126958170122, 853997809212588073, 504029508295196683, 660353231565619200, 482612710018908190]
 accepted = [813786315530305536, 813527378088951809, 813527377736761384, 813452412810690600, 813441662588157952, 836427405656326165, 853997809212588073]
 
 
@@ -476,6 +490,61 @@ async def timeout(user):
     bot.interlist.append(user.id)
     await asyncio.sleep(3600)
     bot.interlist.remove(user.id)
+
+async def conv_rem(msg):
+    days = 0
+    hrs = 0
+    mins = 0
+    secs = 0
+    try:
+        if "d" in msg:
+            newmsg = msg.split("d")
+            days = int(newmsg[0])
+            newmsg.pop(0)
+            msg = "".join(newmsg)
+        if "h" in msg:
+            newmsg = msg.split("h")
+            hrs = int(newmsg[0])
+            newmsg.pop(0)
+            msg = "".join(newmsg)
+        if "m" in msg:
+            newmsg = msg.split("m")
+            mins = int(newmsg[0])
+            newmsg.pop(0)
+            msg = "".join(newmsg)
+        if "s" in msg:
+            newmsg = msg.split("s")
+            secs = int(newmsg[0])
+            newmsg.pop(0)
+            msg = "".join(newmsg)
+        return (days*86400) + (hrs*3600) + (mins*60) + secs
+    except:
+        return "error"
+
+@tasks.loop(seconds=2)
+async def handle_rems():
+    rems = bot.refr["rems"]
+    for i, aut in rems.items():
+        for j in aut:
+            tleft = int(j["time"] - time.time() + j["tadd"])
+            if tleft <= 0:
+                aut.remove(j)
+                await exec_rem(j, i)
+        rems[i] = aut
+    bot.refr["rems"] = rems
+
+async def exec_rem(rem, userid):
+    user = bot.get_user(int(userid))
+    if user is None: return
+    embed = discord.Embed(title="Reminder",
+                          description=f"{rem['desc']}\n"
+                                      f"Set at: <t:{int(rem['tadd'])}:F> (<t:{int(rem['tadd'])}:R>)",
+                          color=embedcolor)
+    embed.set_author(name=user.name, icon_url=user.avatar.url)
+    embed.set_thumbnail(
+        url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+    await user.send(embed=embed)
+    await close_admin()
 
 @bot.command()
 @commands.check(general)
@@ -1850,6 +1919,160 @@ async def result(ctx, code):
     await msg.add_reaction("🔒")
     await close_admin()
 
+@bot.command(aliases=["rem", "rems", "reminders"])
+@commands.check(general)
+async def reminder(ctx, action=None, *args):
+    if action is None:
+        embed = discord.Embed(title="Reminders",
+                              description="Set a reminder and let the bot DM/ping you. Never forget anything again!\n\n"
+                                          "**Commands:**\n"
+                                          "`v.rem add`  (for interactive setup)\n"
+                                          "`v.rem show` (view all active reminders)\n"
+                                          "`v.rem del  <reminder-id>` (delete reminder)\n"
+                                          "`v.rem del -a`             (delete all reminders)\n"
+                                          "\n"
+                                          "**For a quick reminder:** `v.remindme <time> [desc]\n"
+                                          "Example:\n"
+                                          "- `v.remindme 5m switch off microwave`\n"
+                                          "- `v.remindme 1h english class`\n"
+                                          "- `v.remindme 2d5h announce smth`",
+                              color=embedcolor)
+        embed.set_thumbnail(url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+        return await ctx.send(embed=embed)
+    if action.lower() == "show":
+        aut = bot.refr["rems"].get(str(ctx.author.id))
+        if aut is None or len(aut) == 0:
+            embed = discord.Embed(title="Your Reminders",
+                                  description="Nothing here. But its never too late to add a reminder!",
+                                  color=localembed)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+            embed.set_thumbnail(
+                url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+
+            return await ctx.send(embed=embed)
+        embed = discord.Embed(title="Your Reminders",
+                              color=localembed)
+        embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+        embed.set_thumbnail(
+            url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+        for i in aut:
+            hours, remainder = divmod(int(i["time"] - time.time() + i["tadd"]), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            days, hours = divmod(hours, 24)
+            embed.add_field(name=f"ID: {i['id']}", value=f"`Desc:` {i['desc']}\n"
+                                                        f"`Time Left:` {days}d, {hours}h, {minutes}m, {seconds}s\n"
+                                                        f"`Set at:` <t:{int(i['tadd'])}:F> (<t:{int(i['tadd'])}:R>)\n"
+                                                        f"`End at:` <t:{int(i['time'] + i['tadd'])}:F> (<t:{int(i['time'] + i['tadd'])}:R>)", inline=False)
+        await ctx.send(embed=embed)
+    elif action.lower() == "add":
+        try:
+            embed = discord.Embed(title="Add a reminder",
+                                  description="Enter the description for the reminder.\nFor empty description, type `skip`",
+                                  color=localembed)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+            embed.set_thumbnail(url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+            em = await ctx.send(embed=embed)
+
+            def check(msg):
+                return msg.author == ctx.author and msg.channel == ctx.channel
+
+            msg = await bot.wait_for("message", timeout=300, check=check)
+            desc = msg.content
+            if desc.lower() == "skip": desc = ""
+            await msg.delete()
+            embed = discord.Embed(title="Add a reminder",
+                                  description="Enter the time duration from now. This should be in x**d**x**h**x**m**x**s**\n"
+                                              "Examples:\n"
+                                              "`1d5h`  => 1 day 5 hrs\n"
+                                              "`5h10m` => 5 hrs 10 mins\n"
+                                              "`5m30s` => 5 mins 30 secs",
+                                  color=localembed)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+            embed.set_thumbnail(
+                url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+            await em.edit(embed=embed)
+
+            def check(msg):
+                return msg.author == ctx.author and msg.channel == ctx.channel
+
+            msg_ = await bot.wait_for("message", timeout=300, check=check)
+            msg = msg_.content.lower()
+
+            secs = await conv_rem(msg)
+            if secs == "error":
+                return await ctx.send(f"{ctx.author.mention} Invalid time format!")
+            remid = bot.refr.setdefault("rems_c", 100000)
+            bot.refr["rems_c"] = remid + 1
+            allrems = bot.refr.setdefault("rems", {})
+            autrems = allrems.setdefault(str(ctx.author.id), [])
+            autrems.append({"tadd":time.time(), "desc":desc, "time":secs, "id":remid+1})
+            allrems[str(ctx.author.id)] = autrems
+            bot.refr["rems"] = allrems
+            await msg_.delete()
+            embed = discord.Embed(title="Add a reminder",
+                                  description="Done! I will remind you on time ;)",
+                                  colour=localembed)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+            embed.set_thumbnail(
+                url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+            await em.edit(embed=embed)
+            await close_admin()
+        except asyncio.TimeoutError:
+            await ctx.send(f"{ctx.author.mention} You didn't reply in time. Reminder aborted")
+    elif action.lower() in ["delete", "del"]:
+        aut = bot.refr["rems"].get(str(ctx.author.id))
+        if aut is None:
+            embed = discord.Embed(title="Your Reminders",
+                                  description="Nothing here. But its never too late to add a reminder!",
+                                  color=localembed)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+            embed.set_thumbnail(
+                url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+            return await ctx.send(embed=embed)
+        try:
+            if str(args[0]).lower() == "-a":
+                for i in aut:
+                    aut.remove(i)
+                found = True
+            else:
+                remid = int(args[0])
+                found = False
+                for i in aut:
+                    if int(i["id"]) == remid:
+                        aut.remove(i)
+                        found = True
+                        break
+            if not found: raise ValueError
+            else:
+                bot.refr["rems"][str(ctx.author.id)] = aut
+                await ctx.reply(f"{economysuccess} Reminder(s) Deleted")
+                await close_admin()
+        except: return await ctx.reply("Invalid Reminder ID")
+    else: await reminder(ctx)
+
+@bot.command()
+@commands.check(general)
+async def remindme(ctx, rtime, *, desc=None):
+    secs = await conv_rem(rtime.lower())
+    if secs == "error":
+        return await ctx.send(f"{ctx.author.mention} Invalid time format!")
+    if desc is None: desc = ""
+    remid = bot.refr["rems_c"]
+    bot.refr["rems_c"] = remid + 1
+    allrems = bot.refr["rems"]
+    autrems = allrems.setdefault(str(ctx.author.id), [])
+    autrems.append({"tadd": time.time(), "desc": desc, "time": secs, "id": remid + 1})
+    allrems[str(ctx.author.id)] = autrems
+    bot.refr["rems"] = allrems
+    embed = discord.Embed(title="Quick Reminder",
+                          description="Done! I will remind you on time ;)",
+                          colour=localembed)
+    embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+    embed.set_thumbnail(
+        url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+    await ctx.send(embed=embed)
+    await close_admin()
+
 @bot.command()
 @commands.is_owner()
 async def load_peeps(ctx=None):
@@ -1882,8 +2105,7 @@ async def load_data(ctx=None):
     msgs = await chl.history(limit=1).flatten()
     bot.bgdata = json.loads(requests.get(msgs[0].attachments[0]).text)
 
-@bot.event
-async def on_connect():
+async def one_ready():
     print("Connected")
     await bot.wait_until_ready()
     await load_data()
@@ -1893,6 +2115,7 @@ async def on_connect():
     bot.linkinglogs = bot.get_channel(861463678179999784)
     if not bot.pause or not bot.beta:
         if not bot.cwpause: asyncio.create_task(auto_update())
+    handle_rems.start()
 
 @bot.event
 async def on_message(message):
@@ -1971,8 +2194,5 @@ async def on_raw_reaction_add(payload):
             await asyncio.sleep(5)
             await tchl.delete()
 
-#@bot.event
-async def on_command_error(ctx, error):
-    pass
-
+bot.loop.create_task(one_ready())
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
