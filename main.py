@@ -1931,7 +1931,7 @@ async def reminder(ctx, action=None, *args):
                                           "`v.rem del  <reminder-id>` (delete reminder)\n"
                                           "`v.rem del -a`             (delete all reminders)\n"
                                           "\n"
-                                          "**For a quick reminder:** `v.remindme <time> [desc]\n"
+                                          "**For a quick reminder:** `v.remindme <time> [desc]`\n"
                                           "Example:\n"
                                           "- `v.remindme 5m switch off microwave`\n"
                                           "- `v.remindme 1h english class`\n"
