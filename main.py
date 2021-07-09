@@ -1,7 +1,5 @@
 import ssl, msgpack, asyncio, discord, json, sys, random, copy, aiohttp, traceback
 import time, datetime, os, threading, requests, psutil, functools
-
-import aiofiles as aiofiles
 from prettytable import PrettyTable
 from discord.ext import commands, tasks
 from discord.ext.commands import *
