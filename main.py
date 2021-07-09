@@ -663,7 +663,7 @@ async def refresh(ctx, what:str=None):
 
 @bot.command()
 @commands.check(general)
-async def end(ctx=None, clan=None, via=True):
+async def end(ctx=None, clan=None, via=False):
     if not via:
         if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
         if bot.cwpause:
