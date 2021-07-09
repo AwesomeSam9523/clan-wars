@@ -65,7 +65,7 @@ bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
 bot.cwpause = True
-bot.beta = False
+bot.beta = True
 bot.apidown = False
 bot.help_json = {
     "Wars": {
@@ -542,7 +542,7 @@ async def exec_rem(rem, userid):
                           color=embedcolor)
     embed.set_author(name=user.name, icon_url=user.avatar.url)
     embed.set_thumbnail(
-        url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+        url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
     try: await user.send(embed=embed)
     except: await bot.get_channel(rem["chl"]).send(f"{user.mention}", embed=embed)
     await close_admin()
@@ -1938,7 +1938,7 @@ async def reminder(ctx, action=None, *args):
                                           "- `v.remindme 1h english class`\n"
                                           "- `v.remindme 2d5h announce smth`",
                               color=embedcolor)
-        embed.set_thumbnail(url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+        embed.set_thumbnail(url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
         return await ctx.send(embed=embed)
     if action.lower() == "show":
         aut = bot.refr["rems"].get(str(ctx.author.id))
@@ -1948,14 +1948,14 @@ async def reminder(ctx, action=None, *args):
                                   color=localembed)
             embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
             embed.set_thumbnail(
-                url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+                url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
 
             return await ctx.send(embed=embed)
         embed = discord.Embed(title="Your Reminders",
                               color=localembed)
         embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
         embed.set_thumbnail(
-            url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+            url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
         for i in aut:
             hours, remainder = divmod(int(i["time"] - time.time() + i["tadd"]), 3600)
             minutes, seconds = divmod(remainder, 60)
@@ -1971,7 +1971,7 @@ async def reminder(ctx, action=None, *args):
                                   description="Enter the description for the reminder.\nFor empty description, type `skip`",
                                   color=localembed)
             embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
-            embed.set_thumbnail(url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+            embed.set_thumbnail(url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             em = await ctx.send(embed=embed)
 
             def check(msg):
@@ -1990,7 +1990,7 @@ async def reminder(ctx, action=None, *args):
                                   color=localembed)
             embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
             embed.set_thumbnail(
-                url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+                url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             await em.edit(embed=embed)
 
             def check(msg):
@@ -2015,7 +2015,7 @@ async def reminder(ctx, action=None, *args):
                                   colour=localembed)
             embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
             embed.set_thumbnail(
-                url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+                url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             await em.edit(embed=embed)
             await close_admin()
         except asyncio.TimeoutError:
@@ -2028,7 +2028,7 @@ async def reminder(ctx, action=None, *args):
                                   color=localembed)
             embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
             embed.set_thumbnail(
-                url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+                url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             return await ctx.send(embed=embed)
         try:
             if str(args[0]).lower() == "-a":
@@ -2070,7 +2070,7 @@ async def remindme(ctx, rtime, *, desc=None):
                           colour=localembed)
     embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
     embed.set_thumbnail(
-        url="https://png.pngtree.com/element_our/png/20181113/wall-clock-logo-icon-design-template-vector-illustration-png_236712.jpg")
+        url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
     await ctx.send(embed=embed)
     await close_admin()
 
@@ -2087,12 +2087,31 @@ async def load_peeps(ctx=None):
     for i in data["data"]["members"]:
         bot.vntapeeps.append(i["username"].lower())
 
+@bot.command()
+@commands.is_owner()
+async def pause(ctx):
+    if bot.pause: bot.pause = False
+    else: bot.cwpause = True
+    bot.refr["pause"] = bot.pause
+    await close_admin()
+    await ctx.reply(f"Set `pause` to: {bot.pause}")
+
+@bot.command()
+@commands.is_owner()
+async def cwpause(ctx):
+    if bot.cwpause: bot.cwpause = False
+    else: bot.cwpause = True
+    await ctx.reply(f"Set `cwpause` to: {bot.cwpause}")
+    bot.refr["cwpause"] = bot.cwpause
+    await close_admin()
+
 @bot.command(aliases=["ref"])
 async def load_data(ctx=None):
     chl = bot.get_channel(854692793276170280)
     msgs = await chl.history(limit=1).flatten()
     bot.refr = json.loads(requests.get(msgs[0].attachments[0]).text)
-    #bot.refr = json.loads(msgs[0].content)
+    bot.cwpause = bot.refr["cwpause"]
+    bot.pause = bot.refr["pause"]
 
     chl = bot.get_channel(854721559359913994)
     msgs = await chl.history(limit=1).flatten()
