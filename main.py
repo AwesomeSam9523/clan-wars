@@ -53,6 +53,7 @@ bot.links = {}
 bot.data = {}
 bot.userdata = {}
 bot.bgdata = {}
+bot.cwdata = {}
 bot.unsaved = {}
 bot.cache = {}
 bot.pendings = {}
@@ -394,6 +395,26 @@ async def auto_update():
     with open("botdata.json", "w") as f:
         f.write(str(json.dumps(bot.data, indent=2)))
 
+@tasks.loop(minutes=1)
+async def warslogs():
+    exptime = bot.refr.get("cwtime_s")
+    if exptime is None: return
+    exptime2 = bot.refr.get("cwtime_e")
+    if exptime2 is None: return
+    if exptime < time.time() < exptime2:
+        kills, data = await end(clan="VNTA", via=True)
+        if kills == 0:
+            return
+        today = datetime.date.today()
+        d1 = today.strftime("%d-%m-%Y")
+        bot.cwdata[d1] = data
+        await updatecwdata()
+
+async def updatecwdata():
+    with open("cwdata.json", "w") as f:
+        f.write(json.dumps(bot.cwdata, indent=2))
+    await bot.get_channel(862972949069955083).send(file=discord.File("cwdata.json"))
+
 async def update_embeds(clan):
     await bot.wait_until_ready()
     all_data = bot.refr[clan]
@@ -642,27 +663,28 @@ async def refresh(ctx, what:str=None):
 
 @bot.command()
 @commands.check(general)
-async def end(ctx, clan=None):
-    if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
-    if bot.cwpause:
-        embed = discord.Embed(title="Wars Break",
-                              description="Clan wars are not currently running. Please use this command after wars start!",
-                              colour=error_embed)
-        return await ctx.reply(embed=embed)
-    if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
-        return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
-    if clan is not None:
-        if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
-            clan = "VNTA"
+async def end(ctx=None, clan=None, via=True):
+    if not via:
+        if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
+        if bot.cwpause:
+            embed = discord.Embed(title="Wars Break",
+                                  description="Clan wars are not currently running. Please use this command after wars start!",
+                                  colour=error_embed)
+            return await ctx.reply(embed=embed)
+        if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
+            return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
+        if clan is not None:
+            if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
+                clan = "VNTA"
+            else:
+                if ctx.channel.id not in staffchl:
+                    return await ctx.reply(f"For security reasons, this command cannot be used in a public channel.\n"
+                                           f"Please go to {' or '.join([x.mention for x in [bot.get_channel(y) for y in staffchl]])}.")
         else:
-            if ctx.channel.id not in staffchl:
-                return await ctx.reply(f"For security reasons, this command cannot be used in a public channel.\n"
-                                       f"Please go to {' or '.join([x.mention for x in [bot.get_channel(y) for y in staffchl]])}.")
-    else:
-        clan = "VNTA"
-    if ctx.channel.id not in staffchl+[813437673926557736]:
-        return await ctx.reply("You are not allowed to use this command in public chat")
-    await ctx.message.add_reaction(loading)
+            clan = "VNTA"
+        if ctx.channel.id not in staffchl+[813437673926557736]:
+            return await ctx.reply("You are not allowed to use this command in public chat")
+        await ctx.message.add_reaction(loading)
     data = await getdata(clan)
     if data == "error":
         embed = discord.Embed(title=f"{economyerror} Error",
@@ -736,8 +758,17 @@ async def end(ctx, clan=None):
 
     for j in actlist:
         j.set_footer(text=f"Est. Kills: {finalkills} | Bot by {bot.dev}", icon_url=sampfp)
-        a = await ctx.send(embed=j)
-    await ctx.message.clear_reaction(loading)
+        if not via: a = await ctx.send(embed=j)
+    if not via:
+        return await ctx.message.clear_reaction(loading)
+    newdata = []
+    for i in data:
+        dat = {}
+        for k, v in i.items():
+            if k in ["username", "contract"]:
+                dat[k] = v
+        newdata.append(dat)
+    return int(finalkills), newdata
 
 @bot.command(aliases=['eval'],hidden=True)
 @commands.is_owner()
@@ -2139,6 +2170,8 @@ async def load_peeps(ctx=None):
                 bot.vntapeeps.clear()
                 for i in data["data"]["members"]:
                     bot.vntapeeps.append(i["username"].lower())
+                if ctx is not None:
+                    await ctx.message.add_reaction(economysuccess)
     except: pass
 
 @bot.command()
@@ -2158,6 +2191,16 @@ async def cwpause(ctx):
     await ctx.reply(f"Set `cwpause` to: {bot.cwpause}")
     bot.refr["cwpause"] = bot.cwpause
     await close_admin()
+
+@bot.command()
+@commands.is_owner()
+async def cwtime(ctx, string1, string2):
+    secs = await conv_rem(string1)
+    secs2 = await conv_rem(string2)
+    bot.refr["cwtime_s"] = time.time() + secs
+    bot.refr["cwtime_e"] = time.time() + secs2
+    await close_admin()
+    await ctx.message.add_reaction(economysuccess)
 
 @bot.command(aliases=["ref"])
 async def load_data(ctx=None):
@@ -2179,6 +2222,13 @@ async def load_data(ctx=None):
     msgs = await chl.history(limit=1).flatten()
     bot.bgdata = json.loads(requests.get(msgs[0].attachments[0]).text)
 
+    chl = bot.get_channel(862972949069955083)
+    msgs = await chl.history(limit=1).flatten()
+    bot.cwdata = json.loads(requests.get(msgs[0].attachments[0]).text)
+
+    if ctx is not None:
+        await ctx.message.add_reaction(economysuccess)
+
 async def one_ready():
     print("Connected")
     await bot.wait_until_ready()
@@ -2189,7 +2239,9 @@ async def one_ready():
     bot.linkinglogs = bot.get_channel(861463678179999784)
     if not bot.pause or not bot.beta:
         if not bot.cwpause: auto_update.start()
-    handle_rems.start()
+    if not bot.beta or True:
+        handle_rems.start()
+        warslogs.start()
 
 @bot.event
 async def on_message(message):
