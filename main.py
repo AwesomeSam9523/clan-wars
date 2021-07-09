@@ -67,7 +67,7 @@ bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
 bot.cwpause = True
-bot.beta = False
+bot.beta = True
 bot.apidown = False
 bot.help_json = {
     "Wars": {
@@ -188,6 +188,7 @@ success_embed = 5963593
 localembed = 16734606
 economyerror = "❌"
 economysuccess = "✅"
+loading = "<a:loading:862916076769378304>"
 color = 7929797
 sampfp = "https://media.discordapp.net/attachments/854008993248051230/854708889059852288/sam_av.png"
 
@@ -227,11 +228,13 @@ async def getdata(clan):
                     return response_data"""
     bot.reqs += 1
     #return [{'username': 'HiddenName', 'score': 7081125, 'score7': 999995, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'AlricTheEpic', 'score': 8432135, 'score7': 521690, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'prokillmaster', 'score': 9127628, 'score7': 508650, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': '_Jimmyy_', 'score': 7878985, 'score7': 445520, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'timcuck', 'score': 1044825, 'score7': 403480, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 1, 'timeplayed': 1998827, 'kills': 366, 'deaths': 97, 'region': 7}, 'clanRank': 6, 'pr': 0}, {'username': '(SoundWave)', 'score': 9682644, 'score7': 374430, 'role': 2, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'HypnoticCandy', 'score': 6188440, 'score7': 318305, 'role': 0, 'hacker': False, 'verified': True, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'PrimePanda', 'score': 18311098, 'score7': 317225, 'role': 1, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'giude', 'score': 6177730, 'score7': 315240, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 1, 'timeplayed': 3658672, 'kills': 618, 'deaths': 204, 'region': 7}, 'clanRank': 6, 'pr': 0}, {'username': 'flxso', 'score': 8862620, 'score7': 305930, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'TTVHeyItzRiley', 'score': 2481215, 'score7': 299635, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'DinoDS', 'score': 8226703, 'score7': 283100, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'wermiliusgamYT', 'score': 7107445, 'score7': 263760, 'role': 1, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 1, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 7}, 'clanRank': 6, 'pr': 0}, {'username': '2hsjkddfuh', 'score': 8378255, 'score7': 257260, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'PUNKIN_04', 'score': 6422515, 'score7': 236030, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'FistWiTheWrist', 'score': 1141455, 'score7': 235435, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Tamas601', 'score': 15981120, 'score7': 222790, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'sec_aimboter', 'score': 3493655, 'score7': 221270, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 1, 'timeplayed': 1479929, 'kills': 262, 'deaths': 86, 'region': 7}, 'clanRank': 6, 'pr': 0}, {'username': 'Berox', 'score': 5850915, 'score7': 211560, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'PigBoss3232', 'score': 6429266, 'score7': 205960, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'TZYellowNugget', 'score': 15179805, 'score7': 201465, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'SK-_-GAMING', 'score': 4769387, 'score7': 197205, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'bathwater-_-', 'score': 10748014, 'score7': 196580, 'role': 2, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Siyamnur', 'score': 8692415, 'score7': 195095, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'The_Vantablack', 'score': 9019388, 'score7': 186040, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'vidgamer', 'score': 14085171, 'score7': 182735, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'alok87', 'score': 30960605, 'score7': 176465, 'role': 1, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'snipereliot', 'score': 15638609, 'score7': 171565, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'JustZorrox', 'score': 12925065, 'score7': 167865, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Nanogun', 'score': 7244465, 'score7': 155870, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'ER7_SQUAD1', 'score': 3673110, 'score7': 142710, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'TTV_Plasma', 'score': 5305595, 'score7': 140080, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'trashplayer187', 'score': 16478290, 'score7': 131420, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'SushiMan69', 'score': 5501001, 'score7': 129640, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'arya4', 'score': 5231335, 'score7': 124430, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 1, 'timeplayed': 746255, 'kills': 141, 'deaths': 45, 'region': 7}, 'clanRank': 6, 'pr': 0}, {'username': 'PURPLEMUSHROOM', 'score': 8053992, 'score7': 124400, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'K4lt', 'score': 539340, 'score7': 123645, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'MultexGamingYT', 'score': 6771700, 'score7': 119425, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'TeraIO', 'score': 10179749, 'score7': 113475, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'ursociallife2', 'score': 7556087, 'score7': 109135, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'rdhanekula', 'score': 10756897, 'score7': 99725, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'KingWasp', 'score': 5066625, 'score7': 94235, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'xeinny', 'score': 8190260, 'score7': 86540, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Kvb3k', 'score': 7852307, 'score7': 82150, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Urenda06', 'score': 8003970, 'score7': 76770, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': '_68_', 'score': 1433113, 'score7': 76290, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'DragonOfWar', 'score': 5138628, 'score7': 68410, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'forportillo', 'score': 6564425, 'score7': 54545, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Cattiest97', 'score': 8490570, 'score7': 47630, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'FAZEFIREDOES', 'score': 5549176, 'score7': 43290, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'realAffixx', 'score': 7414160, 'score7': 41785, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'TamedKR', 'score': 5606490, 'score7': 39335, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': '0rion86_TOP', 'score': 2817440, 'score7': 36465, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'jacob8793', 'score': 8109249, 'score7': 33200, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'ScopezzUK', 'score': 824215, 'score7': 32900, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'AwesomeSam', 'score': 9288930, 'score7': 27205, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'crzyjo3_ttv', 'score': 3123295, 'score7': 24790, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'JustHaven', 'score': 2387295, 'score7': 19650, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'lmao_epic', 'score': 1167860, 'score7': 17920, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Sklasher20192', 'score': 6906060, 'score7': 17220, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'ensonananyani', 'score': 13218652, 'score7': 16390, 'role': 2, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'IM-aa-boT', 'score': 5439856, 'score7': 15075, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Levinho_', 'score': 3201695, 'score7': 10525, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'minowskii', 'score': 2632935, 'score7': 9430, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 1, 'timeplayed': 562233, 'kills': 123, 'deaths': 19, 'region': 7}, 'clanRank': 6, 'pr': 0}, {'username': 'helloMods', 'score': 5640530, 'score7': 7390, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'VG-LAGZE', 'score': 13050990, 'score7': 6600, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'yuvijo', 'score': 2019455, 'score7': 5705, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Boomer_Kun', 'score': 4228680, 'score7': 5620, 'role': 1, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'datoneguy123', 'score': 9988505, 'score7': 3765, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'pj06', 'score': 3810741, 'score7': 3125, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'GetR3kt17', 'score': 8844970, 'score7': 2725, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'serpentsnlper', 'score': 3851410, 'score7': 1250, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'HikoyyLeRetour', 'score': 5446630, 'score7': 385, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'aflawedmind', 'score': 3365885, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'jstn_361', 'score': 6543900, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': '-slugy', 'score': 919145, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Gamenight', 'score': 4334450, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Gamer_Zares', 'score': 1140587, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Zebbzter01', 'score': 3065280, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'tornn', 'score': 1601925, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'NISEgfx', 'score': 600030, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'KleinSeuntjie', 'score': 4382045, 'score7': 0, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'aabir(FaZe)', 'score': 5410440, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'imsorrycynthia', 'score': 477875, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'FanaticalRoute', 'score': 3050465, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Symphonyyy', 'score': 1348275, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Kaltein', 'score': 11207890, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'mach6', 'score': 277270, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 1, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 7}, 'clanRank': 6, 'pr': 0}, {'username': 'isilac', 'score': 8927460, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'RyzeAu', 'score': 4233915, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Rand0m_12', 'score': 1709180, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'CITYCREEK', 'score': 753995, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'Melvinthepro', 'score': 9218012, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'HenLee1801', 'score': 5794325, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': True, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'WolfTamer69', 'score': 1620315, 'score7': 0, 'role': 1, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}, {'username': 'shewto', 'score': 2462880, 'score7': 0, 'role': 0, 'hacker': False, 'verified': False, 'premium': False, 'contract': {'state': 0, 'timeplayed': 0, 'kills': 0, 'deaths': 0, 'region': 0}, 'clanRank': 6, 'pr': 0}]
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f"https://kr.vercel.app/api/clan?clan={clan}", timeout=aiohttp.ClientTimeout(total=10)) as data:
-            if data.status != 200:
-                return "error"
-            res = json.loads(await data.text())
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://kr.vercel.app/api/clan?clan={clan}", timeout=aiohttp.ClientTimeout(total=10)) as data:
+                if data.status != 200:
+                    return "error"
+                res = json.loads(await data.text())
+    except: return "error"
     today = bot.data.get(time.strftime("%d-%m-%Y"), {})
     today[res["data"]["name"]] = res
     bot.data[time.strftime("%d-%m-%Y")] = today
@@ -417,7 +420,7 @@ async def update_embeds(clan):
             i.timestamp = datetime.datetime.utcnow()
             await actlist[count].edit(embed=i)
     else:
-        return await view(channel, via="sam123", clan=clan)
+        return await view(channel, clan=clan, via="sam123")
 
     if len(data["expired"]) == len(actlist):
         for i in data["expired"]:
@@ -426,7 +429,7 @@ async def update_embeds(clan):
             i.timestamp = datetime.datetime.utcnow()
             await explist[count].edit(embed=i)
     else:
-        return await view(channel, via="sam123", clan=clan)
+        return await view(channel, clan=clan, via="sam123")
 
 async def update_links():
     with open("links.json", "w") as f:
@@ -556,51 +559,54 @@ async def exec_rem(rem, userid):
 
 @bot.command()
 @commands.check(general)
-async def view(channel, clan=None, via=None):
-    if bot.pause: return await channel.send("⚠ ️Maintainence Update. Please retry later")
+async def view(ctx, clan=None, via=None):
+    if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
     if bot.cwpause:
         embed = discord.Embed(title="Wars Break",
                               description="Clan wars are not currently running. Please use this command after wars start!",
                               colour=error_embed)
-        return await channel.reply(embed=embed)
+        return await ctx.reply(embed=embed)
+    ctx2 = ctx
     if via == "sam123" and clan is not None:
         pass
     else:
-        if not any(allow in [role.id for role in channel.author.roles] for allow in accepted):
-            return await channel.reply("Only VNTA members are given the exclusive rights to use the bot.")
+        if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
+            return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
         if clan is not None:
-            if not any(allow in [role.id for role in channel.author.roles] for allow in staff):
+            if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
                 print("not qual")
                 clan = "VNTA"
             else:
-                if channel.channel.id not in staffchl:
-                    return await channel.reply(f"For security reasons, this command cannot be used in a public channel.\n"
+                if ctx.channel.id not in staffchl:
+                    return await ctx.reply(f"For security reasons, this command cannot be used in a public channel.\n"
                                            f"Please go to {' or '.join([x.mention for x in [bot.get_channel(y) for y in staffchl]])}.")
         else:
             clan = "VNTA"
-        if channel.channel.id not in [813437673926557736, 813447381752348723, 854008993248051230]:
-            return await channel.reply(
+        if ctx.channel.id not in [813437673926557736, 813447381752348723, 854008993248051230]:
+            return await ctx.reply(
                 "Please go to <#813437673926557736> or <#813447381752348723> to use `v.view` or `v.end`")
-        channel = channel.channel
+        await ctx.message.add_reaction(loading)
+        ctx = ctx.channel
     data = await embed_view(clan)
     if data == "error":
         embed = discord.Embed(title=f"{economyerror} Error",
                               description="API didnt respond in time",
                               color=error_embed)
         embed.set_footer(text="Please try again later")
-        return await channel.send(embed=embed)
+        await ctx2.message.clear_reaction(loading)
+        return await ctx.send(embed=embed)
     maybeupdate = {}
     for i in data.keys():
         em = data[i]
         ids = []
         for j in em:
-            a = await channel.send(embed=j)
+            a = await ctx.send(embed=j)
             ids.append(a.id)
-
+            await ctx.message.clear_reaction(loading)
         if via == "sam123" and clan is not None:
             maybeupdate[i] = ids
     if len(maybeupdate.values()) != 0:
-        maybeupdate["chl"] = channel.id
+        maybeupdate["chl"] = ctx.id
         bot.refr[clan] = maybeupdate
         await update_embeds(clan)
 
@@ -632,7 +638,7 @@ async def refresh(ctx, what:str=None):
         await update_embeds(clan)
         await ctx.message.add_reaction("✅")
     elif what == "setup":
-        await view(ctx.channel, via="sam123", clan=clan)
+        await view(ctx.channel, clan=clan, via="sam123")
         await close_admin()
 
 @bot.command()
@@ -657,12 +663,14 @@ async def end(ctx, clan=None):
         clan = "VNTA"
     if ctx.channel.id not in [813437673926557736, 813447381752348723, 854008993248051230]:
         return await ctx.reply("Please go to <#813437673926557736> or <#813447381752348723> to use `v.view` or `v.end`")
+    await ctx.message.add_reaction(loading)
     data = await getdata(clan)
     if data == "error":
         embed = discord.Embed(title=f"{economyerror} Error",
                               description="API didnt respond in time",
                               color=error_embed)
         embed.set_footer(text="Please try again later")
+        await ctx.message.clear_reaction(loading)
         return await ctx.send(embed=embed)
     data = data["data"]["members"]
     active = PrettyTable()
@@ -730,6 +738,7 @@ async def end(ctx, clan=None):
     for j in actlist:
         j.set_footer(text=f"Est. Kills: {finalkills} | Bot by {bot.dev}", icon_url=sampfp)
         a = await ctx.send(embed=j)
+    await ctx.message.clear_reaction(loading)
 
 @bot.command(aliases=['eval'],hidden=True)
 @commands.is_owner()
@@ -766,6 +775,7 @@ async def link(ctx, *, ign):
     d = bot.links.get(str(ctx.author.id), [])
     if ign.lower() in [x.lower for x in d]:
         return await ctx.send("You already have this account linked")
+    await ctx.message.add_reaction(loading)
     if ign.lower() in bot.cache:
         t = bot.cache[ign.lower()]["time"]
         if time.time() - t < 15:
@@ -778,9 +788,11 @@ async def link(ctx, *, ign):
                                               description="API didnt respond in time",
                                               color=error_embed)
                         embed.set_footer(text="Please try again later")
+                        await ctx.message.clear_reaction(loading)
                         return await ctx.send(embed=embed)
                     userdata = json.loads(await data.text())
                     if not userdata["success"]:
+                        await ctx.message.clear_reaction(loading)
                         return await ctx.reply(userdata["error"])
     else:
         async with aiohttp.ClientSession() as session:
@@ -789,10 +801,12 @@ async def link(ctx, *, ign):
                     embed = discord.Embed(title=f"{economyerror} Error",
                                           description="API didnt respond in time",
                                           color=error_embed)
+                    await ctx.message.clear_reaction(loading)
                     embed.set_footer(text="Please try again later")
                     return await ctx.send(embed=embed)
                 userdata = json.loads(await data.text())
                 if not userdata["success"]:
+                    await ctx.message.clear_reaction(loading)
                     return await ctx.reply(userdata["error"])
     oldflag = userdata["data"]["stats"]["flg"]
     randflag = random.choice(flags_list)
@@ -805,6 +819,7 @@ async def link(ctx, *, ign):
                                       f"+ Enter the match and finish it.```",
                           color=embedcolor)
     embed.set_footer(text="Once done, react below..")
+    await ctx.message.clear_reaction(loading)
     msg = await ctx.send(embed=embed)
     await msg.add_reaction(economysuccess)
     await msg.add_reaction(economyerror)
@@ -885,13 +900,14 @@ async def contract(ctx, *, ign=None):
                 embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
                 return await ctx.reply(embed=embed)
             ign = ign["main"]
-
+    await ctx.message.add_reaction(loading)
     data = await getdata("VNTA")
     if data == "error":
         embed = discord.Embed(title=f"{economyerror} Error",
                               description="API didnt respond in time",
                               color=error_embed)
         embed.set_footer(text="Please try again later")
+        await ctx.message.clear_reaction(loading)
         return await ctx.send(embed=embed)
     data = data["data"]["members"]
     found = False
@@ -902,6 +918,7 @@ async def contract(ctx, *, ign=None):
             found = True
             break
     if not found:
+        await ctx.message.clear_reaction(loading)
         return await ctx.reply("User not in VNTA or incorrect IGN!")
     timeplayed = int(con["timeplayed"] / 1000)
     left = datetime.timedelta(seconds=timeplayed)
@@ -969,6 +986,7 @@ async def contract(ctx, *, ign=None):
     embed = discord.Embed(color=4521960)
     embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing", icon_url=sampfp)
     embed.set_image(url="attachment://contract.png")
+    await ctx.message.clear_reaction(loading)
     await ctx.send(embed=embed, file=discord.File(imagebytes, filename="contract.png"))
 
 @bot.command(aliases=["p", "pf"])
@@ -996,6 +1014,7 @@ async def profile(ctx, *, ign=None, via=False):
                 embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
                 return await ctx.reply(embed=embed)
             ign = ign["main"]
+    await ctx.message.add_reaction(loading)
     if type(ign) == dict:
         ign = ign["main"]
     bgdata = {}
@@ -1039,9 +1058,11 @@ async def profile(ctx, *, ign=None, via=False):
                                           description="API didnt respond in time",
                                           color=error_embed)
                     embed.set_footer(text="Please try again later")
+                    await ctx.message.clear_reaction(loading)
                     return await ctx.send(embed=embed)
                 userdata = json.loads(await data.text())
                 if not userdata["success"]:
+                    await ctx.message.clear_reaction(loading)
                     return await ctx.reply(userdata["error"])
     userdata = userdata["data"]
     username = userdata["username"]
@@ -1142,6 +1163,7 @@ async def profile(ctx, *, ign=None, via=False):
     except:
         bot.bgdata[ign]["file"] = ""
         await savebgdata()
+        await ctx.message.clear_reaction(loading)
         return await ctx.reply(f"Background Corrupted. It is auto-removed. Please set again using `v.pbg`")
     if imgtype == "png":
         bgimage = bgimage.convert("RGBA").resize((1280, 720))
@@ -1240,6 +1262,7 @@ async def profile(ctx, *, ign=None, via=False):
         image_bytes.seek(0)
     statsoverlay.close()
     bgimage.close()
+    await ctx.message.clear_reaction(loading)
     if not via:
         await ctx.send(file=discord.File(image_bytes, filename=f"profile.{imgtype}"))
     else:
