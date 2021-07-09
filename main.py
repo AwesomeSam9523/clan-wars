@@ -46,6 +46,8 @@ class PersistentView(discord.ui.View):
 
 bot = PersistentViewBot()
 bot.remove_command("help")
+bot.loop.set_debug(True)
+bot.loop.slow_callback_duration = 0.3
 bot.refr = {}
 bot.links = {}
 bot.data = {}
