@@ -385,14 +385,12 @@ async def updateuserdata():
         f.write(json.dumps(bot.userdata, indent=2))
     await chl.send(file=discord.File("userdata.json"))
 
+@tasks.loop(minutes=5.0)
 async def auto_update():
-    while True:
-        await update_embeds("VNTA")
-        files = bot.get_channel(854698116255318057)
-        with open("botdata.json", "w") as f:
-            f.write(str(json.dumps(bot.data, indent=2)))
-        #await files.send(file=discord.File("botdata.json"))
-        await asyncio.sleep(300)
+    await update_embeds("VNTA")
+    files = bot.get_channel(854698116255318057)
+    with open("botdata.json", "w") as f:
+        f.write(str(json.dumps(bot.data, indent=2)))
 
 async def update_embeds(clan):
     await bot.wait_until_ready()
@@ -2165,7 +2163,7 @@ async def one_ready():
     bot.dev = bot.get_user(771601176155783198)
     bot.linkinglogs = bot.get_channel(861463678179999784)
     if not bot.pause or not bot.beta:
-        if not bot.cwpause: asyncio.create_task(auto_update())
+        if not bot.cwpause: auto_update.start()
     handle_rems.start()
 
 @bot.event
