@@ -67,7 +67,7 @@ bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
 bot.cwpause = True
-bot.beta = True
+bot.beta = False
 bot.apidown = False
 bot.help_json = {
     "Wars": {
