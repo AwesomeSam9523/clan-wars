@@ -2092,7 +2092,7 @@ async def reminder(ctx, action=None, *args):
             bot.refr["rems"] = allrems
             await msg_.delete()
             embed = discord.Embed(title="Add a reminder",
-                                  description="Done! I will remind you on time ;)",
+                                  description=f"Done! I will remind you at <t:{int(time.time() + secs)}:F> ;)",
                                   colour=localembed)
             embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
             embed.set_thumbnail(
@@ -2147,7 +2147,7 @@ async def remindme(ctx, rtime, *, desc=None):
     allrems[str(ctx.author.id)] = autrems
     bot.refr["rems"] = allrems
     embed = discord.Embed(title="Quick Reminder",
-                          description="Done! I will remind you on time ;)",
+                          description=f"Done! I will remind you at <t:{int(time.time() + secs)}:F> ;)",
                           colour=localembed)
     embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
     embed.set_thumbnail(
@@ -2239,7 +2239,7 @@ async def one_ready():
     bot.linkinglogs = bot.get_channel(861463678179999784)
     if not bot.pause or not bot.beta:
         if not bot.cwpause: auto_update.start()
-    if not bot.beta or True:
+    if not bot.beta:
         handle_rems.start()
         warslogs.start()
 
