@@ -618,7 +618,7 @@ async def view(ctx, clan=None, via=None):
         for j in em:
             a = await ctx.send(embed=j)
             ids.append(a.id)
-            await ctx.message.clear_reaction(loading)
+            await ctx2.message.clear_reaction(loading)
         if via == "sam123" and clan is not None:
             maybeupdate[i] = ids
     if len(maybeupdate.values()) != 0:
@@ -659,7 +659,7 @@ async def refresh(ctx, what:str=None):
 
 @bot.command()
 @commands.check(general)
-async def end(ctx=None, clan=None, via=True):
+async def end(ctx=None, clan=None, via=False):
     if not via:
         if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
         if bot.cwpause:
