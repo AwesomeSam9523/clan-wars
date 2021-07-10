@@ -660,7 +660,7 @@ async def refresh(ctx, what:str=None):
 @bot.command()
 @commands.check(general)
 async def end(ctx=None, clan=None, via=True):
-    if ctx is not None:
+    if not via:
         if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
         if bot.cwpause:
             embed = discord.Embed(title="Wars Break",
@@ -2139,7 +2139,7 @@ async def remindme(ctx, rtime, *, desc=None):
     bot.refr["rems_c"] = remid + 1
     allrems = bot.refr["rems"]
     autrems = allrems.setdefault(str(ctx.author.id), [])
-    autrems.append({"tadd": time.time(), "desc": desc, "time": secs, "id": remid + 1})
+    autrems.append({"tadd": time.time(), "desc": desc, "time": secs, "id": remid + 1, "chl":ctx.channel.id})
     allrems[str(ctx.author.id)] = autrems
     bot.refr["rems"] = allrems
     embed = discord.Embed(title="Quick Reminder",
@@ -2197,202 +2197,6 @@ async def cwtime(ctx, string1, string2):
     bot.refr["cwtime_e"] = time.time() + secs2
     await close_admin()
     await ctx.message.add_reaction(economysuccess)
-
-class BotCalculator(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=120)
-        self.expr = ""
-        self.embed = discord.Embed(description=f"```\n{0}\n```ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ",
-                                   color=3092790)
-
-    def updatembed(self):
-        if self.expr == "": self.expr = "\u200b"
-        self.embed = discord.Embed(description=f"```\n{self.expr}\n```ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ",
-                              color=3092790)
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="1")
-    async def one(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "1"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="2")
-    async def two(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "2"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="3")
-    async def three(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "3"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.green, label="x")
-    async def multiply(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "*"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.grey, label="←")
-    async def backspace(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr = self.expr[:-1]
-        if len(self.expr) == 0: self.expr = ""
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="4")
-    async def four(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "4"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="5")
-    async def five(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "5"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="6")
-    async def six(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "6"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.green, label="÷")
-    async def divide(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "/"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.grey, label="Clear")
-    async def clear(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr = ""
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="7")
-    async def seven(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "7"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="8")
-    async def eight(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "8"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="9")
-    async def nine(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "9"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.green, label="+")
-    async def plus(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "+"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.grey, label="=")
-    async def equals(self, button: discord.ui.Button, interaction: discord.Interaction):
-        expression = self.expr
-        for i in range(10):
-            expression = expression.replace(f"{i}(", f"{i}*(")
-        expression = expression.replace("\u200b", "").replace("^", "**").replace("²", "**2").replace("³", "**3")
-        print(expression)
-        try:
-            calculated = numexpr.evaluate(expression).item()
-            self.expr = str(calculated)
-        except:
-            calculated = "Invalid Expression"
-            self.expr = ""
-
-        await interaction.response.edit_message(embed=discord.Embed(description=f"```\n{calculated}\n```ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ",
-                              color=3092790))
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="00")
-    async def dzero(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "00"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="0")
-    async def zero(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "0"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label=".")
-    async def dot(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "."
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.green, label="–")
-    async def minus(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "-"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.red, label="Exit")
-    async def exit(self, button: discord.ui.Button, interaction: discord.Interaction):
-        for child in self.children:
-            child.disabled = True
-        await interaction.response.edit_message(embed=self.embed, view=self)
-        self.stop()
-
-    @discord.ui.button(style=discord.ButtonStyle.green, label="(")
-    async def lbracket(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "("
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.green, label=")")
-    async def rbracket(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += ")"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.green, label="x²")
-    async def square(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "²"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.green, label="x³")
-    async def cube(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "³"
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-    @discord.ui.button(style=discord.ButtonStyle.green, label="√x")
-    async def sqrt(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.expr += "sqrt("
-        self.updatembed()
-        await interaction.response.edit_message(embed=self.embed)
-
-@bot.command(aliases=["c", "calc", "ans"])
-async def calculator(ctx, *, expression=None):
-    if expression is not None:
-        await ctx.message.add_reaction(loading)
-        try:
-            for i in range(10):
-                expression = expression.replace(f"{i}(", f"{i}*(")
-            expression = expression.replace("^", "**")
-            calculated = numexpr.evaluate(expression).item()
-            if len(str(calculated)) > 1980:
-                raise ValueError("Too big output to display")
-            await ctx.reply(content=f'```py\n{calculated}```')
-            await ctx.message.clear_reaction(loading)
-        except Exception as ex:
-            await ctx.reply("Invalid Expression!")
-            await ctx.message.clear_reaction(loading)
-    else:
-        embed = discord.Embed(description="```\n0\n```ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ",
-                              color=3092790)
-        await ctx.send(embed=embed, view=BotCalculator())
 
 @bot.command(aliases=["ref"])
 async def load_data(ctx=None):
