@@ -237,8 +237,8 @@ async def getdata(clan):
                 if data.status != 200:
                     return "error"
                 res = json.loads(await data.text())
+                return res
     except: return "error"
-    return res
 
 async def embed_view(clan):
     data = await getdata(clan)
