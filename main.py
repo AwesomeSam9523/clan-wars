@@ -79,16 +79,21 @@ bot.help_json = {
         "usage": "v.view",
         "desc": "Shows wars in embed form"
       },
-    "v.end": {
+      "v.end": {
         "aliases": ["None"],
         "usage": "v.end",
         "desc": "Shows estimated war kills of everyone in embed form"
     },
-    "v.contract":{
+      "v.contract":{
         "aliases":["con"],
         "usage":"v.contract [ign]",
         "desc":"Shows clan wars contract"
-    }
+    },
+      "v.target":{
+          "aliases":["tar"],
+          "usage":"v.target <kills>",
+          "desc":"Find the required KPG and KPM to achieve certain kills **from now**"
+      }
     }, "Profile":{
         "category":"Profile",
         "v.profile":{
@@ -185,6 +190,7 @@ staff = [813441664617939004, 855793126958170122, 853997809212588073, 50402950829
 accepted = [813786315530305536, 813527378088951809, 813527377736761384, 813452412810690600, 813441662588157952, 836427405656326165, 853997809212588073]
 
 usercmds = {}
+lastdata = {"time":0}
 
 error_embed = 16730441
 embedcolor = 5046208
@@ -231,12 +237,16 @@ async def getdata(clan):
                         elif response_data != ["pi"]: break
                     return response_data"""
     bot.reqs += 1
+    if time.time() - lastdata["time"] < 5:
+        return lastdata["data"]
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://kr.vercel.app/api/clan?clan={clan}", timeout=aiohttp.ClientTimeout(total=10)) as data:
                 if data.status != 200:
                     return "error"
                 res = json.loads(await data.text())
+                lastdata["time"] = time.time()
+                lastdata["data"] = res
                 return res
     except: return "error"
 
@@ -2150,6 +2160,59 @@ async def remindme(ctx, rtime, *, desc=None):
         url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
     await ctx.send(embed=embed)
     await close_admin()
+
+@bot.command()
+@commands.check(general)
+async def target(ctx, kills:int):
+    await ctx.message.add_reaction(loading)
+    if (kills <= 0) or (kills >= 4000):
+        await ctx.message.clear_reaction(loading)
+        return await ctx.reply("Smh you should stop playing with me and better do wars")
+    ign = bot.links.get(str(ctx.author.id))
+    if ign is None:
+        await ctx.message.clear_reaction(loading)
+        return await ctx.reply("You need to be linked to use this command. Use `v.link <ign>` to get linked")
+    ign = ign["main"]
+    data = await getdata("VNTA")
+    if data == "error":
+        embed = discord.Embed(title=f"{economyerror} Error",
+                              description="API didnt respond in time",
+                              color=error_embed)
+        embed.set_footer(text="Please try again later")
+        await ctx.message.clear_reaction(loading)
+        return await ctx.send(embed=embed)
+    data = data["data"]["members"]
+    found = False
+    for i in data:
+        if ign.lower() == i["username"].lower():
+            userdata = i
+            con = i["contract"]
+            found = True
+            break
+    if not found:
+        await ctx.message.clear_reaction(loading)
+        return await ctx.reply("User not in VNTA. Make sure that VNTA account is set as your main account")
+    timeplayed = int(con["timeplayed"] / 1000)
+    left = datetime.timedelta(seconds=timeplayed)
+    if timeplayed > 10800:
+        await ctx.message.clear_reaction(loading)
+        return await ctx.reply("You have completed your contract")
+    tleft = 10800 - timeplayed
+    games = tleft / 240
+    ckills = con["kills"]
+    rem = kills - ckills
+    if rem < 0:
+        await ctx.message.clear_reaction(loading)
+        return await ctx.reply("Target less that current kills")
+
+    x = PrettyTable()
+    x.field_names = ["Name", "Stats"]
+    x.title = f"Target- {kills}"
+    x.add_row(["Games left", f"{int(games)}"])
+    x.add_row(["Req. KPG", "{:.2f}".format(rem/games)])
+    x.add_row(["Req. KPM", "{:.2f}".format((rem/games)/4)])
+    await ctx.send(embed=discord.Embed(title=userdata["username"], description=f"```py\n{x}```", color=localembed))
+    await ctx.message.clear_reaction(loading)
 
 @bot.command()
 @commands.is_owner()
