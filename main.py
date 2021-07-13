@@ -98,7 +98,7 @@ bot.help_json = {
     },
       "v.target":{
           "aliases":["tar"],
-          "usage":"v.target <kills>",
+          "usage":"v.target <kills> [ign]",
           "desc":"Find the required KPG and KPM to achieve certain kills **from now**"
       }
     }, "Profile":{
@@ -2177,16 +2177,29 @@ async def remindme(ctx, rtime, *, desc=None):
 
 @bot.command(aliases=["tar"])
 @commands.check(general)
-async def target(ctx, kills:int):
+async def target(ctx, kills:int, *, ign=None):
     await ctx.message.add_reaction(loading)
+    if ign is not None:
+        newign = str(ign).replace('<@!', '').replace('>', '')
+        if len(newign) == len("537623052775718912"):
+            ign = bot.links.get(str(newign))
+            work = bot.userdata.get(str(ctx.author.id), {"incognito": False})["incognito"]
+            if work and ctx.author.id != int(newign): ign = None
+            if ign is None:
+                embed = discord.Embed(description="User not linked yet.",
+                                      color=error_embed)
+                embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
+                return await ctx.reply(embed=embed)
+            ign = ign["main"]
+    else:
+        ign = bot.links.get(str(ctx.author.id))
+        if ign is None:
+            await ctx.message.clear_reaction(loading)
+            return await ctx.reply("You are not linked. Use `v.link <ign>` to get linked")
+        ign = ign["main"]
     if (kills <= 0) or (kills >= 4000):
         await ctx.message.clear_reaction(loading)
         return await ctx.reply("Smh you should stop playing with me and better do wars")
-    ign = bot.links.get(str(ctx.author.id))
-    if ign is None:
-        await ctx.message.clear_reaction(loading)
-        return await ctx.reply("You need to be linked to use this command. Use `v.link <ign>` to get linked")
-    ign = ign["main"]
     data = await getdata("VNTA")
     if data == "error":
         embed = discord.Embed(title=f"{economyerror} Error",
