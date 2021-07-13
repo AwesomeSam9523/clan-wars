@@ -2235,7 +2235,8 @@ async def target(ctx, kills:int, *, ign=None):
     x = PrettyTable()
     x.field_names = ["Name", "Stats"]
     x.title = f"Target- {kills}"
-    x.add_row(["Games left", f"{int(games)}"])
+    x.add_row(["Time left", "{:.2f}".format(games*4)])
+    x.add_row(["Games left", "{:.2f}".format(games)])
     x.add_row(["Req. KPG", "{:.2f}".format(rem/games)])
     x.add_row(["Req. KPM", "{:.2f}".format((rem/games)/4)])
     await ctx.send(embed=discord.Embed(title=userdata["username"], description=f"```py\n{x}```", color=localembed))
