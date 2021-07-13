@@ -2161,7 +2161,7 @@ async def remindme(ctx, rtime, *, desc=None):
     await ctx.send(embed=embed)
     await close_admin()
 
-@bot.command()
+@bot.command(aliases=["tar"])
 @commands.check(general)
 async def target(ctx, kills:int):
     await ctx.message.add_reaction(loading)
