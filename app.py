@@ -20,6 +20,8 @@ def home():
     """
     Presents the 'Login with Discord' link
     """
+    print("Home")
+    print(session)
     oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, scope=scope)
     login_url, state = oauth.authorization_url(authorize_url)
     session["state"] = state
@@ -36,6 +38,7 @@ def oauth_callback():
     The token is stored in a session variable, so it can
     be reused across separate web requests.
     """
+    print("OAUTH")
     print(session)
     try:
         state = session["state"]
