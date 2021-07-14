@@ -67,26 +67,21 @@ def me():
     discord = make_session(token=session.get('oauth2_token'))
     user = discord.get(API_BASE_URL + '/users/@me').json()
     connections = discord.get(API_BASE_URL + '/users/@me/connections').json()
-    api = API()
-    api.store_data(userid=user["id"], connections=connections)
+    store_data(user["id"], connections)
     return smth()
 
-class API:
-    def __init__(self):
-        pass
-
-    def store_data(self, userid, connections):
-        with open("apidata.json", "r") as f:
-            old = json.load(f)
-
-        old[userid] = connections
-
+def store_data(userid, connections):
+    if not os.path.exists("apidata.json"):
         with open("apidata.json", "w") as f:
-            f.write(json.dumps(old, indent=2))
+            f.write("{}")
 
-if not os.path.exists("apidata.json"):
+    with open("apidata.json", "r") as f:
+        old = json.load(f)
+
+    old[userid] = connections
+
     with open("apidata.json", "w") as f:
-        f.write("{}")
+        f.write(json.dumps(old, indent=2))
 
 def smth(): pass
 
