@@ -1,7 +1,7 @@
 import asyncio, discord, json, sys, random, copy, aiohttp, traceback
 import time, datetime, os, threading, requests, psutil, functools, numexpr
 from prettytable import PrettyTable
-from discord.ext import commands, tasks, ipc
+from discord.ext import commands, tasks
 from discord.ext.commands import *
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageSequence
 from io import BytesIO
@@ -14,18 +14,11 @@ class PersistentViewBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=["V.", "v."], case_insensitive=True, intents=intents)
         self.persistent_views_added = False
-        self.ipc = ipc.Server(self, secret_key="NUJl5Q5K2_db7DTS9BX8oa8c7Fc4K6te")  # create our IPC Server
 
     async def on_ready(self):
         if not self.persistent_views_added:
             self.add_view(PersistentView())
             self.persistent_views_added = True
-
-    async def on_ipc_ready(self):
-        print("Ipc is ready.")
-
-    async def on_ipc_error(self, endpoint, error):
-        print(endpoint, "raised", error)
 
 class PersistentView(discord.ui.View):
     def __init__(self):
@@ -208,12 +201,6 @@ economysuccess = "✅"
 loading = "<a:loading:862916076769378304>"
 color = 7929797
 sampfp = "https://media.discordapp.net/attachments/854008993248051230/854708889059852288/sam_av.png"
-
-@bot.ipc.route()
-async def get_member_count(data):
-    guild = bot.get_guild(data.guild_id)  # get the guild object using parsed guild_id
-
-    return guild.member_count  # return the member count to the client
 
 @bot.check
 async def if_allowed(ctx):
