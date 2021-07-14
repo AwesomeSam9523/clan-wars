@@ -4,7 +4,7 @@ pillow
 psutil
 git+https://github.com/Rapptz/discord.py
 numexpr
-flask
+flask==2.0.0
 requests-oauthlib
 Click==7.0
 gunicorn==19.9.0
