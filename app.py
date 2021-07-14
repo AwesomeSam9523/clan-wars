@@ -36,6 +36,7 @@ def oauth_callback():
     The token is stored in a session variable, so it can
     be reused across separate web requests.
     """
+    print(session)
     try:
         state = session["state"]
         print('Got state', state)
@@ -48,6 +49,7 @@ def oauth_callback():
     print(discord.state)
     print(state)
     print()
+
     token = discord.fetch_token(
         token_url,
         state,
