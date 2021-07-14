@@ -74,7 +74,7 @@ bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
 bot.cwpause = True
-bot.beta = False
+bot.beta = True
 bot.apidown = False
 bot.help_json = {
     "Wars": {
@@ -1375,7 +1375,7 @@ async def cbg(ctx):
                             continue
                         else:
                             async with aiohttp.ClientSession(auto_decompress=False) as session:
-                                async with session.get(image, stream=True) as r:
+                                async with session.get(image) as r:
                                     if r.status == 200:
                                         with open(f"bgs/{ctx.author.id}.png", 'wb') as f:
                                             f.write(await r.read())
@@ -1505,7 +1505,7 @@ async def pbg(ctx, *, ign=None):
             elif msgc == "modify 1":
                 try:
                     embed = discord.Embed(description="Upload the `PNG/GIF` file from your PC to set as background.\n"
-                                                      "**Dont send a link to the image! Attach the file**",
+                                                      "**Dont send a link to the image! Upload the file**",
                                           color=embedcolor)
                     embed.set_footer(text="Recommended Size: 1280x720")
                     await ctx.send(embed=embed)
@@ -1518,7 +1518,7 @@ async def pbg(ctx, *, ign=None):
                             continue
                         else:
                             async with aiohttp.ClientSession(auto_decompress=False) as session:
-                                async with session.get(image, stream=True) as r:
+                                async with session.get(image) as r:
                                     if r.status == 200:
                                         with open(f"bgs/{ctx.author.id}.png", 'wb') as f:
                                             f.write(await r.read())
