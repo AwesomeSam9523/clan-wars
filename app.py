@@ -21,6 +21,7 @@ def home():
     Presents the 'Login with Discord' link
     """
     oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, scope=scope)
+    print(oauth.state)
     login_url, state = oauth.authorization_url(authorize_url)
     session["state"] = state
     return redirect(redirect_uri)
@@ -44,7 +45,10 @@ def oauth_callback():
         return redirect('https://vnta.herokuapp.com/')
 
     discord = OAuth2Session(client_id, redirect_uri=redirect_uri, state=state, scope=scope)
-
+    print(discord.state == state)
+    print(discord.state)
+    print(state)
+    print()
     token = discord.fetch_token(
         token_url,
         client_secret=client_secret,
