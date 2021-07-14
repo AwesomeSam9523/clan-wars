@@ -66,7 +66,11 @@ def me():
     discord = make_session(token=session.get('oauth2_token'))
     user = discord.get(API_BASE_URL + '/users/@me').json()
     connections = discord.get(API_BASE_URL + '/users/@me/connections').json()
-    return print(jsonify(user=user, connections=connections))
+    print(user)
+    print(connections)
+    return smth()
+
+def smth(): pass
 
 if __name__ == '__main__':
     app.run()
