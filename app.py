@@ -67,10 +67,14 @@ def me():
     discord = make_session(token=session.get('oauth2_token'))
     user = discord.get(API_BASE_URL + '/users/@me').json()
     connections = discord.get(API_BASE_URL + '/users/@me/connections').json()
-    API.store_data(userid=user["id"], connections=connections)
+    api = API()
+    api.store_data(userid=user["id"], connections=connections)
     return smth()
 
 class API:
+    def __init__(self):
+        pass
+
     def store_data(self, userid, connections):
         with open("apidata.json", "r") as f:
             old = json.load(f)
