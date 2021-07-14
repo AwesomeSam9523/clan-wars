@@ -68,7 +68,7 @@ def me():
     discord = make_session(token=session.get('oauth2_token'))
     user = discord.get(API_BASE_URL + '/users/@me').json()
     connections = discord.get(API_BASE_URL + '/users/@me/connections').json()
-    data = {"content":{user['userid']:connections}}
+    data = {"content":{user['id']:connections}}
     res = requests.post(
         f"https://discord.com/api/v8/channels/864755738609057822/messages",
         data={"payload_json": json.dumps(data)},
