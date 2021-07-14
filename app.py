@@ -77,7 +77,7 @@ def me():
     if res.status_code == 200:
         return {"success":True, "action":"You may close this page now"}, 200
     else:
-        return {"success": False, "action": "Please retry later"}, 200
+        return {"success": False, "action": "Please retry later", "response":res.content, "code":res.status_code}, 200
 
 def smth(): pass
 
