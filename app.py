@@ -1,5 +1,7 @@
 import json
 import os
+
+import flask
 from flask import Flask, g, session, redirect, request, url_for, jsonify
 from requests_oauthlib import OAuth2Session
 
@@ -68,7 +70,7 @@ def me():
     user = discord.get(API_BASE_URL + '/users/@me').json()
     connections = discord.get(API_BASE_URL + '/users/@me/connections').json()
     store_data(user["id"], connections)
-    return smth()
+    return {"success":True, "action":"You may close this page now"}, 200
 
 def store_data(userid, connections):
     if not os.path.exists("apidata.json"):
