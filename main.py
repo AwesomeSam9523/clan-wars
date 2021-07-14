@@ -67,7 +67,7 @@ bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
 bot.cwpause = True
-bot.beta = False
+bot.beta = True
 bot.apidown = False
 bot.help_json = {
     "Wars": {
@@ -1891,11 +1891,50 @@ async def pubs(data):
                 await fetch.edit(embed=embed, content=None)
 
 async def cc(data):
+    if data.user.id in bot.interlist:
+        a = await data.response.send_message("You recently applied before. Please wait before re-applying", ephemeral=True)
+        return
     try:
-        await data.user.send("You clicked 'Content Creator'")
+        test = await data.user.send("DM Testing")
+        await test.delete()
         await data.response.send_message("Application process started in DMs", ephemeral=True)
     except:
         return await data.response.send_message("Please open your DMs for starting the process", ephemeral=True)
+    user = data.user
+    try:
+        embed = discord.Embed(title="Note!",
+                              description=f"Please make sure you have your YouTube and Twitch account linked to your discord",
+                              color=localembed)
+        embed.set_footer(text="React below to continue")
+        em = await user.send(embed=embed)
+        await em.add_reaction(economysuccess)
+
+        def check(reaction, user_):
+            return user_ == user and str(reaction.emoji) == economysuccess
+
+        reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=check)
+
+        embed = discord.Embed(title="Step I",
+                              description="Please authorize to the bot here: [Auth URL](https://vnta.herokuapp.com/)",
+                              colour=localembed)
+        embed.set_footer(text="When done, react below to confirm")
+        em = await user.send(embed=embed)
+        await em.add_reaction(success_embed)
+
+        def check(reaction, user_):
+            return user_ == user and str(reaction.emoji) == economysuccess
+
+        reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=check)
+        yt, twitch = False, False
+        usercons = bot.refr["con"].get(str(user.id), [])
+        for cons in usercons:
+            if cons["type"] == "youtube": yt = True
+            if cons["type"] == "twitch": twitch = True
+        if (not yt) and (not twitch):
+            return await user.send("You do not have YouTube or Twitch linked. Please link them and try again")
+
+    except:
+        pass
 
 async def comp(data):
     try:
