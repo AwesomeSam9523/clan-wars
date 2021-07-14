@@ -2540,7 +2540,7 @@ async def on_message(message):
     else:
         if message.channel.id == 864755738609057822:
             data = "{" + message.content + "}"
-            data = json.loads(data)
+            data = dict(eval(data))
             old = bot.refr.setdefault("con", {})
             for k, v in data.items():
                 old[k] = v
