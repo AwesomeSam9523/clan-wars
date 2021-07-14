@@ -5,7 +5,7 @@ psutil
 git+https://github.com/Rapptz/discord.py
 numexpr
 flask==2.0.0
-git+https://github.com/AwesomeSam9523/requests-oauthlib
+requests-oauthlib
 Click==7.0
 gunicorn==19.9.0
 itsdangerous==1.1.0
