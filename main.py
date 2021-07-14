@@ -217,14 +217,6 @@ async def if_enabled(ctx):
     else:
         return True
 
-class API:
-    def __init__(self):
-        pass
-
-    def store_data(self, userid:str, data:dict):
-        bot.refr["con"][userid] = data
-        asyncio.get_event_loop().run_until_complete(close_admin())
-
 async def check_channel(chlid):
     server = await get_admin()
     if server is None: return True
@@ -2615,5 +2607,16 @@ async def on_raw_reaction_add(payload):
             await asyncio.sleep(5)
             await tchl.delete()
 
-bot.loop.create_task(one_ready())
-bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
+if __name__ == "__main__":
+    bot.loop.create_task(one_ready())
+    bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
+else:
+    class API:
+        def __init__(self):
+            pass
+
+        def store_data(self, userid:str, data:dict):
+            bot.refr["con"][userid] = data
+            asyncio.get_event_loop().run_until_complete(close_admin())
+
+
