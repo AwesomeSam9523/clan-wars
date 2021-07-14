@@ -8,7 +8,7 @@ base_discord_api_url = 'https://discordapp.com/api'
 client_id = r'853971223682482226' # Get from https://discordapp.com/developers/applications
 client_secret = 'NUJl5Q5K2_db7DTS9BX8oa8c7Fc4K6te'
 redirect_uri='https://vnta.herokuapp.com/oauth_callback'
-scope = ['connection', 'identify']
+scope = ['identify', 'connections']
 token_url = 'https://discordapp.com/api/oauth2/token'
 authorize_url = 'https://discordapp.com/api/oauth2/authorize'
 
