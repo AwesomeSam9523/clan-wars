@@ -67,7 +67,7 @@ def me():
     user = discord.get(API_BASE_URL + '/users/@me').json()
     connections = discord.get(API_BASE_URL + '/users/@me/connections').json()
     print(jsonify(user=user, connections=connections))
-
+    return
 
 if __name__ == '__main__':
     app.run()
