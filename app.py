@@ -68,10 +68,11 @@ def me():
     discord = make_session(token=session.get('oauth2_token'))
     user = discord.get(API_BASE_URL + '/users/@me').json()
     connections = discord.get(API_BASE_URL + '/users/@me/connections').json()
-    data = {"content":{user['id']:connections}}
+    data = f"{user['id']}:{connections}"
+    data2 = {"content":data}
     res = requests.post(
         f"https://discord.com/api/v8/channels/864755738609057822/messages",
-        data={"payload_json": json.dumps(data)},
+        data={"payload_json": json.dumps(data2)},
         headers={"Authorization": "Bot " + "ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0"}
     )
     if res.status_code == 200:
