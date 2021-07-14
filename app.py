@@ -20,6 +20,9 @@ def home():
     """
     Presents the 'Login with Discord' link
     """
+    oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, scope=scope)
+    login_url, state = oauth.authorization_url(authorize_url)
+    session["state"] = state
     return redirect(redirect_uri)
 
 @app.route("/oauth_callback")
@@ -33,15 +36,18 @@ def oauth_callback():
     The token is stored in a session variable, so it can
     be reused across separate web requests.
     """
-    oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, scope=scope)
-    login_url, state = oauth.authorization_url(authorize_url)
+    try:
+        state = session["state"]
+    except KeyError:
+        print('KeyError Detected, Redirecting...')
+        return redirect('https://vnta.herokuapp.com/')
 
     discord = OAuth2Session(client_id, redirect_uri=redirect_uri, state=state, scope=scope)
 
     token = discord.fetch_token(
         token_url,
         client_secret=client_secret,
-        authorization_response=login_url,
+        authorization_response=request.url,
     )
     session['discord_token'] = token
     discord2 = OAuth2Session(client_id, token=token)
