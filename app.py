@@ -21,7 +21,6 @@ def home():
     Presents the 'Login with Discord' link
     """
     oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, scope=scope)
-    print(oauth.state)
     login_url, state = oauth.authorization_url(authorize_url)
     session["state"] = state
     return redirect(redirect_uri)
@@ -51,8 +50,10 @@ def oauth_callback():
     print()
     token = discord.fetch_token(
         token_url,
+        state,
         client_secret=client_secret,
         authorization_response=request.url,
+        state=state
     )
     session['discord_token'] = token
     discord2 = OAuth2Session(client_id, token=token)
