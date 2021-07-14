@@ -1,73 +1,73 @@
+import os
+from flask import Flask, g, session, redirect, request, url_for, jsonify
 from requests_oauthlib import OAuth2Session
-from flask import Flask, request, redirect, session, jsonify, make_response
-import os, random
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+OAUTH2_CLIENT_ID = "853971223682482226"
+OAUTH2_CLIENT_SECRET = "NUJl5Q5K2_db7DTS9BX8oa8c7Fc4K6te"
+OAUTH2_REDIRECT_URI = 'https://vnta.herokuapp.com/callback'
 
-base_discord_api_url = 'https://discordapp.com/api'
-client_id = r'853971223682482226' # Get from https://discordapp.com/developers/applications
-client_secret = 'NUJl5Q5K2_db7DTS9BX8oa8c7Fc4K6te'
-redirect_uri='https://vnta.herokuapp.com/oauth_callback'
-scope = ['identify', 'connections']
-token_url = 'https://discordapp.com/api/oauth2/token'
-authorize_url = 'https://discordapp.com/api/oauth2/authorize'
+API_BASE_URL = os.environ.get('API_BASE_URL', 'https://discordapp.com/api')
+AUTHORIZATION_BASE_URL = API_BASE_URL + '/oauth2/authorize'
+TOKEN_URL = API_BASE_URL + '/oauth2/token'
 
 app = Flask(__name__)
-app.secret_key = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
+app.debug = True
+app.config['SECRET_KEY'] = OAUTH2_CLIENT_SECRET
 
-@app.route("/")
-def home():
-    """
-    Presents the 'Login with Discord' link
-    """
-    print("Home")
-    print(session)
-    oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, scope=scope)
-    login_url, state = oauth.authorization_url(authorize_url)
-    session["state"] = state
-    return redirect(redirect_uri)
+if 'http://' in OAUTH2_REDIRECT_URI:
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
 
-@app.route("/oauth_callback")
-def oauth_callback():
-    """
-    The callback we specified in our app.
-    Processes the code given to us by Discord and sends it back
-    to Discord requesting a temporary access token so we can 
-    make requests on behalf (as if we were) the user.
-    e.g. https://discordapp.com/api/users/@me
-    The token is stored in a session variable, so it can
-    be reused across separate web requests.
-    """
-    print("OAUTH")
-    print(session)
-    try:
-        state = session["state"]
-        print('Got state', state)
-    except KeyError:
-        print('KeyError Detected, Redirecting...')
-        return redirect('https://vnta.herokuapp.com/')
 
-    discord = OAuth2Session(client_id, redirect_uri=redirect_uri, state=state, scope=scope)
-    print(discord.state == state)
-    print(discord.state)
-    print(state)
-    print()
+def token_updater(token):
+    session['oauth2_token'] = token
 
+
+def make_session(token=None, state=None, scope=None):
+    return OAuth2Session(
+        client_id=OAUTH2_CLIENT_ID,
+        token=token,
+        state=state,
+        scope=scope,
+        redirect_uri=OAUTH2_REDIRECT_URI,
+        auto_refresh_kwargs={
+            'client_id': OAUTH2_CLIENT_ID,
+            'client_secret': OAUTH2_CLIENT_SECRET,
+        },
+        auto_refresh_url=TOKEN_URL,
+        token_updater=token_updater)
+
+
+@app.route('/')
+def index():
+    scope = request.args.get(
+        'scope',
+        'identify connections')
+    discord = make_session(scope=scope.split(' '))
+    authorization_url, state = discord.authorization_url(AUTHORIZATION_BASE_URL)
+    session['oauth2_state'] = state
+    return redirect(authorization_url)
+
+
+@app.route('/callback')
+def callback():
+    if request.values.get('error'):
+        return request.values['error']
+    discord = make_session(state=session.get('oauth2_state'))
     token = discord.fetch_token(
-        token_url,
-        state,
-        client_secret=client_secret,
-        authorization_response=request.url
-    )
-    session['discord_token'] = token
-    discord2 = OAuth2Session(client_id, token=token)
-    userinfo = discord2.get(base_discord_api_url + '/users/@me')
-    connections = discord2.get(base_discord_api_url + '/users/@me/connections')
-    print(userinfo.json())
-    print(connections.json())
-    return f'Done!'
+        TOKEN_URL,
+        client_secret=OAUTH2_CLIENT_SECRET,
+        authorization_response=request.url)
+    session['oauth2_token'] = token
+    return redirect(url_for('.me'))
+
+
+@app.route('/me')
+def me():
+    discord = make_session(token=session.get('oauth2_token'))
+    user = discord.get(API_BASE_URL + '/users/@me').json()
+    connections = discord.get(API_BASE_URL + '/users/@me/connections').json()
+    print(jsonify(user=user, connections=connections))
+
 
 if __name__ == '__main__':
-    print('Running')
-    app.run(port=8000)
-
+    app.run()
