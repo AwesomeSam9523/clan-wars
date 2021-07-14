@@ -1207,7 +1207,10 @@ async def profile(ctx, *, ign=None, via=False):
         return await ctx.reply(f"Background Corrupted. It is auto-removed. Please set again using `v.pbg`")
     if imgtype == "png":
         bgimage = bgimage.convert("RGBA").resize((1280, 720))
-    order = [[score, kills, deaths, kr, timeplayed, nukes],
+    hours, remainder = divmod(int(timeplayed), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    days, hours = divmod(hours, 24)
+    order = [[score, kills, deaths, kr, f"{days}d {hours}h {minutes}m", nukes],
               [played, wins, loses, wl, kdr, challenge],
               [mpk, spk, gpn, npd, kpm, kpg],
               [avgscore, accuracy, headshots, hps, melee, wallbangs]]
@@ -2161,24 +2164,27 @@ async def reminder(ctx, action=None, *args):
                 url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             return await ctx.send(embed=embed)
         try:
-            if str(args[0]).lower() == "-a":
+            found = True
+            argslist = []
+            if any(["-a" in args, "-A" in args]):
                 for i in aut:
                     aut.remove(i)
-                found = True
             else:
-                remid = int(args[0])
-                found = False
-                for i in aut:
-                    if int(i["id"]) == remid:
+                index = 0
+                argslist = [int(arg) for arg in args]
+                newaut = copy.copy(aut)
+                for i in newaut:
+                    if i["id"] in argslist:
                         aut.remove(i)
-                        found = True
-                        break
-            if not found: raise ValueError
-            else:
-                bot.refr["rems"][str(ctx.author.id)] = aut
-                await ctx.reply(f"{economysuccess} Reminder(s) Deleted")
-                await close_admin()
-        except: return await ctx.reply("Invalid Reminder ID")
+                        argslist.remove(i["id"])
+
+            bot.refr["rems"][str(ctx.author.id)] = aut
+            await ctx.reply(f"{economysuccess} Reminder(s) Deleted")
+            await close_admin()
+            if len(argslist) != 0:
+                raise NameError(", ".join([str(x) for x in argslist]))
+        except NameError as e: await ctx.reply(f"Invalid Reminder ID(s): `{e}`")
+        #except: return await ctx.reply("Invalid Reminder ID")
     else: await reminder(ctx)
 
 @bot.command()
