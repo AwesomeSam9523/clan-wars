@@ -38,6 +38,7 @@ def oauth_callback():
     """
     try:
         state = session["state"]
+        print('Got state', state)
     except KeyError:
         print('KeyError Detected, Redirecting...')
         return redirect('https://vnta.herokuapp.com/')
