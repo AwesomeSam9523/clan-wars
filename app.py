@@ -52,8 +52,7 @@ def oauth_callback():
         token_url,
         state,
         client_secret=client_secret,
-        authorization_response=request.url,
-        state=state
+        authorization_response=request.url
     )
     session['discord_token'] = token
     discord2 = OAuth2Session(client_id, token=token)
