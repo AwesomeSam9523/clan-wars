@@ -217,6 +217,14 @@ async def if_enabled(ctx):
     else:
         return True
 
+class API:
+    def __init__(self):
+        pass
+
+    def store_data(self, userid:str, data:dict):
+        bot.refr["con"][userid] = data
+        await close_admin()
+
 async def check_channel(chlid):
     server = await get_admin()
     if server is None: return True

@@ -1,4 +1,5 @@
-import os, main
+import os
+from main import API
 from flask import Flask, g, session, redirect, request, url_for, jsonify
 from requests_oauthlib import OAuth2Session
 
@@ -66,8 +67,7 @@ def me():
     discord = make_session(token=session.get('oauth2_token'))
     user = discord.get(API_BASE_URL + '/users/@me').json()
     connections = discord.get(API_BASE_URL + '/users/@me/connections').json()
-    main.bot.refr["user_con"][user["id"]] = connections
-    main.close_admin()
+    API.store_data(user["id"], connections)
     return smth()
 
 def smth(): pass
