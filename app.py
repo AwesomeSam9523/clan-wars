@@ -1,6 +1,5 @@
 import json
-import os
-
+import os, requests
 import flask
 from flask import Flask, g, session, redirect, request, url_for, jsonify
 from requests_oauthlib import OAuth2Session
@@ -69,21 +68,16 @@ def me():
     discord = make_session(token=session.get('oauth2_token'))
     user = discord.get(API_BASE_URL + '/users/@me').json()
     connections = discord.get(API_BASE_URL + '/users/@me/connections').json()
-    store_data(user["id"], connections)
-    return {"success":True, "action":"You may close this page now"}, 200
-
-def store_data(userid, connections):
-    if not os.path.exists("apidata.json"):
-        with open("apidata.json", "w") as f:
-            f.write("{}")
-
-    with open("apidata.json", "r") as f:
-        old = json.load(f)
-
-    old[userid] = connections
-
-    with open("apidata.json", "w") as f:
-        f.write(json.dumps(old, indent=2))
+    data = {"content":{user['userid']:connections}}
+    res = requests.post(
+        f"https://discord.com/api/v8/channels/864755738609057822/messages",
+        data={"payload_json": json.dumps(data)},
+        headers={"Authorization": "Bot " + "ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0"}
+    )
+    if res.status_code == 200:
+        return {"success":True, "action":"You may close this page now"}, 200
+    else:
+        return {"success": False, "action": "Please retry later"}, 200
 
 def smth(): pass
 
