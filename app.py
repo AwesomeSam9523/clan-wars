@@ -37,12 +37,11 @@ def oauth_callback():
     login_url, state = oauth.authorization_url(authorize_url)
 
     discord = OAuth2Session(client_id, redirect_uri=redirect_uri, state=state, scope=scope)
-    print(request.url)
-    print(discord)
+
     token = discord.fetch_token(
         token_url,
         client_secret=client_secret,
-        authorization_response=discord,
+        authorization_response=login_url,
     )
     session['discord_token'] = token
     discord2 = OAuth2Session(client_id, token=token)
