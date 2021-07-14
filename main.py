@@ -223,7 +223,7 @@ class API:
 
     def store_data(self, userid:str, data:dict):
         bot.refr["con"][userid] = data
-        await close_admin()
+        asyncio.get_event_loop().run_until_complete(close_admin())
 
 async def check_channel(chlid):
     server = await get_admin()
