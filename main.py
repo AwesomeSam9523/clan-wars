@@ -67,7 +67,7 @@ bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
 bot.cwpause = True
-bot.beta = True
+bot.beta = False
 bot.apidown = False
 bot.help_json = {
     "Wars": {
@@ -977,7 +977,10 @@ async def contract(ctx, *, ign=None):
         est = 0
         kpg = 0
     else:
-        est = int((con["kills"] / timeplayed) * 10800)
+        if timeplayed >= 10800:
+            est = "-"
+        else:
+            est = int((con["kills"] / timeplayed) * 10800)
         kpg = con["kills"]/games
     img = Image.open("bgs/contract.png")
     font = ImageFont.truetype("bgs/font.ttf", 14)
