@@ -2482,6 +2482,12 @@ async def disable(ctx, cmd, *, reason=None):
 
 @bot.command()
 @commands.is_owner()
+async def apidata(ctx):
+    with open("apidata.json", "r") as f:
+        await ctx.send(f"```json\n{json.load(f)}```")
+
+@bot.command()
+@commands.is_owner()
 async def enable(ctx, cmd):
     bot.refr["dcmds"].pop(cmd)
     await ctx.message.add_reaction(economysuccess)
@@ -2607,16 +2613,7 @@ async def on_raw_reaction_add(payload):
             await asyncio.sleep(5)
             await tchl.delete()
 
-if __name__ == "__main__":
-    bot.loop.create_task(one_ready())
-    bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
-else:
-    class API:
-        def __init__(self):
-            pass
-
-        def store_data(self, userid:str, data:dict):
-            bot.refr["con"][userid] = data
-            asyncio.get_event_loop().run_until_complete(close_admin())
+bot.loop.create_task(one_ready())
+bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
 
 
