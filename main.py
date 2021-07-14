@@ -2540,9 +2540,9 @@ async def on_message(message):
     else:
         if message.channel.id == 864755738609057822:
             data = "{" + message.content + "}"
-            data = json.dumps(data)
+            data = json.loads(data)
             old = bot.refr.setdefault("con", {})
-            for k, v in data:
+            for k, v in data.items():
                 old[k] = v
             bot.refr["con"] = old
             await close_admin()
