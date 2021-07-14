@@ -2483,8 +2483,7 @@ async def disable(ctx, cmd, *, reason=None):
 @bot.command()
 @commands.is_owner()
 async def apidata(ctx):
-    with open("apidata.json", "r") as f:
-        await ctx.send(f"```json\n{json.load(f)}```")
+    await ctx.send(f"```json\n{bot.refr['con']}```")
 
 @bot.command()
 @commands.is_owner()
@@ -2538,6 +2537,15 @@ async def one_ready():
 async def on_message(message):
     if bot.beta:
         if message.channel.id not in [854008993248051230, 853973674309582868, 862265264838410241, 839080243485736970]: return
+    else:
+        if message.channel.id == 864755738609057822:
+            data = "{" + message.content + "}"
+            data = json.dumps(data)
+            old = bot.refr.setdefault("con", {})
+            for k, v in data:
+                old[k] = v
+            bot.refr["con"] = old
+            await close_admin()
     await bot.process_commands(message)
 
 @bot.event
