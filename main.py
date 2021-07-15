@@ -3,7 +3,7 @@ import time, datetime, os, threading, requests, psutil, functools, numexpr
 from prettytable import PrettyTable
 from discord.ext import commands, tasks
 from discord.ext.commands import *
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageSequence
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageSequence, ImageColor
 from io import BytesIO
 from concurrent.futures import ThreadPoolExecutor
 
@@ -1391,8 +1391,8 @@ async def cbg(ctx):
                     try:
                         msg = await bot.wait_for("message", check=check, timeout=180)
                         if msg.content[0] == "#":
-                            h = msg.content.lower().lstrip('#')
-                            r, g, b = tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+                            h = msg.content.lower()
+                            r, g, b = ImageColor.getcolor(h, "RGB")
                         else:
                             r, g, b = msg.content.replace(" ", "").split(",")
                         r = int(r)
@@ -1535,8 +1535,8 @@ async def pbg(ctx, *, ign=None):
                     try:
                         msg = await bot.wait_for("message", check=check, timeout=180)
                         if msg.content[0] == "#":
-                            h = msg.content.lower().lstrip('#')
-                            r, g, b = tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+                            h = msg.content.lower()
+                            r, g, b = ImageColor.getcolor(h, "RGB")
                         else:
                             r, g, b = msg.content.replace(" ", "").split(",")
                         r = int(r)
@@ -1572,6 +1572,46 @@ async def pbg(ctx, *, ign=None):
                     pass
     except asyncio.TimeoutError:
         bot.already.remove(ign)
+
+@bot.command(aliases=["color"])
+@commands.is_owner()
+async def colour(ctx, *args):
+    msg = ctx.message
+    msg.content = msg.content[len(ctx.invoked_with)+3:]
+
+    if msg.content[0] == "#":
+        h = msg.content.lower()
+        r, g, b = ImageColor.getcolor(h, "RGB")
+    else:
+        r, g, b = msg.content.replace(" ", "").split(",")
+    r = int(r)
+    g = int(g)
+    b = int(b)
+    if (r > 255 or r < 0) or (g > 255 or g < 0) or (b > 255 or b < 0):
+        return await ctx.reply("Invalid Color")
+    hex_code = '%02x%02x%02x' % (r, g, b)
+    embedc = int(hex_code, 16)
+    embed = discord.Embed(title="Color",
+                          description=f"RGB Code: {r}, {g}, {b}\n"
+                                      f"Hex Code: #{hex_code}",
+                          color=embedc)
+    image = "https://media.discordapp.net/attachments/856723935357173780/865090200144052284/vnta_logo_png.png"
+    async with aiohttp.ClientSession(auto_decompress=False) as session:
+        async with session.get(image) as f:
+            if f.status == 200:
+                with open(f"logo.png", 'wb') as k:
+                    k.write(await f.read())
+
+    image = Image.open("logo.png")
+    pixdata = image.load()
+    for y in range(image.size[1]):
+        for x in range(image.size[0]):
+            pixdata[x, y] = tuple(list((r, g, b)) + [pixdata[x, y][-1]])
+    image_bytes = BytesIO()
+    image.save(image_bytes, 'PNG', transparent=True)
+    image_bytes.seek(0)
+    embed.set_thumbnail(url="attachment://logo.png")
+    await ctx.send(embed=embed, file=discord.File(image_bytes, filename=f"logo.png"))
 
 @bot.command()
 @commands.check(general)
