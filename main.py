@@ -1513,7 +1513,7 @@ async def pbg(ctx, *, ign=None):
                             async with aiohttp.ClientSession(auto_decompress=False) as session:
                                 async with session.get(image) as r:
                                     if r.status == 200:
-                                        with open(f"bgs/{ctx.author.id}.png", 'wb') as f:
+                                        with open(f"bgs/{ctx.author.id}.{image[-3:].lower()}", 'wb') as f:
                                             f.write(await r.read())
                                         bgfile = await bot.get_channel(856723935357173780).send(
                                             file=discord.File(f"bgs/{ctx.author.id}.{image[-3:].lower()}",
