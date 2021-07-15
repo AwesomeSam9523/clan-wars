@@ -417,6 +417,17 @@ async def warslogs():
         bot.cwdata[d1] = data
         await updatecwdata()
 
+@bot.command()
+@commands.is_owner()
+async def logwar(ctx):
+    kills, data = await end(clan="VNTA", via=True)
+
+    today = datetime.date.today()
+    d1 = today.strftime("%d-%m-%Y")
+    bot.cwdata[d1] = data
+    await updatecwdata()
+    await ctx.message.add_reaction(economysuccess)
+
 async def updatecwdata():
     with open("cwdata.json", "w") as f:
         f.write(json.dumps(bot.cwdata, indent=2))
@@ -979,9 +990,10 @@ async def contract(ctx, *, ign=None):
     else:
         if timeplayed >= 10800:
             est = "-"
+            kpg = con["kills"] / 45
         else:
             est = int((con["kills"] / timeplayed) * 10800)
-        kpg = con["kills"]/games
+            kpg = con["kills"]/games
     img = Image.open("bgs/contract.png")
     font = ImageFont.truetype("bgs/font.ttf", 14)
     font2 = ImageFont.truetype("bgs/font.ttf", 18)
