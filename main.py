@@ -67,7 +67,8 @@ bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
 bot.cwpause = True
-bot.beta = False
+if os.path.exists("C:"): bot.beta = True
+else: bot.beta = False
 bot.apidown = False
 bot.help_json = {
     "Wars": {
@@ -190,6 +191,7 @@ staff = [813441664617939004, 855793126958170122, 853997809212588073, 50402950829
 accepted = [813786315530305536, 813527378088951809, 813527377736761384, 813452412810690600, 813441662588157952, 836427405656326165, 853997809212588073]
 
 usercmds = {}
+saycmd = {}
 lastdata = {"time":0}
 
 error_embed = 16730441
@@ -2584,6 +2586,45 @@ async def disable(ctx, cmd, *, reason=None):
 @commands.is_owner()
 async def apidata(ctx):
     await ctx.send(f"```json\n{bot.refr['con']}```")
+
+@bot.command()
+@commands.check(general)
+async def say(ctx, *, sentence):
+    if ctx.author.id not in devs + staff: return
+    chl = sentence.split(" ")[0]
+    chlmodified = False
+    testchl = chl.replace("<#", "").replace(">", "")
+    if len(testchl) == len("839080243485736970"):
+        try:
+            chl = int(testchl)
+            saycmd[str(ctx.author.id)] = chl
+            chlmodified = True
+        except Exception as e:
+            pass
+    chnid = saycmd.get(str(ctx.author.id))
+    if chnid is None:
+        return await ctx.reply("No last used channel found! Use `v.sayhelp` for usage")
+    chn = bot.get_channel(chnid)
+    try:
+        if chlmodified:
+            sentence_new = " ".join(sentence.split(" ")[1:])
+            await chn.send(sentence_new)
+        else:
+            await chn.send(sentence)
+    except:
+        ctx.reply("An error occured. Make sure I have sufficient permission in the channel to talk")
+
+@bot.command()
+@commands.check(general)
+async def sayhelp(ctx):
+    if ctx.author.id not in devs+staff: return
+    msg = "You need to use it like this: `v.say #channel message` for the **first time**. After that, " \
+          "whenever you use `v.say`, it will automatically send in the last used channel.\n\n" \
+          "To update the channel, use `v.say #channel message` again."
+    embed = discord.Embed(title="Say Help",
+                          description=msg,
+                          colour=localembed)
+    await ctx.send(embed=embed)
 
 @bot.command()
 @commands.is_owner()
