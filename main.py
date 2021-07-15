@@ -1574,7 +1574,7 @@ async def pbg(ctx, *, ign=None):
         bot.already.remove(ign)
 
 @bot.command(aliases=["color"])
-@commands.is_owner()
+@commands.check(general)
 async def colour(ctx, *args):
     msg = ctx.message
     msg.content = msg.content[len(ctx.invoked_with)+3:]
