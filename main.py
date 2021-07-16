@@ -67,6 +67,7 @@ bot.uptime = time.time()
 bot.reqs = 0
 bot.pause = False
 bot.cwpause = True
+allowdevs = False
 if os.path.exists("C:"): bot.beta = True
 else: bot.beta = False
 bot.apidown = False
@@ -213,6 +214,7 @@ async def if_allowed(ctx):
 @bot.check
 async def if_enabled(ctx):
     if ctx.command.name in bot.refr.setdefault("dcmds", {}).keys():
+        if allowdevs: return True
         await ctx.reply("Command disabled at the moment.\n"
                         f"Reason: {bot.refr['dcmds'][ctx.command.name]}")
         return False
@@ -227,18 +229,6 @@ async def check_channel(chlid):
     else: return False
 
 async def getdata(clan):
-    """ssl_context = ssl._create_unverified_context()
-                async with websockets.connect(uri=uri, extra_headers=a_headers, ssl=ssl_context) as websocket:
-                    data = msgpack.packb(["r", "clanwars", "Q", None, None, None, "0", None], use_bin_type=True) + b"\x00\x00"
-                    await websocket.send(data)
-                    while True:
-                        response_data = msgpack.unpackb((await websocket.recv())[0:-2], raw=False)
-                        if response_data[0] == "news": continue
-                        elif response_data == ["cpt"]:
-                            await bot.get_channel(854008993248051230).send("<@771601176155783198> Captcha")
-                            return "retry"
-                        elif response_data != ["pi"]: break
-                    return response_data"""
     bot.reqs += 1
     if time.time() - lastdata["time"] < 5:
         return lastdata["data"]
@@ -605,6 +595,7 @@ async def view(ctx, clan=None, via=None):
         embed = discord.Embed(title="Wars Break",
                               description="Clan wars are not currently running. Please use this command after wars start!",
                               colour=error_embed)
+        embed.set_footer(text="To view past contracts and analytics, use 'v.cw'")
         return await ctx.reply(embed=embed)
     ctx2 = ctx
     if via == "sam123" and clan is not None:
@@ -690,6 +681,7 @@ async def end(ctx=None, clan=None, via=False):
             embed = discord.Embed(title="Wars Break",
                                   description="Clan wars are not currently running. Please use this command after wars start!",
                                   colour=error_embed)
+            embed.set_footer(text="To view past contracts and analytics, use 'v.cw'")
             return await ctx.reply(embed=embed)
         if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
             return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
@@ -926,6 +918,7 @@ async def contract(ctx, *, ign=None):
         embed = discord.Embed(title="Wars Break",
                               description="Clan wars are not currently running. Please use this command after wars start!",
                               colour=error_embed)
+        embed.set_footer(text="To view past contracts and analytics, use 'v.cw'")
         return await ctx.reply(embed=embed)
     if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
         return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
@@ -2625,6 +2618,12 @@ async def sayhelp(ctx):
                           description=msg,
                           colour=localembed)
     await ctx.send(embed=embed)
+
+@bot.command()
+@commands.check(general)
+async def cw(ctx, *, ign):
+    pass
+
 
 @bot.command()
 @commands.is_owner()
