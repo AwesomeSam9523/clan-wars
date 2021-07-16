@@ -52,6 +52,7 @@ bot.refr = {}
 bot.links = {}
 bot.userdata = {}
 bot.bgdata = {}
+bot.suggestions = {}
 bot.cwdata = {}
 bot.unsaved = {}
 bot.cache = {}
@@ -145,6 +146,11 @@ bot.help_json = {
             "aliases":["c", "calc"],
             "desc":"Modern Calculator",
             "usage":"v.calc [equation]"
+        },
+        "v.suggest":{
+            "aliases":["sug", "suggestion"],
+            "desc":"Suggest something.",
+            "usage":"v.sug <suggestion>"
         }
     },
     "Staff": {
@@ -2607,6 +2613,20 @@ async def say(ctx, *, sentence):
     except:
         ctx.reply("An error occured. Make sure I have sufficient permission in the channel to talk")
 
+@bot.command(aliases=["suggestion", "sug"])
+@commands.check(general)
+async def suggest(ctx, *, sug):
+    stfchl = bot.get_channel(813447381752348723)
+    embed = discord.Embed(title="Suggestion Approval",
+                          description=sug,
+                          color=localembed)
+    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar.url)
+    em = await stfchl.send(embed=embed)
+    bot.suggestions[em.id] = (ctx.author.id, sug)
+    await em.add_reaction(economysuccess)
+    await em.add_reaction(economyerror)
+    await ctx.message.add_reaction(economysuccess)
+
 @bot.command()
 @commands.check(general)
 async def sayhelp(ctx):
@@ -2623,7 +2643,6 @@ async def sayhelp(ctx):
 @commands.check(general)
 async def cw(ctx, *, ign):
     pass
-
 
 @bot.command()
 @commands.is_owner()
@@ -2733,6 +2752,25 @@ async def on_raw_reaction_add(payload):
             await chan.send(f"{user.mention} {economysuccess} You are successfully linked with `{userdata['data']['username']}`!")
             await linklog(ign=userdata['data']['username'], user=user, t="l")
         bot.pendings.pop(payload.message_id)
+    if payload.channel_id == 813447381752348723 and str(payload.emoji) in [economyerror, economysuccess]:
+        chan = bot.get_channel(payload.channel_id)
+        userd = bot.suggestions.get(payload.message_id)
+        mod = bot.get_user(payload.user_id)
+        if userd is None: return
+        user = userd[0]
+        user = bot.get_user(user)
+        if str(payload.emoji) == "❌":
+            await user.send(f"{economyerror} Your suggestion: `{userd[1]}` was rejected by `{mod}`")
+        else:
+            await user.send(f"{economysuccess} Your suggestion: `{userd[1]}` was accepted by `{mod}`")
+            sugchl = bot.get_channel(861555361264697355)
+            embed = discord.Embed(description=userd[1],
+                                  color=localembed)
+            embed.set_author(name=f"By: {user}", icon_url=user.avatar.url)
+            em = await sugchl.send(embed=embed)
+            await em.add_reaction("👍")
+            await em.add_reaction("👎")
+        bot.suggestions.pop(payload.message_id)
     if str(payload.emoji) == "🔒":
         if payload.message_id in bot.refr.get("opent", []):
             tchl = bot.get_channel(payload.channel_id)
