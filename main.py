@@ -2767,6 +2767,8 @@ async def on_raw_reaction_add(payload):
             embed = discord.Embed(description=userd[1],
                                   color=localembed)
             embed.set_author(name=f"By: {user}", icon_url=user.avatar.url)
+            embed.set_footer(text="#vantalizing")
+            embed.timestamp = datetime.datetime.utcnow()
             em = await sugchl.send(embed=embed)
             await em.add_reaction("👍")
             await em.add_reaction("👎")
