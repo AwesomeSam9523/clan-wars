@@ -24,26 +24,22 @@ class PersistentView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="Pubstomper", custom_id="pubs_",
-                              emoji="<:smg:861873439421235220>")
+    @discord.ui.button(style=discord.ButtonStyle.blurple, label="Pubstomper", custom_id="pubs_1",
+                              emoji="<:ak:861873538134573056>")
     async def pubsb(self, button: discord.ui.Button, interaction: discord.Interaction):
         await pubs(interaction)
 
-    @discord.ui.button(style=discord.ButtonStyle.green, label="Clan Wars", custom_id="wars_",
-                              emoji="<:bowman:861873349121802251>")
-    async def warsb(self, button: discord.ui.Button, interaction: discord.Interaction):
-        await wars(interaction)
-
-    @discord.ui.button(style=discord.ButtonStyle.grey, label="Competitive", custom_id="comp_",
-                              emoji="<:ak:861873538134573056>")
+    @discord.ui.button(style=discord.ButtonStyle.green, label="Competitive", custom_id="comp_1",
+                              emoji="<:smg:861873439421235220>")
     async def compb(self, button: discord.ui.Button, interaction: discord.Interaction):
         await comp(interaction)
 
-    @discord.ui.button(style=discord.ButtonStyle.red, label="Content Creation", custom_id="cc_",
+    @discord.ui.button(style=discord.ButtonStyle.red, label="Content Creation", custom_id="cc_1",
                               emoji="<:trooper:861873482576953385>")
     async def ccb(self, button: discord.ui.Button, interaction: discord.Interaction):
         await cc(interaction)
 
+API_KEY = "AIzaSyDB4zCQQ54G31iA4Cs-AXmWJnm1iSP7Lgw"
 bot = PersistentViewBot()
 bot.remove_command("help")
 bot.loop.set_debug(True)
@@ -1938,7 +1934,7 @@ async def pubs(data):
                 embed.add_field(name="Result", value=res, inline=False)
                 rescode = hex(random.randint(1000, 9999)).lower()
                 allapps = bot.refr.setdefault("apps", [])
-                allapps.append({rescode:{"kdr":kdr, "level":level, "kpg":kpg, "username":username, "nukes":nukes, "scoreweek":scoreweek}})
+                allapps.append({rescode:{"type":"pubs", "kdr":kdr, "level":level, "kpg":kpg, "username":username, "nukes":nukes, "scoreweek":scoreweek}})
                 bot.refr["apps"] = allapps
                 await close_admin()
                 if p:
@@ -1974,26 +1970,85 @@ async def cc(data):
         reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=check)
 
         embed = discord.Embed(title="Step I",
-                              description="Please authorize to the bot here: [Auth URL](https://vnta.herokuapp.com/)",
+                              description="Please authorize to the bot here: [Auth URL](https://vntaweb.herokuapp.com/)",
                               colour=localembed)
         embed.set_footer(text="When done, react below to confirm")
         em = await user.send(embed=embed)
-        await em.add_reaction(success_embed)
+        await em.add_reaction(economysuccess)
 
-        def check(reaction, user_):
-            return user_ == user and str(reaction.emoji) == economysuccess
-
-        reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=check)
+        reaction, user_ = await bot.wait_for('reaction_add', timeout=180, check=check)
+        await em.add_reaction(loading)
         yt, twitch = False, False
         usercons = bot.refr["con"].get(str(user.id), [])
+
         for cons in usercons:
             if cons["type"] == "youtube": yt = True
             if cons["type"] == "twitch": twitch = True
         if (not yt) and (not twitch):
             return await user.send("You do not have YouTube or Twitch linked. Please link them and try again")
+        ytvids = []
+        twitchvids = []
+        subcount = 0
+        thumburl = ""
+        if yt:
+            for k in usercons:
+                if k["type"] == "youtube": chlid = k["id"]
+            uri = f"https://www.googleapis.com/youtube/v3/channels?id={chlid}&key={API_KEY}&part=contentDetails"
+            a = requests.get(uri)
+            data = json.loads(a.text)
+            uploadsid = data["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
 
-    except:
-        pass
+            uri4 = f"https://www.googleapis.com/youtube/v3/channels?part=statistics&id={chlid}&key={API_KEY}"
+            d = requests.get(uri4)
+            data2 = json.loads(d.text)
+            items = data2["items"][0]["statistics"]
+            if items["hiddenSubscriberCount"]: subcount = "Hidden"
+            else: subcount = items["subscriberCount"]
+
+            uri5 = f"https://www.googleapis.com/youtube/v3/channels?part=snippet&id={chlid}&fields=items%2Fsnippet%2Fthumbnails&key={API_KEY}"
+            e = requests.get(uri5)
+            data3 = json.loads(e.text)
+            thumburl = data3["items"][0]["snippet"]["thumbnails"]["medium"]["url"]
+
+            uri2 = f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId={uploadsid}&key={API_KEY}"
+            b = requests.get(uri2)
+            vids = json.loads(b.text)
+            vids_c = vids["items"]
+
+            for i in vids_c:
+                vidid = i["contentDetails"]["videoId"]
+                uri3 = f"https://www.googleapis.com/youtube/v3/videos?part=statistics&id={vidid}&key={API_KEY}"
+                res = requests.get(uri3)
+                viddetail = json.loads(res.text)
+                viddetail = viddetail["items"][0]["statistics"]
+
+                datadict = {"name":i["snippet"]["title"],
+                            "publish":i["snippet"]["publishedAt"],
+                            "views":int(viddetail["viewCount"]),
+                            "likes":int(viddetail["likeCount"]),
+                            "dislikes":int(viddetail["dislikeCount"]),
+                            "comments":int(viddetail["commentCount"]),
+                            "url":f"https://youtube.com/watch?v={vidid}"
+                            }
+                ytvids.append(datadict)
+
+        embed = discord.Embed(title=f"Success", color=localembed)
+
+        rescode = hex(random.randint(10000, 99999)).lower()
+        allapps = bot.refr.setdefault("apps", [])
+        allapps.append({rescode: {"type":"cc", "yt": {"data":ytvids, "thumbnail":thumburl, "subs":subcount, "url":f"https://www.youtube.com/channel/{chlid}"}, "twitch":twitchvids}})
+        bot.refr["apps"] = allapps
+        await close_admin()
+        await em.clear_reaction(loading)
+        embed.add_field(name="What to do now?",
+                        value=f"Head over to <#845682300967714831>, and type `v.result {rescode}`.\n"
+                              "A new ticket will be opened with your stats posted. "
+                              "The staff will guide you after that.", inline=False)
+        embed.set_footer(text="#vantalizing")
+        embed.set_thumbnail(
+            url="https://images-ext-2.discordapp.net/external/l8ile3RBeJ7FZELTOiecL6LMUQz5qmExL8ELzQFuEag/https/media.discordapp.net/attachments/817374020810178583/838450855648690226/vnta_logo_png.png")
+        await user.send(embed=embed)
+    except: pass
 
 async def comp(data):
     try:
@@ -2034,8 +2089,11 @@ async def result(ctx, code):
                 break
         if found:
             apps.remove(j)
+            bot.refr["apps"] = apps
+            await close_admin()
             break
-    if not found: return await ctx.reply("Invalid code or ticket already opened")
+    if not found:
+        return await ctx.reply("Invalid code or ticket already opened")
     await ctx.message.delete()
     guild = ctx.guild
     overwrites = {
@@ -2049,57 +2107,115 @@ async def result(ctx, code):
     bot.refr["appcount"] = num + 1
     score = 0
     economysuccess = "✔️"
+    embedslist = []
+    if userapp["type"] == "pubs":
+        level = userapp["level"]
+        kdr = userapp["kdr"]
+        kpg = userapp["kpg"]
+        nukes = userapp["nukes"]
+        scoreweek = userapp["scoreweek"]
 
-    level = userapp["level"]
-    kdr = userapp["kdr"]
-    kpg = userapp["kpg"]
-    nukes = userapp["nukes"]
-    scoreweek = userapp["scoreweek"]
+        embed = discord.Embed(title=userapp["username"], colour=localembed)
+        if level >= 60:
+            mark = economysuccess
+            score += 1
+        else:
+            mark = economyerror
+        embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
 
-    embed = discord.Embed(title=userapp["username"], colour=localembed)
-    if level >= 60:
-        mark = economysuccess
-        score += 1
-    else:
-        mark = economyerror
-    embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
+        if float(kdr) >= 4:
+            mark = economysuccess
+            score += 1
+        else:
+            mark = economyerror
+        embed.add_field(name=f"\\{mark} KDR", value=str(kdr), inline=False)
 
-    if float(kdr) >= 4:
-        mark = economysuccess
-        score += 1
-    else:
-        mark = economyerror
-    embed.add_field(name=f"\\{mark} KDR", value=str(kdr), inline=False)
+        if float(kpg) >= 16:
+            mark = economysuccess
+            score += 1
+        else:
+            mark = economyerror
+        embed.add_field(name=f"\\{mark} KPG", value=str(kpg), inline=False)
 
-    if float(kpg) >= 16:
-        mark = economysuccess
-        score += 1
-    else:
-        mark = economyerror
-    embed.add_field(name=f"\\{mark} KPG", value=str(kpg), inline=False)
+        if nukes >= 100:
+            mark = economysuccess
+            score += 1
+        else:
+            mark = economyerror
+        embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
 
-    if nukes >= 100:
-        mark = economysuccess
-        score += 1
-    else:
-        mark = economyerror
-    embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
+        if scoreweek >= 100000:
+            mark = economysuccess
+            score += 1
+        else:
+            mark = economyerror
+        embed.add_field(name=f"\\{mark} Score/week", value=str(scoreweek), inline=False)
+        if score == 5:
+            res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
+        elif 3 <= score <= 4:
+            res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
+        else:
+            res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
+        embed.add_field(name="Result", value=res)
+        embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
+        embedslist.append(embed)
+    elif userapp["type"] == "cc":
+        yt = userapp["yt"]
+        embed = discord.Embed(title="<:YouTube:865575628710608916> YouTube", colour=localembed, url=yt["url"])
+        count=len(yt["data"])
+        if count != 0:
+            embed.set_thumbnail(url=yt["thumbnail"])
+            embed.add_field(name="Total Videos", value=count)
+            embed.add_field(name="Subscribers", value=yt["subs"])
+            embed.add_field(name="\u200b", value="\u200b")
+            views, likes, dislikes = 0, 0, 0
+            views_l, likes_l, dislikes_l = [], [], []
+            for i in yt["data"]:
+                views += i["views"]
+                likes += i["likes"]
+                dislikes += i["dislikes"]
 
-    if scoreweek >= 100000:
-        mark = economysuccess
-        score += 1
-    else:
-        mark = economyerror
-    embed.add_field(name=f"\\{mark} Score/week", value=str(scoreweek), inline=False)
-    if score == 5:
-        res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
-    elif 3 <= score <= 4:
-        res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
-    else:
-        res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
-    embed.add_field(name="Result", value=res)
-    embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
-    msg = await channel.send(f"{ctx.author.mention} Please wait for a staff to respond.", embed=embed)
+                views_l.append(i["views"])
+                likes_l.append(i["likes"])
+                dislikes_l.append(i["dislikes"])
+            embed.add_field(name="Average Views", value="{:.2f}".format(views/count))
+            embed.add_field(name="Average Likes", value="{:.2f}".format(likes/count))
+            embed.add_field(name="Average Dislikes", value="{:.2f}\n\u200b".format(dislikes/count))
+
+            max_views = max(views_l)
+            max_likes = max(likes_l)
+            max_dislikes = max(dislikes_l)
+            for i in yt["data"]:
+                if i["views"] == max_views: embed.add_field(name=f"Most Viewed:", value=f"[`{i['name']}`]({i['url']})\n"
+                                                                                        f"**Views:** {max_views}\n"
+                                                                                      f"**Likes:** {i['likes']}\n"
+                                                                                      f"**Dislikes:** {i['dislikes']}\n"
+                                                                                      f"**Comments:** {i['comments']}\n"
+                                                                                      f"\u200b",
+                                                            inline=False)
+                if i["likes"] == max_likes: embed.add_field(name=f"Most Liked:", value=f"[`{i['name']}`]({i['url']})\n"
+                                                                                       f"**Views:** {max_likes}\n"
+                                                                                      f"**Likes:** {i['likes']}\n"
+                                                                                      f"**Dislikes:** {i['dislikes']}\n"
+                                                                                      f"**Comments:** {i['comments']}\n"
+                                                                                      f"\u200b",
+                                                            inline=False)
+                if i["dislikes"] == max_dislikes: embed.add_field(name=f"Most Disliked:", value=f"[`{i['name']}`]({i['url']})\n"
+                                                                                                f"**Views:** {max_dislikes}\n"
+                                                                                      f"**Likes:** {i['likes']}\n"
+                                                                                      f"**Dislikes:** {i['dislikes']}\n"
+                                                                                      f"**Comments:** {i['comments']}\n"
+                                                                                      f"\u200b",
+                                                            inline=False)
+        embedslist.append(embed)
+
+        twi = userapp["twitch"]
+        embed = discord.Embed(title="<:Twitch:865575682208825355> Twitch", colour=localembed)
+        embed.add_field(name="Smth", value=len(twi))
+        embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
+        embedslist.append(embed)
+    else: embed = discord.Embed()
+    msg = await channel.send(f"{ctx.author.mention} Please wait for a staff to respond.", embeds=embedslist)
     opent = bot.refr.setdefault("opent", [])
     opent.append(msg.id)
     bot.refr["opent"] = opent
