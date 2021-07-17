@@ -1841,8 +1841,8 @@ async def pubs(data):
         return await data.response.send_message("Please open your DMs for starting the process", ephemeral=True)
     user = data.user
     if str(user.id) not in bot.links:
-        await user.send("You are not linked to VNTA bot. Please go to <#845682300967714831> and type `v.link <your ign>`.\n"
-                        "After linking, you can restart this process from <#845682300570304546>")
+        await user.send("You are not linked to VNTA bot. Please go to <#813437412071440394> and type `v.link <your ign>`.\n"
+                        "After linking, you can restart this process from <#813727689646538762>")
         return
     ign = bot.links.get(str(user.id))['main']
     embed = discord.Embed(title="Pubstomper Application",
@@ -1863,7 +1863,7 @@ async def pubs(data):
         else:
             return await user.send("Application Aborted")
     except asyncio.TimeoutError:
-        await user.send("You didnt reply in time.")
+        return await user.send("You didnt reply in time.")
 
     fetch = await user.send("Fetching Stats, Hang on..")
     async with aiohttp.ClientSession() as session:
@@ -1956,7 +1956,7 @@ async def pubs(data):
                 bot.refr["apps"] = allapps
                 await close_admin()
                 if p:
-                    embed.add_field(name="If you wish to continue:", value=f"Head over to <#845682300967714831>, and type `v.result {rescode}`.\n"
+                    embed.add_field(name="If you wish to continue:", value=f"Head over to <#813437412071440394>, and type `v.result {rescode}`.\n"
                                                                   "A new ticket will be opened with your result posted."
                                                                   " The staff will guide you after that.\n\n"
                                                                   "Note: To abort the process, dont use `v.result` command.",
@@ -2091,7 +2091,7 @@ async def cc(data):
         await close_admin()
         await em.remove_reaction(loading, bot.user)
         embed.add_field(name="What to do now?",
-                        value=f"Head over to <#845682300967714831>, and type `v.result {rescode}`.\n"
+                        value=f"Head over to <#813437412071440394>, and type `v.result {rescode}`.\n"
                               "A new ticket will be opened with your stats posted. "
                               "The staff will guide you after that.", inline=False)
         embed.set_footer(text="#vantalizing")
@@ -2110,8 +2110,8 @@ async def comp(data):
         return await data.response.send_message("Please open your DMs for starting the process", ephemeral=True)
     user = data.user
     if str(user.id) not in bot.links:
-        await user.send("You are not linked to VNTA bot. Please go to <#845682300967714831> and type `v.link <your ign>`.\n"
-                        "After linking, you can restart this process from <#845682300570304546>")
+        await user.send("You are not linked to VNTA bot. Please go to <#813437412071440394> and type `v.link <your ign>`.\n"
+                        "After linking, you can restart this process from <#813727689646538762>")
         return
     ign = bot.links.get(str(user.id))['main']
     embed = discord.Embed(title="Competitive Application",
@@ -2132,7 +2132,7 @@ async def comp(data):
         else:
             return await user.send("Application Aborted")
     except asyncio.TimeoutError:
-        await user.send("You didnt reply in time.")
+        return await user.send("You didnt reply in time.")
 
     fetch = await user.send("Fetching Stats, Hang on..")
     async with aiohttp.ClientSession() as session:
@@ -2225,7 +2225,7 @@ async def comp(data):
                 bot.refr["apps"] = allapps
                 await close_admin()
                 embed.add_field(name="If you wish to continue:",
-                                value=f"Head over to <#845682300967714831>, and type `v.result {rescode}`.\n"
+                                value=f"Head over to <#813437412071440394>, and type `v.result {rescode}`.\n"
                                       "A new ticket will be opened with your result posted."
                                       " The staff will guide you after that.\n\n"
                                       "Note: To abort the process, dont use `v.result` command.",
@@ -2352,9 +2352,14 @@ async def result(ctx, code):
             embed.add_field(name="Average Likes", value="{:.2f}".format(likes/count))
             embed.add_field(name="Average Dislikes", value="{:.2f}\n\u200b".format(dislikes/count))
 
-            max_views = max(views_l)
-            max_likes = max(likes_l)
-            max_dislikes = max(dislikes_l)
+            if len(views_l) != 0: max_views = max(views_l)
+            else: max_views = 0
+            if len(likes_l) != 0: max_likes = max(likes_l)
+            else:
+                max_likes = 0
+            if len(dislikes_l) != 0: max_dislikes = max(dislikes_l)
+            else:
+                max_dislikes = 0
             for i in yt["data"]:
                 if i["views"] == max_views: embed.add_field(name=f"Most Viewed:", value=f"[`{i['name']}`]({i['url']})\n"
                                                                                         f"**Views:** {max_views}\n"
@@ -2394,7 +2399,8 @@ async def result(ctx, code):
             views_l = []
             for vid in twitchdata["data"]:
                 views_l.append(vid["view_count"])
-            maxview = max(views_l)
+            if len(views_l) != 0: maxview = max(views_l)
+            else: maxview = 0
 
             for vid in twitchdata["data"]:
                 if vid["view_count"] == maxview:
