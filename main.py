@@ -24,27 +24,31 @@ class PersistentView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="Pubstomper", custom_id="pubs_1",
+    @discord.ui.button(style=discord.ButtonStyle.blurple, label="Pubstomper", custom_id="pubs_2",
                               emoji="<:ak:861873538134573056>")
     async def pubsb(self, button: discord.ui.Button, interaction: discord.Interaction):
         await pubs(interaction)
 
-    @discord.ui.button(style=discord.ButtonStyle.green, label="Competitive", custom_id="comp_1",
+    @discord.ui.button(style=discord.ButtonStyle.green, label="Competitive", custom_id="comp_2",
                               emoji="<:smg:861873439421235220>")
     async def compb(self, button: discord.ui.Button, interaction: discord.Interaction):
         await comp(interaction)
 
-    @discord.ui.button(style=discord.ButtonStyle.red, label="Content Creation", custom_id="cc_1",
+    @discord.ui.button(style=discord.ButtonStyle.red, label="Content Creation", custom_id="cc_2",
                               emoji="<:trooper:861873482576953385>")
     async def ccb(self, button: discord.ui.Button, interaction: discord.Interaction):
         await cc(interaction)
 
-API_KEY = "AIzaSyDB4zCQQ54G31iA4Cs-AXmWJnm1iSP7Lgw"
+YT_API_KEY = "AIzaSyDB4zCQQ54G31iA4Cs-AXmWJnm1iSP7Lgw"
+CLIENT_ID = "0dgqs0ani15dwgr1pn8ojbbvvn81k8"
+CLIENT_SECRET = "20k31xx6rnzkqf1vqim843eopd7e24"
+
 bot = PersistentViewBot()
 bot.remove_command("help")
 bot.loop.set_debug(True)
 bot.loop.slow_callback_duration = 0.3
 bot.refr = {}
+bot.twitchapi = {"expiry":0}
 bot.links = {}
 bot.userdata = {}
 bot.bgdata = {}
@@ -1937,20 +1941,14 @@ async def pubs(data):
                 else: mark = economyerror
                 embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
 
-                if scoreweek >= 100000:
-                    mark = economysuccess
-                    score += 1
-                else: mark = economyerror
-                embed.add_field(name=f"\\{mark} Score/week", value=str(scoreweek), inline=False)
                 p = False
                 if score == 5:
                     res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
                     p = True
-                elif 3 <= score <= 4:
+                elif 2 <= score <= 4:
                     res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
                     p = True
-                else:
-                    res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
+                else: res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
                 embed.add_field(name="Result", value=res, inline=False)
                 rescode = hex(random.randint(1000, 9999)).lower()
                 allapps = bot.refr.setdefault("apps", [])
@@ -1958,9 +1956,11 @@ async def pubs(data):
                 bot.refr["apps"] = allapps
                 await close_admin()
                 if p:
-                    embed.add_field(name="What to do now?", value=f"Head over to <#845682300967714831>, and type `v.result {rescode}`.\n"
+                    embed.add_field(name="If you wish to continue:", value=f"Head over to <#845682300967714831>, and type `v.result {rescode}`.\n"
                                                                   "A new ticket will be opened with your result posted."
-                                                                  " The staff will guide you after that.", inline=False)
+                                                                  " The staff will guide you after that.\n\n"
+                                                                  "Note: To abort the process, dont use `v.result` command.",
+                                    inline=False)
                 embed.set_footer(text="#vantalizing")
                 embed.set_thumbnail(url="https://images-ext-2.discordapp.net/external/l8ile3RBeJ7FZELTOiecL6LMUQz5qmExL8ELzQFuEag/https/media.discordapp.net/attachments/817374020810178583/838450855648690226/vnta_logo_png.png")
                 await fetch.edit(embed=embed, content=None)
@@ -2007,44 +2007,39 @@ async def cc(data):
         if (not yt) and (not twitch):
             return await user.send("You do not have YouTube or Twitch linked. Please link them and try again")
         ytvids = []
-        twitchvids = []
+        twitchdata = {}
         subcount = 0
         thumburl = ""
         if yt:
             for k in usercons:
                 if k["type"] == "youtube": chlid = k["id"]
-            uri = f"https://www.googleapis.com/youtube/v3/channels?id={chlid}&key={API_KEY}&part=contentDetails"
+            uri = f"https://www.googleapis.com/youtube/v3/channels?id={chlid}&key={YT_API_KEY}&part=contentDetails"
             a = requests.get(uri)
             data = json.loads(a.text)
-            print(data)
             uploadsid = data["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
 
-            uri4 = f"https://www.googleapis.com/youtube/v3/channels?part=statistics&id={chlid}&key={API_KEY}"
+            uri4 = f"https://www.googleapis.com/youtube/v3/channels?part=statistics&id={chlid}&key={YT_API_KEY}"
             d = requests.get(uri4)
             data2 = json.loads(d.text)
-            print(data2)
             items = data2["items"][0]["statistics"]
             if items["hiddenSubscriberCount"]: subcount = "Hidden"
             else: subcount = items["subscriberCount"]
 
-            uri5 = f"https://www.googleapis.com/youtube/v3/channels?part=snippet&id={chlid}&fields=items%2Fsnippet%2Fthumbnails&key={API_KEY}"
+            uri5 = f"https://www.googleapis.com/youtube/v3/channels?part=snippet&id={chlid}&fields=items%2Fsnippet%2Fthumbnails&key={YT_API_KEY}"
             e = requests.get(uri5)
             data3 = json.loads(e.text)
-            print(data3)
             thumburl = data3["items"][0]["snippet"]["thumbnails"]["medium"]["url"]
 
-            uri2 = f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId={uploadsid}&key={API_KEY}"
+            uri2 = f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId={uploadsid}&key={YT_API_KEY}"
             b = requests.get(uri2)
             vids = json.loads(b.text)
-            print(vids)
             vids_c = vids["items"]
 
             for i in vids_c:
                 vidid = i["contentDetails"]["videoId"]
-                uri3 = f"https://www.googleapis.com/youtube/v3/videos?part=statistics&id={vidid}&key={API_KEY}"
+                uri3 = f"https://www.googleapis.com/youtube/v3/videos?part=statistics&id={vidid}&key={YT_API_KEY}"
                 res = requests.get(uri3)
                 viddetail = json.loads(res.text)
-                print(viddetail)
                 viddetail = viddetail["items"][0]["statistics"]
 
                 datadict = {"name":i["snippet"]["title"],
@@ -2056,12 +2051,42 @@ async def cc(data):
                             "url":f"https://youtube.com/watch?v={vidid}"
                             }
                 ytvids.append(datadict)
+        if twitch:
+            for k in usercons:
+                if k["type"] == "twitch": chlid = k["id"]
+            if bot.twitchapi["expiry"] < time.time():
+                print("Requesting new token...")
+                a = requests.post(f"https://id.twitch.tv/oauth2/token?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&grant_type=client_credentials")
+                res = json.loads(a.text)
+                bot.twitchapi["token"] = res["access_token"]
+                bot.twitchapi["expiry"] = time.time() + res["expires_in"]
+            header = {'Authorization': f'Bearer {bot.twitchapi["token"]}', 'Client-Id': CLIENT_ID}
+
+            url = f"https://api.twitch.tv/helix/users?id={chlid}"
+            a = requests.get(url, headers=header)
+            data = json.loads(a.text)
+            data = data["data"][0]
+            twitchdata["pfp"] = data["profile_image_url"]
+            twitchdata["name"] = data["display_name"]
+            twitchdata["views"] = data["view_count"]
+
+            url2 = f"https://api.twitch.tv/helix/users/follows?to_id={chlid}"
+            b = requests.get(url2, headers=header)
+            data2 = json.loads(b.text)
+            twitchdata["followers"] = data2["total"]
+
+            url3 = f"https://api.twitch.tv/helix/videos?user_id={chlid}"
+            c = requests.get(url3, headers=header)
+            data3 = json.loads(c.text)
+            twitchdata["data"] = data3["data"]
 
         embed = discord.Embed(title=f"Success", color=localembed)
 
         rescode = hex(random.randint(10000, 99999)).lower()
         allapps = bot.refr.setdefault("apps", [])
-        allapps.append({rescode: {"type":"cc", "yt": {"data":ytvids, "thumbnail":thumburl, "subs":subcount, "url":f"https://www.youtube.com/channel/{chlid}"}, "twitch":{"data":twitchvids}}})
+        allapps.append({rescode: {"type":"cc",
+                                  "yt": {"linked":yt, "data":ytvids, "thumbnail":thumburl, "subs":subcount, "url":f"https://www.youtube.com/channel/{chlid}"},
+                                  "twitch":{"linked":twitch, "data":twitchdata}}})
         bot.refr["apps"] = allapps
         await close_admin()
         await em.remove_reaction(loading, bot.user)
@@ -2077,10 +2102,137 @@ async def cc(data):
 
 async def comp(data):
     try:
-        await data.user.send("You clicked 'Competitive'")
-        await data.response.send_message("Application process started in DMs", ephemeral=True)
-    except:
+        test = await data.user.send("DM Testing")
+        await test.delete()
+        a = await data.response.send_message("Application process started in DMs", ephemeral=True)
+    except Exception as e:
+        print(e)
         return await data.response.send_message("Please open your DMs for starting the process", ephemeral=True)
+    user = data.user
+    if str(user.id) not in bot.links:
+        await user.send("You are not linked to VNTA bot. Please go to <#845682300967714831> and type `v.link <your ign>`.\n"
+                        "After linking, you can restart this process from <#845682300570304546>")
+        return
+    ign = bot.links.get(str(user.id))['main']
+    embed = discord.Embed(title="Competitive Application",
+                          description=f"Welcome to VNTA Application Process! Please follow the steps below for a smooth & troublefree experience\n"
+                                      f"You are applying for your account- `{ign}`.\n"
+                                      f"**Type `c` to confirm.**",
+                          colour=localembed)
+    embed.set_footer(text="The bot takes your main account to consideration.\nSet it using 'v.main <ign>'")
+    await user.send(embed=embed)
+    def check(msg):
+        return msg.author == user and msg.guild is None
+
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=180)
+        res = msg.content.lower()
+        if res == "c":
+            asyncio.create_task(timeout(user))
+        else:
+            return await user.send("Application Aborted")
+    except asyncio.TimeoutError:
+        await user.send("You didnt reply in time.")
+
+    fetch = await user.send("Fetching Stats, Hang on..")
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://kr.vercel.app/api/profile?username={ign}") as data:
+            if data.status != 200:
+                embed = discord.Embed(title=f"{economyerror} Error",
+                                      description="Failed to fetch automatically: API didnt respond in time",
+                                      color=error_embed)
+                await fetch.edit(embed=embed)
+            else:
+                userdata = json.loads(await data.text())
+                userdata = userdata["data"]
+                username = userdata["username"]
+                clan = userdata["clan"]
+                kills = userdata["kills"]
+                deaths = userdata["deaths"]
+                kr = userdata["funds"]
+                datestr = userdata["createdAt"].split("T")[0]
+                wins = userdata["wins"]
+                score = userdata["score"]
+                level = userdata["level"]
+                played = userdata["games"]
+                loses = played - wins
+                challenge = userdata["challenge"]
+                if challenge is None: challenge = 0
+                else: challenge = int(challenge) + 1
+                nukes = userdata["stats"].get("n", 0)
+                headshots = userdata["stats"].get("hs", 0)
+                shots = userdata["stats"].get("s", 0)
+                hits = userdata["stats"].get("h", 0)
+                timeplayed = int(userdata["timePlayed"] / 1000)
+                melee = userdata["stats"].get("mk", 0)
+                wallbangs = userdata["stats"].get("wb", 0)
+                date_obj = datetime.datetime.strptime(datestr, '%Y-%m-%d')
+                now = datetime.datetime.now()
+                daysplayed = (now - date_obj).days
+                mpk = "{:.2f}".format((shots - hits) / kills)
+                hps = "{:.2f}%".format((headshots / hits) * 100)
+                gpn = "{:.2f}".format(played / nukes)
+                npd = "{:.2f}".format(nukes / daysplayed)
+                kpg = "{:.2f}".format(kills / played)
+                kpm = "{:.2f}".format(float(kpg) / 4)
+                if loses == 0: loses = 1
+                wl = "{:.2f}".format(wins / loses)
+                kdr = "{:.4f}".format(kills / deaths)
+                spk = "{:.2f}".format(score / kills)
+                avgscore = int(score / played)
+                accuracy = "{:.2f}%".format((hits / shots) * 100)
+                scoreweek = int((score/daysplayed)/7)
+
+                score = 0
+                economysuccess = "✔️"
+                embed = discord.Embed(title=f"{username}", color=localembed)
+                if level >= 40:
+                    mark = economysuccess
+                    score += 1
+                else: mark = economyerror
+                embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
+
+                if float(kdr) >= 4:
+                    mark = economysuccess
+                    score += 1
+                else: mark = economyerror
+                embed.add_field(name=f"\\{mark} KDR", value=str(kdr), inline=False)
+
+                if float(kpg) >= 16:
+                    mark = economysuccess
+                    score += 1
+                else: mark = economyerror
+                embed.add_field(name=f"\\{mark} KPG", value=str(kpg), inline=False)
+
+                if nukes >= 100:
+                    mark = economysuccess
+                    score += 1
+                else: mark = economyerror
+                embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
+
+                p = False
+                if score == 5:
+                    res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
+                    p = True
+                elif 2 <= score <= 4:
+                    res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
+                    p = True
+                else: res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
+                embed.add_field(name="Result", value=res, inline=False)
+                rescode = hex(random.randint(1000, 9999)).lower()
+                allapps = bot.refr.setdefault("apps", [])
+                allapps.append({rescode:{"type":"pubs", "kdr":kdr, "level":level, "kpg":kpg, "username":username, "nukes":nukes, "scoreweek":scoreweek}})
+                bot.refr["apps"] = allapps
+                await close_admin()
+                embed.add_field(name="If you wish to continue:",
+                                value=f"Head over to <#845682300967714831>, and type `v.result {rescode}`.\n"
+                                      "A new ticket will be opened with your result posted."
+                                      " The staff will guide you after that.\n\n"
+                                      "Note: To abort the process, dont use `v.result` command.",
+                                inline=False)
+                embed.set_footer(text="#vantalizing")
+                embed.set_thumbnail(url="https://images-ext-2.discordapp.net/external/l8ile3RBeJ7FZELTOiecL6LMUQz5qmExL8ELzQFuEag/https/media.discordapp.net/attachments/817374020810178583/838450855648690226/vnta_logo_png.png")
+                await fetch.edit(embed=embed, content=None)
 
 @bot.command()
 @commands.is_owner()
@@ -2133,7 +2285,7 @@ async def result(ctx, code):
         nukes = userapp["nukes"]
         scoreweek = userapp["scoreweek"]
 
-        embed = discord.Embed(title=userapp["username"], colour=localembed)
+        embed = discord.Embed(title=userapp["username"], colour=localembed, url=f"https://kr.social/p/{userapp['username']}")
         if level >= 60:
             mark = economysuccess
             score += 1
@@ -2179,8 +2331,8 @@ async def result(ctx, code):
         embedslist.append(embed)
     elif userapp["type"] == "cc":
         yt = userapp["yt"]
-        count=len(yt["data"])
-        if count != 0:
+        if yt["linked"]:
+            count = len(yt["data"])
             embed = discord.Embed(title="<:YouTube:865575628710608916> YouTube", colour=localembed, url=yt["url"])
             embed.set_thumbnail(url=yt["thumbnail"])
             embed.add_field(name="Total Videos", value=count)
@@ -2227,27 +2379,57 @@ async def result(ctx, code):
                                                             inline=False)
             embedslist.append(embed)
         else:
-            embed = discord.Embed(title="<:YouTube:865575628710608916> YouTube", colour=localembed, url=yt["url"],
-                                  description="No videos")
+            embed = discord.Embed(title="<:YouTube:865575628710608916> YouTube", colour=localembed,
+                                  description="Not Linked")
             embedslist.append(embed)
 
         twi = userapp["twitch"]
-        count = len(twi["data"])
-        if count != 0:
+        if twi["linked"]:
+            twitchdata = twi["data"]
             embed = discord.Embed(title="<:Twitch:865575682208825355> Twitch", colour=localembed)
-            embed.add_field(name="Smth", value=len(twi))
+            embed.add_field(name="Name", value=twitchdata["name"])
+            embed.add_field(name="Followers", value=twitchdata["followers"])
+            embed.add_field(name="Total Views", value=twitchdata["views"])
+            embed.add_field(name="Videos Found", value=len(twitchdata["data"]))
+            views_l = []
+            for vid in twitchdata["data"]:
+                views_l.append(vid["view_count"])
+            maxview = max(views_l)
+
+            for vid in twitchdata["data"]:
+                if vid["view_count"] == maxview:
+                    dur = vid["duration"]
+                    splitted = dur.split("h")
+                    hrs = splitted[0]
+                    split2 = splitted[1].split("m")
+                    mins = split2[0]
+
+                    created = vid["created_at"].split("T")[0]
+                    dtobj = datetime.datetime.strptime(created, "%Y-%m-%d")
+                    timeobj = int(time.mktime(dtobj.timetuple()))
+                    embed.add_field(name="Most Viewed:",
+                                    value=f"[`{vid['title']}`]({vid['url']})\n"
+                                          f"**Views:** {maxview}\n"
+                                          f"**Duration:** `{hrs}h {mins}m`\n"
+                                          f"**Streamed On:** <t:{timeobj}:D> (<t:{timeobj}:R>)")
             embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
+
+            embed.set_thumbnail(url=twitchdata["pfp"])
             embedslist.append(embed)
         else:
             embed = discord.Embed(title="<:Twitch:865575682208825355> Twitch", colour=localembed,
-                                  description="No Data")
+                                  description="Not Linked")
+            embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
             embedslist.append(embed)
     else: embed = discord.Embed()
-    msg = await channel.send(f"{ctx.author.mention} Please wait for a staff to respond.", embeds=embedslist)
+    msg = await channel.send(f"{ctx.author.mention}", embeds=embedslist)
     opent = bot.refr.setdefault("opent", [])
     opent.append(msg.id)
     bot.refr["opent"] = opent
     await msg.add_reaction("🔒")
+    if userapp["type"] in ["pubs", "comp"]:
+        await channel.send("Kindly wait for a <@&813729487292334081> to respond.\n"
+                           "In the meanwhile, please post the screenshot of your best game")
     await close_admin()
 
 @bot.command(aliases=["rem", "rems", "reminders"])
@@ -2840,7 +3022,7 @@ async def one_ready():
 @bot.event
 async def on_message(message):
     if bot.beta:
-        if message.channel.id not in [854008993248051230, 853973674309582868, 862265264838410241, 839080243485736970]: return
+        if message.channel.id not in [864755738609057822, 854008993248051230, 853973674309582868, 862265264838410241, 839080243485736970, 865896015641706504]: return
     else:
         if message.channel.id == 864755738609057822:
             data = "{" + message.content + "}"
