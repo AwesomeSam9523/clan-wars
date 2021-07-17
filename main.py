@@ -2390,7 +2390,8 @@ async def result(ctx, code):
         twi = userapp["twitch"]
         if twi["linked"]:
             twitchdata = twi["data"]
-            embed = discord.Embed(title="<:Twitch:865575682208825355> Twitch", colour=localembed)
+            embed = discord.Embed(title="<:Twitch:865575682208825355> Twitch", colour=localembed,
+                                  url=f"https://twitch.tv/{twitchdata['name']}")
             embed.add_field(name="Name", value=twitchdata["name"])
             embed.add_field(name="Followers", value=twitchdata["followers"])
             embed.add_field(name="Total Views", value=twitchdata["views"])
