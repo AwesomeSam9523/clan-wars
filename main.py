@@ -67,6 +67,7 @@ bot.cwpause = True
 allowdevs = False
 if os.path.exists("C:"): bot.beta = True
 else: bot.beta = False
+bot.webworking = False
 bot.apidown = False
 bot.help_json = {
     "Wars": {
@@ -161,24 +162,24 @@ bot.help_json = {
             "usage":"v.forcelink @user <ign>",
             "desc":"Force link a user with an account"
         },
-        "e.set_chl": {
+        "v.set_chl": {
             "aliases": ["add_chl"],
-            "usage": "e.set_chl <#channel>",
+            "usage": "v.set_chl <#channel>",
             "desc": "Allows the bot to respond in that channel",
         },
         "v.del_chl": {
             "aliases": ["delete_chl", "rem_chl", "remove_chl"],
-            "usage": "e.del_chl <#channel>",
+            "usage": "v.del_chl <#channel>",
             "desc": "Disallows the bot to respond in that channel",
         },
         "v.list_chl": {
             "aliases": ["show_chl"],
-            "usage": "e.list_chl",
+            "usage": "v.list_chl",
             "desc": "Lists all the channels where the bot is allowed to respond",
         },
         "v.reset_chl": {
             "aliases": ["None"],
-            "usage": "e.reset_chl",
+            "usage": "v.reset_chl",
             "desc": "Clears all the configuration and makes the bot to respond again in **all** the channels",
         }
     }
@@ -410,6 +411,14 @@ async def warslogs():
         d1 = today.strftime("%d-%m-%Y")
         bot.cwdata[d1] = data
         await updatecwdata()
+
+@tasks.loop(minutes=2)
+async def webping():
+    a = requests.get("https://vntaweb.herokuapp.com/ping")
+    if a.status_code == 200:
+        bot.webworking = True
+    else:
+        bot.webworking = False
 
 @bot.command()
 @commands.is_owner()
@@ -1792,9 +1801,20 @@ async def reset_chl(ctx):
 @bot.command()
 @commands.check(general)
 async def ping(ctx):
-    msg = await ctx.send('Pong!')
-    ping = "{:.2f}".format(bot.latency*1000)
-    await msg.edit(content=f'Pong! `{ping} ms`')
+    msg = await ctx.send('Pinging Bot...')
+    ping = "{:.2f} ms".format(bot.latency*1000)
+    await msg.edit(content=f'Pong!\n'
+                           f'Bot: `{ping}`\n'
+                           f'Pinging Web Server...')
+    t1 = time.time()
+    a = requests.get("https://vntaweb.herokuapp.com/ping")
+    if a.status_code == 200:
+        pingtime = "{:.2f} ms".format(time.time() - t1)
+    else:
+        pingtime = "Unreachable"
+    await msg.edit(content=f'Pong!\n'
+                           f'Bot: `{ping}`\n'
+                           f'Web: `{pingtime}`')
 
 @bot.command(aliases=["app"])
 @commands.is_owner()
@@ -1996,11 +2016,13 @@ async def cc(data):
             uri = f"https://www.googleapis.com/youtube/v3/channels?id={chlid}&key={API_KEY}&part=contentDetails"
             a = requests.get(uri)
             data = json.loads(a.text)
+            print(data)
             uploadsid = data["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
 
             uri4 = f"https://www.googleapis.com/youtube/v3/channels?part=statistics&id={chlid}&key={API_KEY}"
             d = requests.get(uri4)
             data2 = json.loads(d.text)
+            print(data2)
             items = data2["items"][0]["statistics"]
             if items["hiddenSubscriberCount"]: subcount = "Hidden"
             else: subcount = items["subscriberCount"]
@@ -2008,11 +2030,13 @@ async def cc(data):
             uri5 = f"https://www.googleapis.com/youtube/v3/channels?part=snippet&id={chlid}&fields=items%2Fsnippet%2Fthumbnails&key={API_KEY}"
             e = requests.get(uri5)
             data3 = json.loads(e.text)
+            print(data3)
             thumburl = data3["items"][0]["snippet"]["thumbnails"]["medium"]["url"]
 
             uri2 = f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId={uploadsid}&key={API_KEY}"
             b = requests.get(uri2)
             vids = json.loads(b.text)
+            print(vids)
             vids_c = vids["items"]
 
             for i in vids_c:
@@ -2020,6 +2044,7 @@ async def cc(data):
                 uri3 = f"https://www.googleapis.com/youtube/v3/videos?part=statistics&id={vidid}&key={API_KEY}"
                 res = requests.get(uri3)
                 viddetail = json.loads(res.text)
+                print(viddetail)
                 viddetail = viddetail["items"][0]["statistics"]
 
                 datadict = {"name":i["snippet"]["title"],
@@ -2053,13 +2078,6 @@ async def cc(data):
 async def comp(data):
     try:
         await data.user.send("You clicked 'Competitive'")
-        await data.response.send_message("Application process started in DMs", ephemeral=True)
-    except:
-        return await data.response.send_message("Please open your DMs for starting the process", ephemeral=True)
-
-async def wars(data):
-    try:
-        await data.user.send("You clicked 'Clan Wars'")
         await data.response.send_message("Application process started in DMs", ephemeral=True)
     except:
         return await data.response.send_message("Please open your DMs for starting the process", ephemeral=True)
@@ -2807,6 +2825,7 @@ async def one_ready():
     if not bot.beta:
         handle_rems.start()
         warslogs.start()
+        webping.start()
 
 @bot.event
 async def on_message(message):
