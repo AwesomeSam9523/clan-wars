@@ -2073,7 +2073,7 @@ async def cc(data):
         embed.set_thumbnail(
             url="https://images-ext-2.discordapp.net/external/l8ile3RBeJ7FZELTOiecL6LMUQz5qmExL8ELzQFuEag/https/media.discordapp.net/attachments/817374020810178583/838450855648690226/vnta_logo_png.png")
         await user.send(embed=embed)
-    except: pass
+    except Exception as e: print(e)
 
 async def comp(data):
     try:
