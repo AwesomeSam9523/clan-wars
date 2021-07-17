@@ -865,7 +865,6 @@ async def link(ctx, *, ign):
                 if not userdata["success"]:
                     await ctx.message.clear_reaction(loading)
                     return await ctx.reply(userdata["error"])
-    oldflag = userdata["data"]["stats"]["flg"]
     randflag = random.choice(flags_list)
     newflag = randflag[2]
     embed = discord.Embed(title="Link your account..",
@@ -3073,7 +3072,7 @@ async def on_raw_reaction_add(payload):
                 return await chan.send(f"{user.mention}", embed=embed)
 
             userdata = json.loads(datatext)
-            oldflag = userdata["data"]["stats"]["flg"]
+            oldflag = userdata["data"]["stats"].get("flg", "a")
             if oldflag != userd[2]:
                 return await chan.send(f"{user.mention} The flag change wasn't detected. Make sure to stick to the end of the match\n"
                                        f"Retry using `v.link {userdata['data']['username']}`")
