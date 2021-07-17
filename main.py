@@ -2061,10 +2061,10 @@ async def cc(data):
 
         rescode = hex(random.randint(10000, 99999)).lower()
         allapps = bot.refr.setdefault("apps", [])
-        allapps.append({rescode: {"type":"cc", "yt": {"data":ytvids, "thumbnail":thumburl, "subs":subcount, "url":f"https://www.youtube.com/channel/{chlid}"}, "twitch":twitchvids}})
+        allapps.append({rescode: {"type":"cc", "yt": {"data":ytvids, "thumbnail":thumburl, "subs":subcount, "url":f"https://www.youtube.com/channel/{chlid}"}, "twitch":{"data":twitchvids}}})
         bot.refr["apps"] = allapps
         await close_admin()
-        await em.clear_reaction(loading)
+        await em.remove_reaction(loading, bot.user)
         embed.add_field(name="What to do now?",
                         value=f"Head over to <#845682300967714831>, and type `v.result {rescode}`.\n"
                               "A new ticket will be opened with your stats posted. "
@@ -2179,9 +2179,9 @@ async def result(ctx, code):
         embedslist.append(embed)
     elif userapp["type"] == "cc":
         yt = userapp["yt"]
-        embed = discord.Embed(title="<:YouTube:865575628710608916> YouTube", colour=localembed, url=yt["url"])
         count=len(yt["data"])
         if count != 0:
+            embed = discord.Embed(title="<:YouTube:865575628710608916> YouTube", colour=localembed, url=yt["url"])
             embed.set_thumbnail(url=yt["thumbnail"])
             embed.add_field(name="Total Videos", value=count)
             embed.add_field(name="Subscribers", value=yt["subs"])
@@ -2225,13 +2225,23 @@ async def result(ctx, code):
                                                                                       f"**Comments:** {i['comments']}\n"
                                                                                       f"\u200b",
                                                             inline=False)
-        embedslist.append(embed)
+            embedslist.append(embed)
+        else:
+            embed = discord.Embed(title="<:YouTube:865575628710608916> YouTube", colour=localembed, url=yt["url"],
+                                  description="No videos")
+            embedslist.append(embed)
 
         twi = userapp["twitch"]
-        embed = discord.Embed(title="<:Twitch:865575682208825355> Twitch", colour=localembed)
-        embed.add_field(name="Smth", value=len(twi))
-        embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
-        embedslist.append(embed)
+        count = len(twi["data"])
+        if count != 0:
+            embed = discord.Embed(title="<:Twitch:865575682208825355> Twitch", colour=localembed)
+            embed.add_field(name="Smth", value=len(twi))
+            embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
+            embedslist.append(embed)
+        else:
+            embed = discord.Embed(title="<:Twitch:865575682208825355> Twitch", colour=localembed,
+                                  description="No Data")
+            embedslist.append(embed)
     else: embed = discord.Embed()
     msg = await channel.send(f"{ctx.author.mention} Please wait for a staff to respond.", embeds=embedslist)
     opent = bot.refr.setdefault("opent", [])
