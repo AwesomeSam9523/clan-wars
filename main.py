@@ -1911,7 +1911,6 @@ async def pubs(data):
                 spk = "{:.2f}".format(score / kills)
                 avgscore = int(score / played)
                 accuracy = "{:.2f}%".format((hits / shots) * 100)
-                scoreweek = int((score/daysplayed)/7)
 
                 score = 0
                 economysuccess = "✔️"
@@ -1951,7 +1950,7 @@ async def pubs(data):
                 embed.add_field(name="Result", value=res, inline=False)
                 rescode = hex(random.randint(1000, 9999)).lower()
                 allapps = bot.refr.setdefault("apps", [])
-                allapps.append({rescode:{"type":"pubs", "kdr":kdr, "level":level, "kpg":kpg, "username":username, "nukes":nukes, "scoreweek":scoreweek}})
+                allapps.append({rescode:{"type":"pubs", "kdr":kdr, "level":level, "kpg":kpg, "username":username, "nukes":nukes}})
                 bot.refr["apps"] = allapps
                 await close_admin()
                 if p:
@@ -2180,7 +2179,6 @@ async def comp(data):
                 spk = "{:.2f}".format(score / kills)
                 avgscore = int(score / played)
                 accuracy = "{:.2f}%".format((hits / shots) * 100)
-                scoreweek = int((score/daysplayed)/7)
 
                 score = 0
                 economysuccess = "✔️"
@@ -2220,7 +2218,7 @@ async def comp(data):
                 embed.add_field(name="Result", value=res, inline=False)
                 rescode = hex(random.randint(1000, 9999)).lower()
                 allapps = bot.refr.setdefault("apps", [])
-                allapps.append({rescode:{"type":"pubs", "kdr":kdr, "level":level, "kpg":kpg, "username":username, "nukes":nukes, "scoreweek":scoreweek}})
+                allapps.append({rescode:{"type":"comp", "kdr":kdr, "level":level, "kpg":kpg, "username":username, "nukes":nukes}})
                 bot.refr["apps"] = allapps
                 await close_admin()
                 embed.add_field(name="If you wish to continue:",
@@ -2282,9 +2280,8 @@ async def result(ctx, code):
         kdr = userapp["kdr"]
         kpg = userapp["kpg"]
         nukes = userapp["nukes"]
-        scoreweek = userapp["scoreweek"]
 
-        embed = discord.Embed(title=userapp["username"], colour=localembed, url=f"https://kr.social/p/{userapp['username']}")
+        embed = discord.Embed(title=f'{userapp["username"]} | Pubstomper Application', colour=localembed, url=f"https://kr.social/p/{userapp['username']}")
         if level >= 60:
             mark = economysuccess
             score += 1
@@ -2313,15 +2310,9 @@ async def result(ctx, code):
             mark = economyerror
         embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
 
-        if scoreweek >= 100000:
-            mark = economysuccess
-            score += 1
-        else:
-            mark = economyerror
-        embed.add_field(name=f"\\{mark} Score/week", value=str(scoreweek), inline=False)
         if score == 5:
             res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
-        elif 3 <= score <= 4:
+        elif 2 <= score <= 4:
             res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
         else:
             res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
@@ -2427,7 +2418,51 @@ async def result(ctx, code):
                                   description="Not Linked")
             embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
             embedslist.append(embed)
-    else: embed = discord.Embed()
+    else:
+        level = userapp["level"]
+        kdr = userapp["kdr"]
+        kpg = userapp["kpg"]
+        nukes = userapp["nukes"]
+
+        embed = discord.Embed(title=f'{userapp["username"]} | Competitive Application', colour=localembed,
+                              url=f"https://kr.social/p/{userapp['username']}")
+        if level >= 40:
+            mark = economysuccess
+            score += 1
+        else:
+            mark = economyerror
+        embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
+
+        if float(kdr) >= 4:
+            mark = economysuccess
+            score += 1
+        else:
+            mark = economyerror
+        embed.add_field(name=f"\\{mark} KDR", value=str(kdr), inline=False)
+
+        if float(kpg) >= 16:
+            mark = economysuccess
+            score += 1
+        else:
+            mark = economyerror
+        embed.add_field(name=f"\\{mark} KPG", value=str(kpg), inline=False)
+
+        if nukes >= 100:
+            mark = economysuccess
+            score += 1
+        else:
+            mark = economyerror
+        embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
+
+        if score == 5:
+            res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
+        elif 2 <= score <= 4:
+            res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
+        else:
+            res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
+        embed.add_field(name="Result", value=res)
+        embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
+        embedslist.append(embed)
     msg = await channel.send(f"{ctx.author.mention}", embeds=embedslist)
     opent = bot.refr.setdefault("opent", [])
     opent.append(msg.id)
