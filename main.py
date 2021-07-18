@@ -161,6 +161,11 @@ bot.help_json = {
             "usage":"v.cbg",
             "desc":"Edit clan background"
         },
+        "v.appconfig": {
+            "aliases": ["appc"],
+            "usage": "v.appconfig",
+            "desc": "Modify requirements",
+        },
         "v.forcelink":{
             "aliases":["fl", "forcel", "flink"],
             "usage":"v.forcelink @user <ign>",
@@ -1828,9 +1833,17 @@ async def application(ctx):
     await ctx.send(view=PersistentView(), embed=embed)
 
 async def pubs(data):
+    kdr_req = bot.refr["pubs_con"]["kdr"]
+    level_req = bot.refr["pubs_con"]["level"]
+    kpg_req = bot.refr["pubs_con"]["kpg"]
+    nukes_req = bot.refr["pubs_con"]["nukes"]
+    a_open = bot.refr["pubs_con"]["open"]
     if data.user.id in bot.interlist:
         a = await data.response.send_message("You recently applied before. Please wait before re-applying", ephemeral=True)
         return
+
+    if not a_open:
+        await data.response.send_message("Pubstomper applications are closed", ephemeral=True)
     try:
         test = await data.user.send("DM Testing")
         await test.delete()
@@ -1915,35 +1928,32 @@ async def pubs(data):
                 score = 0
                 economysuccess = "✔️"
                 embed = discord.Embed(title=f"{username}", color=localembed)
-                if level >= 60:
+                if level >= level_req:
                     mark = economysuccess
                     score += 1
                 else: mark = economyerror
                 embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
 
-                if float(kdr) >= 4:
+                if float(kdr) >= kdr_req:
                     mark = economysuccess
                     score += 1
                 else: mark = economyerror
                 embed.add_field(name=f"\\{mark} KDR", value=str(kdr), inline=False)
 
-                if float(kpg) >= 16:
+                if float(kpg) >= kpg_req:
                     mark = economysuccess
                     score += 1
                 else: mark = economyerror
                 embed.add_field(name=f"\\{mark} KPG", value=str(kpg), inline=False)
 
-                if nukes >= 100:
+                if nukes >= nukes_req:
                     mark = economysuccess
                     score += 1
                 else: mark = economyerror
                 embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
 
                 p = False
-                if score == 5:
-                    res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
-                    p = True
-                elif 2 <= score <= 4:
+                if 2 <= score <= 4:
                     res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
                     p = True
                 else: res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
@@ -1964,9 +1974,14 @@ async def pubs(data):
                 await fetch.edit(embed=embed, content=None)
 
 async def cc(data):
+    a_open = bot.refr["cc_con"]["open"]
     if data.user.id in bot.interlist:
-        a = await data.response.send_message("You recently applied before. Please wait before re-applying", ephemeral=True)
+        a = await data.response.send_message("You recently applied before. Please wait before re-applying",
+                                             ephemeral=True)
         return
+
+    if not a_open:
+        await data.response.send_message("CC applications are closed", ephemeral=True)
     try:
         test = await data.user.send("DM Testing")
         await test.delete()
@@ -2099,6 +2114,18 @@ async def cc(data):
     except Exception as e: print(e)
 
 async def comp(data):
+    kdr_req = bot.refr["comp_con"]["kdr"]
+    level_req = bot.refr["comp_con"]["level"]
+    kpg_req = bot.refr["comp_con"]["kpg"]
+    nukes_req = bot.refr["comp_con"]["nukes"]
+    a_open = bot.refr["comp_con"]["open"]
+    if data.user.id in bot.interlist:
+        a = await data.response.send_message("You recently applied before. Please wait before re-applying",
+                                             ephemeral=True)
+        return
+
+    if not a_open:
+        await data.response.send_message("Competitive applications are closed", ephemeral=True)
     try:
         test = await data.user.send("DM Testing")
         await test.delete()
@@ -2183,35 +2210,32 @@ async def comp(data):
                 score = 0
                 economysuccess = "✔️"
                 embed = discord.Embed(title=f"{username}", color=localembed)
-                if level >= 40:
+                if level >= level_req:
                     mark = economysuccess
                     score += 1
                 else: mark = economyerror
                 embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
 
-                if float(kdr) >= 4:
+                if float(kdr) >= kdr_req:
                     mark = economysuccess
                     score += 1
                 else: mark = economyerror
                 embed.add_field(name=f"\\{mark} KDR", value=str(kdr), inline=False)
 
-                if float(kpg) >= 16:
+                if float(kpg) >= kpg_req:
                     mark = economysuccess
                     score += 1
                 else: mark = economyerror
                 embed.add_field(name=f"\\{mark} KPG", value=str(kpg), inline=False)
 
-                if nukes >= 100:
+                if nukes >= nukes_req:
                     mark = economysuccess
                     score += 1
                 else: mark = economyerror
                 embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
 
                 p = False
-                if score == 5:
-                    res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
-                    p = True
-                elif 2 <= score <= 4:
+                if 2 <= score <= 4:
                     res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
                     p = True
                 else: res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
@@ -2230,6 +2254,193 @@ async def comp(data):
                 embed.set_footer(text="#vantalizing")
                 embed.set_thumbnail(url="https://images-ext-2.discordapp.net/external/l8ile3RBeJ7FZELTOiecL6LMUQz5qmExL8ELzQFuEag/https/media.discordapp.net/attachments/817374020810178583/838450855648690226/vnta_logo_png.png")
                 await fetch.edit(embed=embed, content=None)
+
+async def configpubs(ctx):
+    bot.refr.setdefault("pubs_con", {})
+    kdr = bot.refr["pubs_con"].get("kdr", 4)
+    level = bot.refr["pubs_con"].get("level", 60)
+    kpg = bot.refr["pubs_con"].get("kpg", 16)
+    nukes = bot.refr["pubs_con"].get("nukes", 100)
+    a_open = bot.refr["pubs_con"].get("open", True)
+    if a_open: ifopen = "Yes"
+    else: ifopen = "No"
+
+    embed = discord.Embed(title="Pubstomper Configuration",
+                          description="Type `modify <s.no>` to change that field's value", color=localembed)
+    embed.add_field(name="1. Application Open", value=ifopen, inline=False)
+    embed.add_field(name="2. Level", value=level, inline=False)
+    embed.add_field(name="3. KDR", value=kdr, inline=False)
+    embed.add_field(name="4. KPG", value=kpg, inline=False)
+    embed.add_field(name="5. Nukes", value=nukes, inline=False)
+    embed.set_footer(text="Type 'cancel' to cancel changes\n"
+                          "Type 'save' to save all the changes")
+    newdict = {"kdr":kdr, "kpg":kpg, "level":level, "nukes":nukes, "open":a_open}
+    await ctx.send(embed=embed)
+
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
+    while True:
+        try:
+            msg = await bot.wait_for("message", check=check, timeout=120)
+            cont = msg.content.lower()
+
+            if cont == "modify 1":
+                if a_open: a_open = False
+                else: a_open = True
+                await msg.add_reaction(economysuccess)
+            if cont == "modify 2":
+                await ctx.send("Enter the new value")
+                newmsg = await bot.wait_for("message", check=check, timeout=60)
+                try: level = int(newmsg.content); await newmsg.add_reaction(economysuccess)
+                except: await ctx.send("Incorrect Value")
+            if cont == "modify 3":
+                await ctx.send("Enter the new value")
+                newmsg = await bot.wait_for("message", check=check, timeout=60)
+                try: kdr = int(newmsg.content); await newmsg.add_reaction(economysuccess)
+                except: await ctx.send("Incorrect Value")
+            if cont == "modify 4":
+                await ctx.send("Enter the new value")
+                newmsg = await bot.wait_for("message", check=check, timeout=60)
+                try: kpg = int(newmsg.content); await newmsg.add_reaction(economysuccess)
+                except: await ctx.send("Incorrect Value")
+            if cont == "modify 5":
+                await ctx.send("Enter the new value")
+                newmsg = await bot.wait_for("message", check=check, timeout=60)
+                try: nukes = int(newmsg.content); await newmsg.add_reaction(economysuccess)
+                except: await ctx.send("Incorrect Value")
+            if cont == "cancel": return
+            if cont == "save":
+                bot.refr["pubs_con"] = newdict
+                await close_admin()
+                await ctx.send(f"{economysuccess} Saved all the changes")
+                return
+            newdict = {"kdr": kdr, "kpg": kpg, "level": level, "nukes": nukes, "open": a_open}
+        except:
+            pass
+
+async def configcomp(ctx):
+    bot.refr.setdefault("comp_con", {})
+    kdr = bot.refr["comp_con"].get("kdr", 4)
+    level = bot.refr["comp_con"].get("level", 40)
+    kpg = bot.refr["comp_con"].get("kpg", 16)
+    nukes = bot.refr["comp_con"].get("nukes", 100)
+    a_open = bot.refr["comp_con"].get("open", True)
+    if a_open: ifopen = "Yes"
+    else: ifopen = "No"
+
+    embed = discord.Embed(title="Competitive Configuration",
+                          description="Type `modify <s.no>` to change that field's value", color=localembed)
+    embed.add_field(name="1. Application Open", value=ifopen, inline=False)
+    embed.add_field(name="2. Level", value=level, inline=False)
+    embed.add_field(name="3. KDR", value=kdr, inline=False)
+    embed.add_field(name="4. KPG", value=kpg, inline=False)
+    embed.add_field(name="5. Nukes", value=nukes, inline=False)
+    embed.set_footer(text="Type 'cancel' to cancel changes\n"
+                          "Type 'save' to save all the changes")
+    newdict = {"kdr":kdr, "kpg":kpg, "level":level, "nukes":nukes, "open":a_open}
+    await ctx.send(embed=embed)
+
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
+    while True:
+        try:
+            msg = await bot.wait_for("message", check=check, timeout=120)
+            cont = msg.content.lower()
+
+            if cont == "modify 1":
+                if a_open: a_open = False
+                else: a_open = True
+                await msg.add_reaction(economysuccess)
+            if cont == "modify 2":
+                await ctx.send("Enter the new value")
+                newmsg = await bot.wait_for("message", check=check, timeout=60)
+                try: level = int(newmsg.content); await newmsg.add_reaction(economysuccess)
+                except: await ctx.send("Incorrect Value")
+            if cont == "modify 3":
+                await ctx.send("Enter the new value")
+                newmsg = await bot.wait_for("message", check=check, timeout=60)
+                try: kdr = int(newmsg.content); await newmsg.add_reaction(economysuccess)
+                except: await ctx.send("Incorrect Value")
+            if cont == "modify 4":
+                await ctx.send("Enter the new value")
+                newmsg = await bot.wait_for("message", check=check, timeout=60)
+                try: kpg = int(newmsg.content); await newmsg.add_reaction(economysuccess)
+                except: await ctx.send("Incorrect Value")
+            if cont == "modify 5":
+                await ctx.send("Enter the new value")
+                newmsg = await bot.wait_for("message", check=check, timeout=60)
+                try: nukes = int(newmsg.content); await newmsg.add_reaction(economysuccess)
+                except: await ctx.send("Incorrect Value")
+            if cont == "save":
+                bot.refr["comp_con"] = newdict
+                await close_admin()
+                await ctx.send(f"{economysuccess} Saved all the changes")
+                return
+            if cont == "cancel": return
+            newdict = {"kdr": kdr, "kpg": kpg, "level": level, "nukes": nukes, "open": a_open}
+        except:
+            pass
+
+async def configcc(ctx):
+    bot.refr.setdefault("cc_con", {})
+    a_open = bot.refr["cc_con"].get("open", True)
+    if a_open: ifopen = "Yes"
+    else: ifopen = "No"
+
+    embed = discord.Embed(title="CC Configuration",
+                          description="Type `modify <s.no>` to change that field's value", color=localembed)
+    embed.add_field(name="1. Application Open", value=ifopen, inline=False)
+    embed.set_footer(text="Type 'cancel' to cancel changes\n"
+                          "Type 'save' to save all the changes")
+    newdict = {"open":a_open}
+    await ctx.send(embed=embed)
+
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
+    while True:
+        try:
+            msg = await bot.wait_for("message", check=check, timeout=120)
+            cont = msg.content.lower()
+
+            if cont == "modify 1":
+                if a_open: a_open = False
+                else: a_open = True
+                await msg.add_reaction(economysuccess)
+            if cont == "cancel": return
+            if cont == "save":
+                bot.refr["cc_con"] = newdict
+                await close_admin()
+                await ctx.send(f"{economysuccess} Saved all the changes")
+                return
+            newdict = {"open": a_open}
+        except:
+            pass
+
+@bot.command(aliases=["appc"])
+async def appconfig(ctx):
+    if ctx.author.id not in staff+devs: return
+    embed = discord.Embed(title="⚙️ Configuration",
+                          description="**Select the option below:**\n\n"
+                                      "1\N{variation selector-16}\N{combining enclosing keycap} Pubstomper\n"
+                                      "2\N{variation selector-16}\N{combining enclosing keycap} Competitive\n"
+                                      "3\N{variation selector-16}\N{combining enclosing keycap} Content Creator",
+                          color=localembed)
+    a = await ctx.send(embed=embed)
+    await a.add_reaction("1\N{variation selector-16}\N{combining enclosing keycap}")
+    await a.add_reaction("2\N{variation selector-16}\N{combining enclosing keycap}")
+    await a.add_reaction("3\N{variation selector-16}\N{combining enclosing keycap}")
+
+    def check(reaction, user):
+        return user == ctx.author
+
+    reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check)
+
+    if str(reaction.emoji) == "1\N{variation selector-16}\N{combining enclosing keycap}":
+        await configpubs(ctx)
+    elif str(reaction.emoji) == "2\N{variation selector-16}\N{combining enclosing keycap}":
+        await configcomp(ctx)
+    elif str(reaction.emoji) == "3\N{variation selector-16}\N{combining enclosing keycap}":
+        await configcc(ctx)
 
 @bot.command()
 @commands.is_owner()
