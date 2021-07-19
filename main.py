@@ -40,10 +40,12 @@ class PersistentView(discord.ui.View):
         await cc(interaction)
 
 YT_API_KEY = "AIzaSyDB4zCQQ54G31iA4Cs-AXmWJnm1iSP7Lgw"
+SOCIAL_KEYS = ["AIzaSyC6Zaibw8jVcxT42yhGRnSLl-fui334bT0", "AIzaSyAf4hSXUzCSXoxpZQFRypr-8VEVdexCapo", "AIzaSyDYIs60oDoXXmtAqD50Zxh_ZQdYcONIoc0"]
 CLIENT_ID = "0dgqs0ani15dwgr1pn8ojbbvvn81k8"
 CLIENT_SECRET = "20k31xx6rnzkqf1vqim843eopd7e24"
 
 bot = PersistentViewBot()
+bot.apikey = YT_API_KEY
 bot.remove_command("help")
 bot.loop.set_debug(True)
 bot.loop.slow_callback_duration = 0.3
@@ -53,7 +55,6 @@ bot.links = {}
 bot.userdata = {}
 bot.bgdata = {}
 bot.suggestions = {}
-bot.cwdata = {}
 bot.unsaved = {}
 bot.cache = {}
 bot.pendings = {}
@@ -193,14 +194,14 @@ bot.help_json = {
         }
     }
 }
-
+bot.ytcache = {}
 disregarded = []
 warn1 = []
 warn2 = []
 devs = [771601176155783198]
 staffchl = [854008993248051230, 813444187566506027]
 flags_list = [['Afghanistan', 'af', 0], ['Albania', 'al', 1], ['Algeria', 'dz', 2], ['American Samoa', 'as', 3], ['Andorra', 'ad', 4], ['Angola', 'ao', 5], ['Anguilla', 'ai', 6], ['Antarctica', 'aq', 7], ['Antigua and Barbuda', 'ag', 8], ['Argentina', 'ar', 9], ['Armenia', 'am', 10], ['Aruba', 'aw', 11], ['Australia', 'au', 12], ['Austria', 'at', 13], ['Azerbaijan', 'az', 14], ['Bahamas', 'bs', 15], ['Bahrain', 'bh', 16], ['Bangladesh', 'bd', 17], ['Barbados', 'bb', 18], ['Belarus', 'by', 19], ['Belgium', 'be', 20], ['Belize', 'bz', 21], ['Benin', 'bj', 22], ['Bermuda', 'bm', 23], ['Bhutan', 'bt', 24], ['Bolivia', 'bo', 25], ['Bosnia and Herzegovina', 'ba', 26], ['Botswana', 'bw', 27], ['Brazil', 'br', 28], ['British Indian Ocean Territory', 'io', 29], ['British Virgin Islands', 'vg', 30], ['Brunei', 'bn', 31], ['Bulgaria', 'bg', 32], ['Burkina Faso', 'bf', 33], ['Burundi', 'bi', 34], ['Cambodia', 'kh', 35], ['Cameroon', 'cm', 36], ['Canada', 'ca', 37], ['Cape Verde', 'cv', 38], ['Cayman Islands', 'ky', 39], ['Central African Republic', 'cf', 40], ['Chad', 'td', 41], ['Chile', 'cl', 42], ['China', 'cn', 43], ['Christmas Island', 'cx', 44], ['Cocos Islands', 'cc', 45], ['Colombia', 'co', 46], ['Comoros', 'km', 47], ['Cook Islands', 'ck', 48], ['Costa Rica', 'cr', 49], ['Croatia', 'hr', 50], ['Cuba', 'cu', 51], ['Curacao', 'cw', 52], ['Cyprus', 'cy', 53], ['Czech Republic', 'cz', 54], ['Democratic Republic of the Congo', 'cd', 55], ['Denmark', 'dk', 56], ['Djibouti', 'dj', 57], ['Dominica', 'dm', 58], ['Dominican Republic', 'do', 59], ['East Timor', 'tl', 60], ['Ecuador', 'ec', 61], ['Egypt', 'eg', 62], ['El Salvador', 'sv', 63], ['Equatorial Guinea', 'gq', 64], ['Eritrea', 'er', 65], ['Estonia', 'ee', 66], ['Ethiopia', 'et', 67], ['Falkland Islands', 'fk', 68], ['Faroe Islands', 'fo', 69], ['Fiji', 'fj', 70], ['Finland', 'fi', 71], ['France', 'fr', 72], ['French Polynesia', 'pf', 73], ['Gabon', 'ga', 74], ['Gambia', 'gm', 75], ['Georgia', 'ge', 76], ['Germany', 'de', 77], ['Ghana', 'gh', 78], ['Gibraltar', 'gi', 79], ['Greece', 'gr', 80], ['Greenland', 'gl', 81], ['Grenada', 'gd', 82], ['Guam', 'gu', 83], ['Guatemala', 'gt', 84], ['Guernsey', 'gg', 85], ['Guinea', 'gn', 86], ['Guinea-Bissau', 'gw', 87], ['Guyana', 'gy', 88], ['Haiti', 'ht', 89], ['Honduras', 'hn', 90], ['Hong Kong', 'hk', 91], ['Hungary', 'hu', 92], ['Iceland', 'is', 93], ['India', 'in', 94], ['Indonesia', 'id', 95], ['Iran', 'ir', 96], ['Iraq', 'iq', 97], ['Ireland', 'ie', 98], ['Isle of Man', 'im', 99], ['Israel', 'il', 100], ['Italy', 'it', 101], ['Ivory Coast', 'ci', 102], ['Jamaica', 'jm', 103], ['Japan', 'jp', 104], ['Jersey', 'je', 105], ['Jordan', 'jo', 106], ['Kazakhstan', 'kz', 107], ['Kenya', 'ke', 108], ['Kiribati', 'ki', 109], ['Kosovo', 'xk', 110], ['Kuwait', 'kw', 111], ['Kyrgyzstan', 'kg', 112], ['Laos', 'la', 113], ['Latvia', 'lv', 114], ['Lebanon', 'lb', 115], ['Lesotho', 'ls', 116], ['Liberia', 'lr', 117], ['Libya', 'ly', 118], ['Liechtenstein', 'li', 119], ['Lithuania', 'lt', 120], ['Luxembourg', 'lu', 121], ['Macau', 'mo', 122], ['Macedonia', 'mk', 123], ['Madagascar', 'mg', 124], ['Malawi', 'mw', 125], ['Malaysia', 'my', 126], ['Maldives', 'mv', 127], ['Mali', 'ml', 128], ['Malta', 'mt', 129], ['Marshall Islands', 'mh', 130], ['Mauritania', 'mr', 131], ['Mauritius', 'mu', 132], ['Mayotte', 'yt', 133], ['Mexico', 'mx', 134], ['Micronesia', 'fm', 135], ['Moldova', 'md', 136], ['Monaco', 'mc', 137], ['Mongolia', 'mn', 138], ['Montenegro', 'me', 139], ['Montserrat', 'ms', 140], ['Morocco', 'ma', 141], ['Mozambique', 'mz', 142], ['Myanmar', 'mm', 143], ['Namibia', 'na', 144], ['Nauru', 'nr', 145], ['Nepal', 'np', 146], ['Netherlands', 'nl', 147], ['Netherlands Antilles', 'an', 148], ['New Caledonia', 'nc', 149], ['New Zealand', 'nz', 150], ['Nicaragua', 'ni', 151], ['Niger', 'ne', 152], ['Nigeria', 'ng', 153], ['Niue', 'nu', 154], ['North Korea', 'kp', 155], ['Northern Mariana Islands', 'mp', 156], ['Norway', 'no', 157], ['Oman', 'om', 158], ['Pakistan', 'pk', 159], ['Palau', 'pw', 160], ['Palestine', 'ps', 161], ['Panama', 'pa', 162], ['Papua New Guinea', 'pg', 163], ['Paraguay', 'py', 164], ['Peru', 'pe', 165], ['Philippines', 'ph', 166], ['Pitcairn', 'pn', 167], ['Poland', 'pl', 168], ['Portugal', 'pt', 169], ['Puerto Rico', 'pr', 170], ['Qatar', 'qa', 171], ['Republic of the Congo', 'cg', 172], ['Reunion', 're', 173], ['Romania', 'ro', 174], ['Russia', 'ru', 175], ['Rwanda', 'rw', 176], ['Saint Barthelemy', 'bl', 177], ['Saint Helena', 'sh', 178], ['Saint Kitts and Nevis', 'kn', 179], ['Saint Lucia', 'lc', 180], ['Saint Martin', 'mf', 181], ['Saint Pierre and Miquelon', 'pm', 182], ['Saint Vincent and the Grenadines', 'vc', 183], ['Samoa', 'ws', 184], ['San Marino', 'sm', 185], ['Sao Tome and Principe', 'st', 186], ['Saudi Arabia', 'sa', 187], ['Senegal', 'sn', 188], ['Serbia', 'rs', 189], ['Seychelles', 'sc', 190], ['Sierra Leone', 'sl', 191], ['Singapore', 'sg', 192], ['Sint Maarten', 'sx', 193], ['Slovakia', 'sk', 194], ['Slovenia', 'si', 195], ['Solomon Islands', 'sb', 196], ['Somalia', 'so', 197], ['South Africa', 'za', 198], ['South Korea', 'kr', 199], ['South Sudan', 'ss', 200], ['Spain', 'es', 201], ['Sri Lanka', 'lk', 202], ['Sudan', 'sd', 203], ['Suriname', 'sr', 204], ['Svalbard and Jan Mayen', 'sj', 205], ['Swaziland', 'sz', 206], ['Sweden', 'se', 207], ['Switzerland', 'ch', 208], ['Syria', 'sy', 209], ['Taiwan', 'tw', 210], ['Tajikistan', 'tj', 211], ['Tanzania', 'tz', 212], ['Thailand', 'th', 213], ['Togo', 'tg', 214], ['Tokelau', 'tk', 215], ['Tonga', 'to', 216], ['Trinidad and Tobago', 'tt', 217], ['Tunisia', 'tn', 218], ['Turkey', 'tr', 219], ['Turkmenistan', 'tm', 220], ['Turks and Caicos Islands', 'tc', 221], ['Tuvalu', 'tv', 222], ['U.S. Virgin Islands', 'vi', 223], ['Uganda', 'ug', 224], ['Ukraine', 'ua', 225], ['United Arab Emirates', 'ae', 226], ['United Kingdom', 'gb', 227], ['United States', 'us', 228], ['Uruguay', 'uy', 229], ['Uzbekistan', 'uz', 230], ['Vanuatu', 'vu', 231], ['Vatican', 'va', 232], ['Venezuela', 've', 233], ['Vietnam', 'vn', 234], ['Wallis and Futuna', 'wf', 235], ['Western Sahara', 'eh', 236], ['Yemen', 'ye', 237], ['Zambia', 'zm', 238], ['Zimbabwe', 'zw', 239]]
-staff = [813441664617939004, 855793126958170122, 853997809212588073, 504029508295196683, 660353231565619200, 482612710018908190, 753869126522503310]
+staff = [813441664617939004, 855793126958170122, 853997809212588073, 504029508295196683, 660353231565619200, 482612710018908190, 753869126522503310, 771601176155783198]
 accepted = [813786315530305536, 813527378088951809, 813527377736761384, 813452412810690600, 813441662588157952, 836427405656326165, 853997809212588073]
 
 usercmds = {}
@@ -214,6 +215,9 @@ localembed = 16734606
 economyerror = "❌"
 economysuccess = "✅"
 loading = "<a:loading:862916076769378304>"
+youtube = "<:YouTube:865575628710608916>"
+twitch = "<:Twitch:865575682208825355>"
+twitter = "<:Twitter:866566539581587456>"
 color = 7929797
 sampfp = "https://media.discordapp.net/attachments/854008993248051230/854708889059852288/sam_av.png"
 
@@ -394,7 +398,7 @@ async def general(ctx):
 async def close_admin():
     chl = bot.get_channel(854692793276170280)
     with open("admin.json", "w") as f:
-        f.write(json.dumps(bot.refr))
+        f.write(json.dumps(bot.refr, indent=2))
     await chl.send(file=discord.File("admin.json"))
 
 async def updateuserdata():
@@ -407,19 +411,79 @@ async def updateuserdata():
 async def auto_update():
     await update_embeds("VNTA")
 
-@tasks.loop(minutes=1)
-async def warslogs():
-    exptime = bot.refr.get("cwtime_s")
-    exptime2 = bot.refr.get("cwtime_e")
-    if (exptime2 is None) or (exptime is None): return
-    if exptime < time.time() < exptime2:
-        kills, data = await end(clan="VNTA", via=True)
-        if kills == 0:
-            return
-        today = datetime.date.today()
-        d1 = today.strftime("%d-%m-%Y")
-        bot.cwdata[d1] = data
-        await updatecwdata()
+@tasks.loop(seconds=40)
+async def yt_socials_check():
+    reqs = bot.refr.setdefault("api", 0)
+    if reqs >= 2500 and bot.apikey == YT_API_KEY:
+        bot.apikey = SOCIAL_KEYS[0]
+    elif reqs >= 12475 and bot.apikey == SOCIAL_KEYS[0]:
+        bot.apikey = SOCIAL_KEYS[1]
+    elif reqs >= 22450 and bot.apikey == SOCIAL_KEYS[1]:
+        bot.apikey = SOCIAL_KEYS[2]
+    SOCIAL_KEY = bot.apikey
+    for i in bot.refr["social_yt"]["subs"]:
+        ytcache = bot.refr.setdefault("ytcache", {})
+        uploadsid = ytcache.get(i)
+        if uploadsid is None:
+            uri = f"https://www.googleapis.com/youtube/v3/channels?id={i}&key={YT_API_KEY}&part=contentDetails"
+            a = requests.get(uri)
+            data = json.loads(a.text)
+            if data["pageInfo"]["totalResults"] == 0:
+                bot.refr["social_yt"]["subs"].remove(i)
+                continue
+            uploadsid = data["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+            ytcache[i] = uploadsid
+        uri2 = f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId={uploadsid}&key={SOCIAL_KEY}"
+        b = requests.get(uri2)
+        vids = json.loads(b.text)
+        vidid = vids["items"][0]["contentDetails"]["videoId"]
+        donevids = bot.refr.setdefault("ytdone", [])
+        if vidid not in donevids:
+            firstcheck = bot.refr.setdefault("ytfirst", [])
+            if i in firstcheck:
+                await newvideo(vidid, vids["items"][0]["snippet"]["channelTitle"])
+            else:
+                firstcheck.append(i)
+                donevids.append(vidid)
+    await close_admin()
+
+@tasks.loop(seconds=40)
+async def twitch_socials_check():
+    if bot.twitchapi["expiry"] < time.time():
+        print("Requesting new token...")
+        a = requests.post(
+            f"https://id.twitch.tv/oauth2/token?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&grant_type=client_credentials")
+        res = json.loads(a.text)
+        bot.twitchapi["token"] = res["access_token"]
+        bot.twitchapi["expiry"] = time.time() + res["expires_in"]
+    header = {'Authorization': f'Bearer {bot.twitchapi["token"]}', 'Client-Id': CLIENT_ID}
+    for i in bot.refr["social_twitch"]["subs"]:
+        uri = f"https://api.twitch.tv/helix/streams?user_login={i}"
+        a = requests.get(uri, headers=header)
+        data = json.loads(a.text)
+        fin = data["data"]
+        checklist = bot.refr.setdefault("twitchlive", [])
+        if (len(fin) != 0) and (i not in checklist): await streamstart(fin); checklist.append(i)
+        elif i in checklist: checklist.remove(i)
+    await close_admin()
+
+async def newvideo(vidid, name):
+    ytdata = bot.refr["social_yt"]
+    chl = bot.get_channel(ytdata["channel"])
+    role = chl.guild.get_role(ytdata["role"])
+    await chl.send(ytdata["msg"].format(name=name, role=role.mention, link=f"https://youtu.be/{vidid}"))
+    donevids = bot.refr["ytdone"]
+    donevids.append(vidid)
+    await close_admin()
+
+async def streamstart(data):
+    ytdata = bot.refr["social_twitch"]
+    chl = bot.get_channel(ytdata["channel"])
+    role = chl.guild.get_role(ytdata["role"])
+    await chl.send(ytdata["msg"].format(name=data["user_name"],
+                                        role=role.mention,
+                                        link=f"https://twitch.tv/{data['user_login']}",
+                                        title=data['title']))
 
 @tasks.loop(minutes=2)
 async def webping():
@@ -428,22 +492,6 @@ async def webping():
         bot.webworking = True
     else:
         bot.webworking = False
-
-@bot.command()
-@commands.is_owner()
-async def logwar(ctx):
-    kills, data = await end(clan="VNTA", via=True)
-
-    today = datetime.date.today()
-    d1 = today.strftime("%d-%m-%Y")
-    bot.cwdata[d1] = data
-    await updatecwdata()
-    await ctx.message.add_reaction(economysuccess)
-
-async def updatecwdata():
-    with open("cwdata.json", "w") as f:
-        f.write(json.dumps(bot.cwdata, indent=2))
-    await bot.get_channel(862972949069955083).send(file=discord.File("cwdata.json"))
 
 async def update_embeds(clan):
     await bot.wait_until_ready()
@@ -889,7 +937,7 @@ async def link(ctx, *, ign):
 @bot.command(aliases=["fl", "forcel", "flink"])
 @commands.check(general)
 async def forcelink(ctx, user:discord.Member, *, ign):
-    if ctx.author.id not in staff+devs: return
+    if ctx.author.id not in staff: return
 
     t = bot.links.get(str(user.id), {"main": ign, "all": []})
     t["all"] = list(set(t["all"]))
@@ -906,7 +954,7 @@ async def forcelink(ctx, user:discord.Member, *, ign):
 @bot.command()
 @commands.check(general)
 async def unlink(ctx, *, ign):
-    if ctx.author.id not in staff+devs: return
+    if ctx.author.id not in staff: return
 
     t = bot.links.get(str(ctx.author.id), {"main": ign, "all": []})
     t["all"] = list(set(t["all"]))
@@ -2418,7 +2466,7 @@ async def configcc(ctx):
 
 @bot.command(aliases=["appc"])
 async def appconfig(ctx):
-    if ctx.author.id not in staff+devs: return
+    if ctx.author.id not in staff: return
     embed = discord.Embed(title="⚙️ Configuration",
                           description="**Select the option below:**\n\n"
                                       "1\N{variation selector-16}\N{combining enclosing keycap} Pubstomper\n"
@@ -3160,11 +3208,6 @@ async def disable(ctx, cmd, *, reason=None):
     await close_admin()
 
 @bot.command()
-@commands.is_owner()
-async def apidata(ctx):
-    await ctx.send(f"```json\n{bot.refr['con']}```")
-
-@bot.command()
 @commands.check(general)
 async def say(ctx, *, sentence):
     if ctx.author.id not in devs + staff: return
@@ -3217,10 +3260,292 @@ async def sayhelp(ctx):
                           colour=localembed)
     await ctx.send(embed=embed)
 
-@bot.command()
+@bot.command(aliases=["soc"])
 @commands.check(general)
-async def cw(ctx, *, ign):
-    pass
+async def socials(ctx, platform=None, action=None):
+    if ctx.author.id not in staff: return
+    if platform is None:
+        embed = discord.Embed(title="VNTA Social Manager",
+                              description="Here are the commands for management:",
+                              color=localembed)
+        embed.add_field(name=f"{youtube} `v.soc yt`", value="Manage YouTube", inline=False)
+        embed.add_field(name=f"{twitch} `v.soc twitch`", value="Manage Twitch", inline=False)
+        embed.add_field(name=f"{twitter} `v.soc twitter`", value="Manage Twitter", inline=False)
+        return await ctx.send(embed=embed)
+    if platform.lower() == "yt":
+        await yt_manage(ctx, action)
+    elif platform.lower() == "twitch":
+        await twitch_manage(ctx, action)
+    elif platform.lower() == "twitter":
+        await twitter_manage(ctx)
+
+async def yt_manage(ctx, action=None):
+    if action is None:
+        embed = discord.Embed(title="<:YouTube:865575628710608916> YouTube",
+                              description="Here are the actions you can perform:",
+                              color=localembed)
+        embed.add_field(name="`channel`", value="View or change the channel where you want to send notification", inline=False)
+        embed.add_field(name="`subs`", value="Check the people whom you have subscribed", inline=False)
+        embed.add_field(name="`add`", value="Add a subscription", inline=False)
+        embed.add_field(name="`rem`", value="Remove a subscription", inline=False)
+        embed.add_field(name="`msg`", value="View or change the message the bot sends", inline=False)
+        embed.add_field(name="`role`", value="View or change the role which is pinged", inline=False)
+        embed.set_footer(text="Type 'v.socials yt <action>' to view/edit it")
+        return await ctx.send(embed=embed)
+    ytdata = bot.refr.setdefault("social_yt", {})
+    action = action.lower()
+    def rcheck(reaction, user_):
+        return user_ == ctx.author
+
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
+    if action == "channel":
+        a = ytdata.setdefault("channel", 0)
+        if a == 0: chl = "Not set"
+        else: chl = bot.get_channel(a).mention
+        embed = discord.Embed(title="Channel", description=f"> {chl}\n"
+                                                           f"\n"
+                                                           f"To change the channel, react with 🇨",
+                              color=localembed)
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction("🇨")
+
+        reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=rcheck)
+        if str(reaction.emoji) != "🇨": return
+        await ctx.send("Send the ID of the new channel (DO NOT MENTION THE CHANNEL)")
+
+        chlid = await bot.wait_for("message", timeout=60, check=check)
+        try:
+            newchl = int(chlid.content)
+            newchl = bot.get_channel(newchl)
+            if newchl is None: raise ValueError
+        except:
+            return await chlid.reply("Invalid ID")
+        ytdata["channel"] = newchl.id
+        await chlid.add_reaction(economysuccess)
+    elif action == "subs":
+        subs = ytdata.get("subs", [])
+        subs_string = "\n".join(["> https://www.youtube.com/channel/"+x for x in subs])
+        if subs_string == "": subs_string = "> No channels subscribed"
+        embed = discord.Embed(title="Your Subscriptions",
+                              description=subs_string, color=localembed)
+        embed.set_footer(text="To add: 'v.socials yt add'\n"
+                              "To remove: 'v.socials yt rem'")
+        await ctx.send(embed=embed)
+    elif action == "add":
+        await ctx.reply("Enter the channel URL to add. Prefer regular URL over vanity URL as they are more reliable")
+        msg = await bot.wait_for("message", timeout=60, check=check)
+        msgc = msg.content
+        if "https://www.youtube.com/channel/" not in msgc:
+            return await msg.reply("Invalid URL")
+        finalurl = msgc.replace("https://www.youtube.com/channel/", "")
+        old = ytdata.get("subs", [])
+        if finalurl in old:
+            return await msg.reply("URL already subscribed!")
+        old.append(finalurl)
+        ytdata["subs"] = old
+        await msg.add_reaction(economysuccess)
+    elif action == "rem":
+        await ctx.reply("Enter the channel URL to remove")
+        msg = await bot.wait_for("message", timeout=60, check=check)
+        msgc = msg.content
+        if "https://www.youtube.com/channel/" not in msgc:
+            return await msg.reply("Invalid URL")
+        finalurl = msgc.replace("https://www.youtube.com/channel/", "")
+        old = ytdata.get("subs", [])
+        if finalurl not in old:
+            return await msg.reply("URL isn't subscribed!")
+        old.remove(finalurl)
+        ytdata["subs"] = old
+        await msg.add_reaction(economysuccess)
+    elif action == "msg":
+        oldmsg = ytdata.setdefault("msg", "{role} **{name} just uploaded a video! Check it out: {link}**")
+        embed = discord.Embed(title="Message", description=f"`{oldmsg}`\n\n"
+                                                           f"Variables:\n"
+                                                           "`{role}`- Role to ping\n"
+                                                           "`{name}`- Name of the channel\n"
+                                                           "`{link}`- Link of the video",
+                              color=localembed)
+        embed.set_footer(text="To change the message, react below")
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction("🇨")
+
+        reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=rcheck)
+        if str(reaction.emoji) != "🇨": return
+        await ctx.send("Enter the new message. You can only use the variables defined above.\n"
+                       "Do **not** remove the brackets `{}` from the variables")
+
+        chlid = await bot.wait_for("message", timeout=60, check=check)
+        ytdata["msg"] = chlid.content
+        await chlid.add_reaction(economysuccess)
+    elif action == "role":
+        a = ytdata.setdefault("role", 0)
+        if a == 0:
+            chl = "Not set"
+        else:
+            chl = ctx.guild.get_role(a).mention
+        embed = discord.Embed(title="Role", description=f"> {chl}\n"
+                                                           f"\n"
+                                                           f"To change the role, react with 🇨",
+                              color=localembed)
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction("🇨")
+
+        reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=rcheck)
+        if str(reaction.emoji) != "🇨": return
+        await ctx.send("Send the ID of the new role (DO NOT MENTION THE ROLE)")
+
+        chlid = await bot.wait_for("message", timeout=60, check=check)
+        try:
+            newchl = int(chlid.content)
+            newchl = ctx.guild.get_role(newchl)
+            if newchl is None: raise ValueError
+        except:
+            return await chlid.reply("Invalid ID")
+        ytdata["role"] = newchl.id
+        await chlid.add_reaction(economysuccess)
+    else: return
+    bot.refr["social_yt"] = ytdata
+    await close_admin()
+
+async def twitch_manage(ctx, action=None):
+    if action is None:
+        embed = discord.Embed(title="<:Twitch:865575682208825355> Twitch",
+                              description="Here are the actions you can perform:",
+                              color=localembed)
+        embed.add_field(name="`channel`", value="View or change the channel where you want to send notification",
+                        inline=False)
+        embed.add_field(name="`subs`", value="Check the people whom you have subscribed", inline=False)
+        embed.add_field(name="`add`", value="Add a subscription", inline=False)
+        embed.add_field(name="`rem`", value="Remove a subscription", inline=False)
+        embed.add_field(name="`msg`", value="View or change the message the bot sends", inline=False)
+        embed.add_field(name="`role`", value="View or change the role which is pinged", inline=False)
+        embed.set_footer(text="Type 'v.socials twitch <action>' to view/edit it")
+        return await ctx.send(embed=embed)
+    twitchdata = bot.refr.setdefault("social_twitch", {})
+    action = action.lower()
+
+    def rcheck(reaction, user_):
+        return user_ == ctx.author
+
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
+
+    if action == "channel":
+        a = twitchdata.setdefault("channel", 0)
+        if a == 0:
+            chl = "Not set"
+        else:
+            chl = bot.get_channel(a).mention
+        embed = discord.Embed(title="Channel", description=f"> {chl}\n"
+                                                           f"\n"
+                                                           f"To change the channel, react with 🇨",
+                              color=localembed)
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction("🇨")
+
+        reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=rcheck)
+        if str(reaction.emoji) != "🇨": return
+        await ctx.send("Send the ID of the new channel (DO NOT MENTION THE CHANNEL)")
+
+        chlid = await bot.wait_for("message", timeout=60, check=check)
+        try:
+            newchl = int(chlid.content)
+            newchl = bot.get_channel(newchl)
+            if newchl is None: raise ValueError
+        except:
+            return await chlid.reply("Invalid ID")
+        twitchdata["channel"] = newchl.id
+        await chlid.add_reaction(economysuccess)
+    elif action == "subs":
+        subs = twitchdata.get("subs", [])
+        subs_string = "\n".join(["> https://www.twitch.tv/" + x for x in subs])
+        if subs_string == "": subs_string = "> No channels subscribed"
+        embed = discord.Embed(title="Your Subscriptions",
+                              description=subs_string, color=localembed)
+        embed.set_footer(text="To add: 'v.socials twitch add'\n"
+                              "To remove: 'v.socials twitch rem'")
+        await ctx.send(embed=embed)
+    elif action == "add":
+        await ctx.reply("Enter the channel URL to add.")
+        msg = await bot.wait_for("message", timeout=60, check=check)
+        msgc = msg.content
+        if "https://www.twitch.tv/" not in msgc:
+            return await msg.reply("Invalid URL")
+        finalurl = msgc.replace("https://www.twitch.tv/", "")
+        old = twitchdata.get("subs", [])
+        if finalurl in old:
+            return await msg.reply("URL already subscribed!")
+        old.append(finalurl)
+        twitchdata["subs"] = old
+        await msg.add_reaction(economysuccess)
+    elif action == "rem":
+        await ctx.reply("Enter the channel URL to remove")
+        msg = await bot.wait_for("message", timeout=60, check=check)
+        msgc = msg.content
+        if "https://www.twitch.tv/" not in msgc:
+            return await msg.reply("Invalid URL")
+        finalurl = msgc.replace("https://www.twitch.tv/", "")
+        old = twitchdata.get("subs", [])
+        if finalurl not in old:
+            return await msg.reply("URL isn't subscribed!")
+        old.remove(finalurl)
+        twitchdata["subs"] = old
+        await msg.add_reaction(economysuccess)
+    elif action == "msg":
+        oldmsg = twitchdata.setdefault("msg", "{role} **{name} is live! {title} Join him: {link}**")
+        embed = discord.Embed(title="Message", description=f"`{oldmsg}`\n\n"
+                                                           f"Variables:\n"
+                                                           "`{role}`- Role to ping\n"
+                                                           "`{name}`- Name of the channel\n"
+                                                           "`{link}`- Link of the stream\n"
+                                                           "`{title}` - Title of the stream",
+                              color=localembed)
+        embed.set_footer(text="To change the message, react below")
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction("🇨")
+
+        reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=rcheck)
+        if str(reaction.emoji) != "🇨": return
+        await ctx.send("Enter the new message. You can only use the variables defined above.\n"
+                       "Do **not** remove the brackets `{}` from the variables")
+
+        chlid = await bot.wait_for("message", timeout=60, check=check)
+        twitchdata["msg"] = chlid.content
+        await chlid.add_reaction(economysuccess)
+    elif action == "role":
+        a = twitchdata.setdefault("role", 0)
+        if a == 0:
+            chl = "Not set"
+        else:
+            chl = ctx.guild.get_role(a).mention
+        embed = discord.Embed(title="Role", description=f"> {chl}\n"
+                                                        f"\n"
+                                                        f"To change the role, react with 🇨",
+                              color=localembed)
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction("🇨")
+
+        reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=rcheck)
+        if str(reaction.emoji) != "🇨": return
+        await ctx.send("Send the ID of the new role (DO NOT MENTION THE ROLE)")
+
+        chlid = await bot.wait_for("message", timeout=60, check=check)
+        try:
+            newchl = int(chlid.content)
+            newchl = ctx.guild.get_role(newchl)
+            if newchl is None: raise ValueError
+        except:
+            return await chlid.reply("Invalid ID")
+        twitchdata["role"] = newchl.id
+        await chlid.add_reaction(economysuccess)
+    else:
+        return
+    bot.refr["social_twitch"] = twitchdata
+    await close_admin()
+
+async def twitter_manage(ctx, action=None):
+    await ctx.reply("Comming Soon™️")
 
 @bot.command()
 @commands.is_owner()
@@ -3249,10 +3574,6 @@ async def load_data(ctx=None):
     msgs = await chl.history(limit=1).flatten()
     bot.bgdata = json.loads(requests.get(msgs[0].attachments[0]).text)
 
-    chl = bot.get_channel(862972949069955083)
-    msgs = await chl.history(limit=1).flatten()
-    bot.cwdata = json.loads(requests.get(msgs[0].attachments[0]).text)
-
     if ctx is not None:
         await ctx.message.add_reaction(economysuccess)
 
@@ -3268,8 +3589,9 @@ async def one_ready():
         if not bot.cwpause: auto_update.start()
     if not bot.beta:
         handle_rems.start()
-        warslogs.start()
         webping.start()
+        yt_socials_check.start()
+        twitch_socials_check.start()
 
 @bot.event
 async def on_message(message):
@@ -3379,6 +3701,10 @@ async def on_raw_reaction_add(payload):
             await tchl.send("Deleting in 5 secs...")
             await asyncio.sleep(5)
             await tchl.delete()
+
+@bot.event
+async def on_commnd_error(ctx, error):
+    if isinstance(error, asyncio.TimeoutError): return
 
 bot.loop.create_task(one_ready())
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
