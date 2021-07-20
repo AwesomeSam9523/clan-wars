@@ -480,9 +480,13 @@ async def twitter_socials_check():
         data = json.loads(a.text)
         data = data["data"][0]
         donetweets = bot.refr.setdefault("twitterdone", [])
+        firstcheck = bot.refr.setdefault("twitterfirst", [])
+        print(data)
+        print(donetweets)
+        print(firstcheck)
         if data['id'] not in donetweets:
-            firstcheck = bot.refr.setdefault("twitterfirst", [])
             if i in firstcheck:
+                print("Sending new tweet")
                 await newtweet(k, data)
             else:
                 firstcheck.append(i)
