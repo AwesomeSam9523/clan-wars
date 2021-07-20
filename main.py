@@ -481,12 +481,8 @@ async def twitter_socials_check():
         data = data["data"][0]
         donetweets = bot.refr.setdefault("twitterdone", [])
         firstcheck = bot.refr.setdefault("twitterfirst", [])
-        print(data)
-        print(donetweets)
-        print(firstcheck)
         if data['id'] not in donetweets:
             if i in firstcheck:
-                print("Sending new tweet")
                 await newtweet(k, data)
             else:
                 firstcheck.append(i)
@@ -3297,6 +3293,24 @@ async def sayhelp(ctx):
                           description=msg,
                           colour=localembed)
     await ctx.send(embed=embed)
+    
+@bot.command()
+@commands.check(general)
+async def statusw(ctx, *, newst):
+    if ctx.author.id not in staff: return
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=newst))
+
+@bot.command()
+@commands.check(general)
+async def statusl(ctx, *, newst):
+    if ctx.author.id not in staff: return
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=newst))
+
+@bot.command()
+@commands.check(general)
+async def statusp(ctx, *, newst):
+    if ctx.author.id not in staff: return
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=newst))
 
 @bot.command(aliases=["soc"])
 @commands.check(general)
@@ -3759,6 +3773,8 @@ async def one_ready():
     await load_data()
     await load_peeps()
     print("Ready")
+    vnta = bot.get_guild(719946380285837322)
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{vnta.member_count} peeps"))
     bot.dev = bot.get_user(771601176155783198)
     bot.linkinglogs = bot.get_channel(861463678179999784)
     if not bot.pause or not bot.beta:
