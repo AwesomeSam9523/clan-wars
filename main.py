@@ -479,7 +479,6 @@ async def twitter_socials_check():
         a = requests.get(uri, headers=header)
         data = json.loads(a.text)
         data = data["data"][0]
-        print(data)
         donetweets = bot.refr.setdefault("twitterdone", [])
         if data['id'] not in donetweets:
             firstcheck = bot.refr.setdefault("twitterfirst", [])
@@ -510,7 +509,7 @@ async def streamstart(data):
                                         title=data['title']))
 
 async def newtweet(user, data):
-    ytdata = bot.refr["social_tweet"]
+    ytdata = bot.refr["social_twitter"]
     chl = bot.get_channel(ytdata["channel"])
     role = chl.guild.get_role(ytdata["role"])
     twmsg = ytdata["msg"].format(name=user, role=role.mention, link=f"https://twitter.com/i/web/status/{data['id']}")
