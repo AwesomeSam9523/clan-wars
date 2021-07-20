@@ -44,6 +44,10 @@ SOCIAL_KEYS = ["AIzaSyC6Zaibw8jVcxT42yhGRnSLl-fui334bT0", "AIzaSyAf4hSXUzCSXoxpZ
 CLIENT_ID = "0dgqs0ani15dwgr1pn8ojbbvvn81k8"
 CLIENT_SECRET = "20k31xx6rnzkqf1vqim843eopd7e24"
 
+TWITTER_API_KEY = "nm6dTe6hT07TgOV6SFvtJHktc"
+TWITTER_API_SECRET = "4s77OUIGgaB0j7T0xEs0KY9lVeIrcf75e2e17SOjFBt2xNWUaB"
+TWITTER_BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAALRjRwEAAAAA8Jzs2fXphQlosXN2ewneKU4gNvQ%3D6dKHyQTzIOjXnKJbxs7ltt5XmFoArwXyMqUKCLOBJWpNe8IJEZ"
+
 bot = PersistentViewBot()
 bot.apikey = YT_API_KEY
 bot.remove_command("help")
@@ -467,6 +471,23 @@ async def twitch_socials_check():
         elif i in checklist: checklist.remove(i)
     await close_admin()
 
+@tasks.loop(seconds=20)
+async def twitter_socials_check():
+    header = {"Authorization": f"Bearer {TWITTER_BEARER_TOKEN}"}
+    for k, i in bot.refr["social_twitter"]["subs"].items():
+        uri = f"https://api.twitter.com/2/users/{i}/tweets"
+        a = requests.get(uri, headers=header)
+        data = json.loads(a.text)
+        data = data["data"][0]
+        donetweets = bot.refr.setdefault("twitterdone", [])
+        if data['id'] not in donetweets:
+            firstcheck = bot.refr.setdefault("twitterfirst", [])
+            if i in firstcheck:
+                await newtweet(k, data)
+            else:
+                firstcheck.append(i)
+                donetweets.append(data['id'])
+
 async def newvideo(vidid, name):
     ytdata = bot.refr["social_yt"]
     chl = bot.get_channel(ytdata["channel"])
@@ -474,6 +495,7 @@ async def newvideo(vidid, name):
     await chl.send(ytdata["msg"].format(name=name, role=role.mention, link=f"https://youtu.be/{vidid}"))
     donevids = bot.refr["ytdone"]
     donevids.append(vidid)
+    bot.refr["ytdone"] = donevids
     await close_admin()
 
 async def streamstart(data):
@@ -484,6 +506,17 @@ async def streamstart(data):
                                         role=role.mention,
                                         link=f"https://twitch.tv/{data['user_login']}",
                                         title=data['title']))
+
+async def newtweet(user, data):
+    ytdata = bot.refr["social_tweet"]
+    chl = bot.get_channel(ytdata["channel"])
+    role = chl.guild.get_role(ytdata["role"])
+    twmsg = ytdata["msg"].format(name=user, role=role.mention, link=f"https://twitter.com/i/web/status/{data['id']}")
+    await chl.send(twmsg)
+    donevids = bot.refr["twitterdone"]
+    donevids.append(data['id'])
+    bot.refr["twitterdone"] = donevids
+    await close_admin()
 
 @tasks.loop(minutes=2)
 async def webping():
@@ -3277,7 +3310,7 @@ async def socials(ctx, platform=None, action=None):
     elif platform.lower() == "twitch":
         await twitch_manage(ctx, action)
     elif platform.lower() == "twitter":
-        await twitter_manage(ctx)
+        await twitter_manage(ctx, action)
 
 async def yt_manage(ctx, action=None):
     if action is None:
@@ -3545,7 +3578,145 @@ async def twitch_manage(ctx, action=None):
     await close_admin()
 
 async def twitter_manage(ctx, action=None):
-    await ctx.reply("Comming Soon™️")
+    if action is None:
+        embed = discord.Embed(title="<:Twitter:866566539581587456> Twitter",
+                              description="Here are the actions you can perform:",
+                              color=localembed)
+        embed.add_field(name="`channel`", value="View or change the channel where you want to send notification",
+                        inline=False)
+        embed.add_field(name="`subs`", value="Check the people whom you have subscribed", inline=False)
+        embed.add_field(name="`add`", value="Add a subscription", inline=False)
+        embed.add_field(name="`rem`", value="Remove a subscription", inline=False)
+        embed.add_field(name="`msg`", value="View or change the message the bot sends", inline=False)
+        embed.add_field(name="`role`", value="View or change the role which is pinged", inline=False)
+        embed.set_footer(text="Type 'v.socials twitter <action>' to view/edit it")
+        return await ctx.send(embed=embed)
+
+    twitterdata = bot.refr.setdefault("social_twitter", {})
+    action = action.lower()
+
+    def rcheck(reaction, user_):
+        return user_ == ctx.author
+
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
+
+    if action == "channel":
+        a = twitterdata.setdefault("channel", 0)
+        if a == 0:
+            chl = "Not set"
+        else:
+            chl = bot.get_channel(a).mention
+        embed = discord.Embed(title="Channel", description=f"> {chl}\n"
+                                                           f"\n"
+                                                           f"To change the channel, react with 🇨",
+                              color=localembed)
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction("🇨")
+
+        reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=rcheck)
+        if str(reaction.emoji) != "🇨": return
+        await ctx.send("Send the ID of the new channel (DO NOT MENTION THE CHANNEL)")
+
+        chlid = await bot.wait_for("message", timeout=60, check=check)
+        try:
+            newchl = int(chlid.content)
+            newchl = bot.get_channel(newchl)
+            if newchl is None: raise ValueError
+        except:
+            return await chlid.reply("Invalid ID")
+        twitterdata["channel"] = newchl.id
+        await chlid.add_reaction(economysuccess)
+    elif action == "subs":
+        subs = twitterdata.get("subs", {})
+        subs_string = "\n".join(["> https://www.twitter.com/" + x for x in subs])
+        if subs_string == "": subs_string = "> No channels subscribed"
+        embed = discord.Embed(title="Your Subscriptions",
+                              description=subs_string, color=localembed)
+        embed.set_footer(text="To add: 'v.socials twitter add'\n"
+                              "To remove: 'v.socials twitter rem'")
+        await ctx.send(embed=embed)
+    elif action == "add":
+        header = {"Authorization": f"Bearer {TWITTER_BEARER_TOKEN}"}
+        await ctx.reply("Enter the channel URL to add.")
+        msg = await bot.wait_for("message", timeout=60, check=check)
+        msgc = msg.content
+        if "https://twitter.com/" not in msgc:
+            return await msg.reply("Invalid URL")
+        finalurl = msgc.replace("https://twitter.com/", "")
+        old = twitterdata.get("subs", {})
+        if finalurl in old.keys():
+            return await msg.reply("URL already subscribed!")
+        uri = f"https://api.twitter.com/2/users/by/username/{finalurl}"
+        a = requests.get(uri, headers=header)
+        data = json.loads(a.text)
+        data = data["data"]
+        old[finalurl] = data["id"]
+        twitterdata["subs"] = old
+        await msg.add_reaction(economysuccess)
+    elif action == "rem":
+        await ctx.reply("Enter the channel URL to remove")
+        msg = await bot.wait_for("message", timeout=60, check=check)
+        msgc = msg.content
+        if "https://twitter.com/" not in msgc:
+            return await msg.reply("Invalid URL")
+        finalurl = msgc.replace("https://twitter.com/", "")
+        old = twitterdata.get("subs", {})
+        if finalurl not in old:
+            return await msg.reply("URL isn't subscribed!")
+        old.pop(finalurl)
+        twitterdata["subs"] = old
+        await msg.add_reaction(economysuccess)
+    elif action == "msg":
+        oldmsg = twitterdata.setdefault("msg", "{role} **{name}** just posted a tweet! Check it out here: {link}")
+        embed = discord.Embed(title="Message", description=f"`{oldmsg}`\n\n"
+                                                           f"Variables:\n"
+                                                           "`{role}`- Role to ping\n"
+                                                           "`{name}`- Name of the handle\n"
+                                                           "`{link}`- Link of the tweet",
+                              color=localembed)
+        embed.set_footer(text="To change the message, react below")
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction("🇨")
+
+        reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=rcheck)
+        if str(reaction.emoji) != "🇨": return
+        await ctx.send("Enter the new message. You can only use the variables defined above.\n"
+                       "Do **not** remove the brackets `{}` from the variables")
+
+        chlid = await bot.wait_for("message", timeout=60, check=check)
+        twitterdata["msg"] = chlid.content
+        await chlid.add_reaction(economysuccess)
+    elif action == "role":
+        a = twitterdata.setdefault("role", 0)
+        if a == 0:
+            chl = "Not set"
+        else:
+            chl = ctx.guild.get_role(a).mention
+        embed = discord.Embed(title="Role", description=f"> {chl}\n"
+                                                        f"\n"
+                                                        f"To change the role, react with 🇨",
+                              color=localembed)
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction("🇨")
+
+        reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=rcheck)
+        if str(reaction.emoji) != "🇨": return
+        await ctx.send("Send the ID of the new role (DO NOT MENTION THE ROLE)")
+
+        chlid = await bot.wait_for("message", timeout=60, check=check)
+        try:
+            newchl = int(chlid.content)
+            newchl = ctx.guild.get_role(newchl)
+            if newchl is None: raise ValueError
+        except:
+            return await chlid.reply("Invalid ID")
+        twitterdata["role"] = newchl.id
+        await chlid.add_reaction(economysuccess)
+    else:
+        return
+    bot.refr["social_twitter"] = twitterdata
+    await close_admin()
 
 @bot.command()
 @commands.is_owner()
@@ -3592,6 +3763,7 @@ async def one_ready():
         webping.start()
         yt_socials_check.start()
         twitch_socials_check.start()
+    twitter_socials_check.start()
 
 @bot.event
 async def on_message(message):
