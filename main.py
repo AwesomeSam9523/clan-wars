@@ -479,6 +479,7 @@ async def twitter_socials_check():
         a = requests.get(uri, headers=header)
         data = json.loads(a.text)
         data = data["data"][0]
+        print(data)
         donetweets = bot.refr.setdefault("twitterdone", [])
         if data['id'] not in donetweets:
             firstcheck = bot.refr.setdefault("twitterfirst", [])
@@ -487,6 +488,7 @@ async def twitter_socials_check():
             else:
                 firstcheck.append(i)
                 donetweets.append(data['id'])
+    await close_admin()
 
 async def newvideo(vidid, name):
     ytdata = bot.refr["social_yt"]
@@ -3763,7 +3765,7 @@ async def one_ready():
         webping.start()
         yt_socials_check.start()
         twitch_socials_check.start()
-    twitter_socials_check.start()
+        twitter_socials_check.start()
 
 @bot.event
 async def on_message(message):
