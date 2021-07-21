@@ -4356,6 +4356,7 @@ async def one_ready():
         yt_socials_check.start()
         twitch_socials_check.start()
         twitter_socials_check.start()
+        fotd_check.start()
 
 @bot.event
 async def on_message(message):
