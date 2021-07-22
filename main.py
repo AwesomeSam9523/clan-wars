@@ -4343,8 +4343,8 @@ async def usage(ctx, state=None):
         embed = discord.Embed(title="🔴 Updating Live",
                               description=f"```\n{x}```",
                               color=localembed)
-        await msg.edit(embed = embed)
-        await asyncio.sleep(0.5)
+        await bot.usagemsg.edit(embed = embed)
+        await asyncio.sleep(1)
 
 def get_net_usage():
     old_value = 0
