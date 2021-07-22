@@ -207,7 +207,37 @@ staffchl = [854008993248051230, 813444187566506027]
 flags_list = [['Afghanistan', 'af', 0], ['Albania', 'al', 1], ['Algeria', 'dz', 2], ['American Samoa', 'as', 3], ['Andorra', 'ad', 4], ['Angola', 'ao', 5], ['Anguilla', 'ai', 6], ['Antarctica', 'aq', 7], ['Antigua and Barbuda', 'ag', 8], ['Argentina', 'ar', 9], ['Armenia', 'am', 10], ['Aruba', 'aw', 11], ['Australia', 'au', 12], ['Austria', 'at', 13], ['Azerbaijan', 'az', 14], ['Bahamas', 'bs', 15], ['Bahrain', 'bh', 16], ['Bangladesh', 'bd', 17], ['Barbados', 'bb', 18], ['Belarus', 'by', 19], ['Belgium', 'be', 20], ['Belize', 'bz', 21], ['Benin', 'bj', 22], ['Bermuda', 'bm', 23], ['Bhutan', 'bt', 24], ['Bolivia', 'bo', 25], ['Bosnia and Herzegovina', 'ba', 26], ['Botswana', 'bw', 27], ['Brazil', 'br', 28], ['British Indian Ocean Territory', 'io', 29], ['British Virgin Islands', 'vg', 30], ['Brunei', 'bn', 31], ['Bulgaria', 'bg', 32], ['Burkina Faso', 'bf', 33], ['Burundi', 'bi', 34], ['Cambodia', 'kh', 35], ['Cameroon', 'cm', 36], ['Canada', 'ca', 37], ['Cape Verde', 'cv', 38], ['Cayman Islands', 'ky', 39], ['Central African Republic', 'cf', 40], ['Chad', 'td', 41], ['Chile', 'cl', 42], ['China', 'cn', 43], ['Christmas Island', 'cx', 44], ['Cocos Islands', 'cc', 45], ['Colombia', 'co', 46], ['Comoros', 'km', 47], ['Cook Islands', 'ck', 48], ['Costa Rica', 'cr', 49], ['Croatia', 'hr', 50], ['Cuba', 'cu', 51], ['Curacao', 'cw', 52], ['Cyprus', 'cy', 53], ['Czech Republic', 'cz', 54], ['Democratic Republic of the Congo', 'cd', 55], ['Denmark', 'dk', 56], ['Djibouti', 'dj', 57], ['Dominica', 'dm', 58], ['Dominican Republic', 'do', 59], ['East Timor', 'tl', 60], ['Ecuador', 'ec', 61], ['Egypt', 'eg', 62], ['El Salvador', 'sv', 63], ['Equatorial Guinea', 'gq', 64], ['Eritrea', 'er', 65], ['Estonia', 'ee', 66], ['Ethiopia', 'et', 67], ['Falkland Islands', 'fk', 68], ['Faroe Islands', 'fo', 69], ['Fiji', 'fj', 70], ['Finland', 'fi', 71], ['France', 'fr', 72], ['French Polynesia', 'pf', 73], ['Gabon', 'ga', 74], ['Gambia', 'gm', 75], ['Georgia', 'ge', 76], ['Germany', 'de', 77], ['Ghana', 'gh', 78], ['Gibraltar', 'gi', 79], ['Greece', 'gr', 80], ['Greenland', 'gl', 81], ['Grenada', 'gd', 82], ['Guam', 'gu', 83], ['Guatemala', 'gt', 84], ['Guernsey', 'gg', 85], ['Guinea', 'gn', 86], ['Guinea-Bissau', 'gw', 87], ['Guyana', 'gy', 88], ['Haiti', 'ht', 89], ['Honduras', 'hn', 90], ['Hong Kong', 'hk', 91], ['Hungary', 'hu', 92], ['Iceland', 'is', 93], ['India', 'in', 94], ['Indonesia', 'id', 95], ['Iran', 'ir', 96], ['Iraq', 'iq', 97], ['Ireland', 'ie', 98], ['Isle of Man', 'im', 99], ['Israel', 'il', 100], ['Italy', 'it', 101], ['Ivory Coast', 'ci', 102], ['Jamaica', 'jm', 103], ['Japan', 'jp', 104], ['Jersey', 'je', 105], ['Jordan', 'jo', 106], ['Kazakhstan', 'kz', 107], ['Kenya', 'ke', 108], ['Kiribati', 'ki', 109], ['Kosovo', 'xk', 110], ['Kuwait', 'kw', 111], ['Kyrgyzstan', 'kg', 112], ['Laos', 'la', 113], ['Latvia', 'lv', 114], ['Lebanon', 'lb', 115], ['Lesotho', 'ls', 116], ['Liberia', 'lr', 117], ['Libya', 'ly', 118], ['Liechtenstein', 'li', 119], ['Lithuania', 'lt', 120], ['Luxembourg', 'lu', 121], ['Macau', 'mo', 122], ['Macedonia', 'mk', 123], ['Madagascar', 'mg', 124], ['Malawi', 'mw', 125], ['Malaysia', 'my', 126], ['Maldives', 'mv', 127], ['Mali', 'ml', 128], ['Malta', 'mt', 129], ['Marshall Islands', 'mh', 130], ['Mauritania', 'mr', 131], ['Mauritius', 'mu', 132], ['Mayotte', 'yt', 133], ['Mexico', 'mx', 134], ['Micronesia', 'fm', 135], ['Moldova', 'md', 136], ['Monaco', 'mc', 137], ['Mongolia', 'mn', 138], ['Montenegro', 'me', 139], ['Montserrat', 'ms', 140], ['Morocco', 'ma', 141], ['Mozambique', 'mz', 142], ['Myanmar', 'mm', 143], ['Namibia', 'na', 144], ['Nauru', 'nr', 145], ['Nepal', 'np', 146], ['Netherlands', 'nl', 147], ['Netherlands Antilles', 'an', 148], ['New Caledonia', 'nc', 149], ['New Zealand', 'nz', 150], ['Nicaragua', 'ni', 151], ['Niger', 'ne', 152], ['Nigeria', 'ng', 153], ['Niue', 'nu', 154], ['North Korea', 'kp', 155], ['Northern Mariana Islands', 'mp', 156], ['Norway', 'no', 157], ['Oman', 'om', 158], ['Pakistan', 'pk', 159], ['Palau', 'pw', 160], ['Palestine', 'ps', 161], ['Panama', 'pa', 162], ['Papua New Guinea', 'pg', 163], ['Paraguay', 'py', 164], ['Peru', 'pe', 165], ['Philippines', 'ph', 166], ['Pitcairn', 'pn', 167], ['Poland', 'pl', 168], ['Portugal', 'pt', 169], ['Puerto Rico', 'pr', 170], ['Qatar', 'qa', 171], ['Republic of the Congo', 'cg', 172], ['Reunion', 're', 173], ['Romania', 'ro', 174], ['Russia', 'ru', 175], ['Rwanda', 'rw', 176], ['Saint Barthelemy', 'bl', 177], ['Saint Helena', 'sh', 178], ['Saint Kitts and Nevis', 'kn', 179], ['Saint Lucia', 'lc', 180], ['Saint Martin', 'mf', 181], ['Saint Pierre and Miquelon', 'pm', 182], ['Saint Vincent and the Grenadines', 'vc', 183], ['Samoa', 'ws', 184], ['San Marino', 'sm', 185], ['Sao Tome and Principe', 'st', 186], ['Saudi Arabia', 'sa', 187], ['Senegal', 'sn', 188], ['Serbia', 'rs', 189], ['Seychelles', 'sc', 190], ['Sierra Leone', 'sl', 191], ['Singapore', 'sg', 192], ['Sint Maarten', 'sx', 193], ['Slovakia', 'sk', 194], ['Slovenia', 'si', 195], ['Solomon Islands', 'sb', 196], ['Somalia', 'so', 197], ['South Africa', 'za', 198], ['South Korea', 'kr', 199], ['South Sudan', 'ss', 200], ['Spain', 'es', 201], ['Sri Lanka', 'lk', 202], ['Sudan', 'sd', 203], ['Suriname', 'sr', 204], ['Svalbard and Jan Mayen', 'sj', 205], ['Swaziland', 'sz', 206], ['Sweden', 'se', 207], ['Switzerland', 'ch', 208], ['Syria', 'sy', 209], ['Taiwan', 'tw', 210], ['Tajikistan', 'tj', 211], ['Tanzania', 'tz', 212], ['Thailand', 'th', 213], ['Togo', 'tg', 214], ['Tokelau', 'tk', 215], ['Tonga', 'to', 216], ['Trinidad and Tobago', 'tt', 217], ['Tunisia', 'tn', 218], ['Turkey', 'tr', 219], ['Turkmenistan', 'tm', 220], ['Turks and Caicos Islands', 'tc', 221], ['Tuvalu', 'tv', 222], ['U.S. Virgin Islands', 'vi', 223], ['Uganda', 'ug', 224], ['Ukraine', 'ua', 225], ['United Arab Emirates', 'ae', 226], ['United Kingdom', 'gb', 227], ['United States', 'us', 228], ['Uruguay', 'uy', 229], ['Uzbekistan', 'uz', 230], ['Vanuatu', 'vu', 231], ['Vatican', 'va', 232], ['Venezuela', 've', 233], ['Vietnam', 'vn', 234], ['Wallis and Futuna', 'wf', 235], ['Western Sahara', 'eh', 236], ['Yemen', 'ye', 237], ['Zambia', 'zm', 238], ['Zimbabwe', 'zw', 239]]
 staff = [813441664617939004, 855793126958170122, 853997809212588073, 504029508295196683, 660353231565619200, 482612710018908190, 753869126522503310, 771601176155783198]
 accepted = [813786315530305536, 813527378088951809, 813527377736761384, 813452412810690600, 813441662588157952, 836427405656326165, 853997809212588073]
-
+order = {813713185462681610: [814511339905089577, 813704960565837864, 813704961103888434, 813440705892057178,
+                                  813440705497137212, 813441661806968878, 813440702788534303, 813439916842811433],
+         813713007267676181: [823254966054420520, 813439915827658802, 813439922337087489, 813439922169970718,
+                                  813439921440292917, 813439920873144330, 813452411825029160, 813441664025624646,
+                                  835545980811870218, 840962503768670239, 850476873548300319, 814604370569330729,
+                                  813527378088951809, 813527377736761384, 833377173477523476, 833377173975859221,
+                                  844654018127331348, 844654478099742770],
+         813441664919273473: [813452197966250024, 814161003041521725, 813452198344130570, 813452199270416445,
+                                  813452411141619794, 813729487292334081],
+         813713509804015677: [813713508487266401, 813713670537871390, 813713669417467925, 813713508360650794,
+                                  813713671368343562, 813713508477960192, 813713671434797086, 813713668771938324,
+                                  813713509586042880, 733161301748088895, 818500848526032916, 856108515059171328,
+                                  867409936019357707, 860253758784405505, 860790673128423424, 867405643232182292,
+                                  859458033876729856, 863797568126058527, 864001098490839040, 862974237609820170,
+                                  855413544844394546, 867405814875291648, 852831111348224010, 857863855267250207,
+                                  861102137923600384, 856022125139722291, 857702070568222781, 858737388049006602,
+                                  864163763724484608, 854400768533331968, 857459053411303444, 852830517194784799,
+                                  859275060790951966, 856994513914560552, 853714634280271883, 853482658138292236,
+                                  853682026790780949, 856972592967188501, 853049609914941470, 836784812001591297,
+                                  835782018968190996, 853234007167598653, 853336822327148594, 853271796061044766,
+                                  866641487994945536, 852800177295327242, 853076127030837278, 858384194471723009,
+                                  852798231167107123, 852813875615105065, 853282869346959400, 852794742161014794,
+                                  852879710895472651, 852736622360920134, 836661337412075521, 844912463623094313,
+                                  834346081428570162, 845561689768067092, 835513734570311680, 844586713644138536,
+                                  823126696306802718, 834086293095972876, 836641820602662962, 835564323136995368,
+                                  837232066973794336, 844215221982855208, 840842478717894686, 823571172426776626,
+                                  819078762439901194, 848659609358434304, 855793126958170122],
+         813713012564295701: [857525749875081226, 813439916125978664, 813441664617939004, 823303887430877224,
+                                  820234763650465822, 819823118163509268, 813452412810690600, 823303541090549770,
+                                  823303540365066262, 812034716373876818, 813439914356113438, 813439914862968842,
+                                  813441662588157952, 819077019949727804]}
 usercmds = {}
 saycmd = {}
 lastdata = {"time":0}
@@ -1092,8 +1122,9 @@ async def fotd_check():
         index += 1
         fotd = bot.get_channel(813535171117580350)
         role = bot.get_guild(719946380285837322).get_role(813704961103888434)
-        await fotd.send(f"__**{role.mention} #{index+100}**__\n\n"
+        upv = await fotd.send(f"__**{role.mention} #{index+100}**__\n\n"
                         f"{facts[index]}")
+        await upv.add_reaction("<:Upvote:837564803090219028>")
         bot.refr["factindex"] = index
         bot.refr["fotd"] = time.time()
         await asyncio.sleep(0.1)
@@ -4505,6 +4536,39 @@ async def on_raw_reaction_add(payload):
             await tchl.send("Deleting in 5 secs...")
             await asyncio.sleep(5)
             await tchl.delete()
+
+@bot.event
+async def on_member_update(before, after):
+    if before.roles == after.roles: return
+    autroles = [y.id for y in after.roles]
+    vnta = bot.get_guild(719946380285837322)
+    for k, v in order.items():
+        if any([x in autroles for x in v]):
+            if k not in autroles:
+                await after.add_roles(vnta.get_role(k))
+        else:
+            if k in autroles:
+                await after.remove_roles(vnta.get_role(k))
+
+@bot.command()
+@commands.is_owner()
+async def dividers(ctx):
+    vnta = bot.get_guild(719946380285837322)
+    i = 1
+    for after in vnta.members:
+        print(f"Divider for {after} ({i}/{len(vnta.members)})")
+        autroles = [y.id for y in after.roles]
+        for k, v in order.items():
+            if any([x in autroles for x in v]):
+                if k not in autroles:
+                    print(f"  |- Added {k}")
+                    await after.add_roles(vnta.get_role(k))
+            else:
+                if k in autroles:
+                    print(f"  |- Removed {k}")
+                    await after.remove_roles(vnta.get_role(k))
+        i += 1
+        print()
 
 bot.loop.create_task(one_ready())
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
