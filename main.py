@@ -4315,6 +4315,43 @@ async def enable(ctx, cmd):
     await ctx.message.add_reaction(economysuccess)
     await close_admin()
 
+@bot.command()
+@commands.is_owner()
+async def usage(ctx, state=None):
+    embed = discord.Embed(title="🔴 Updating Live",
+                         description="Running Tests...",
+                         color=localembed)
+    msg = await ctx.send(embed=embed)
+    bot.usage_ = True
+    if state is not None: bot.usage_ = False
+    while True:
+        if not bot.usage_:
+            embed = discord.Embed(title="⚪ Stopped",
+                                  color=localembed)
+            await msg.edit(embed=embed)
+            break
+        mempercent = psutil.virtual_memory().percent
+        cpupercent = psutil.cpu_percent()
+        netusage = get_net_usage()
+        x = PrettyTable()
+        x.field_names = ["Type", "Usage"]
+        x.add_row(["RAM", f"{mempercent}%"])
+        x.add_row(["CPU", f"{cpupercent}%"])
+        x.add_row(["Network", netusage])
+        x.title = "Usage Stats"
+        embed = discord.Embed(title="🔴 Updating Live",
+                              description=f"```\n{x}```",
+                              color=localembed)
+        await msg.edit(embed = embed)
+        await asyncio.sleep(0.5)
+
+def get_net_usage():
+    old_value = 0
+    new_value = psutil.net_io_counters().bytes_sent + psutil.net_io_counters().bytes_recv
+    diff = new_value - old_value
+    old_value = new_value
+    return "{:.3f}".format(diff)
+
 @bot.command(aliases=["ref"])
 async def load_data(ctx=None):
     chl = bot.get_channel(854692793276170280)
