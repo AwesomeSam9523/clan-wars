@@ -5,7 +5,6 @@ from discord.ext import commands, tasks
 from discord.ext.commands import *
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageSequence, ImageColor
 from io import BytesIO
-import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor
 
 print("Starting")
