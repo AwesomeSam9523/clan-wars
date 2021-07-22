@@ -4507,10 +4507,6 @@ async def on_raw_reaction_add(payload):
             await asyncio.sleep(5)
             await tchl.delete()
 
-@bot.event
-async def on_commnd_error(ctx, error):
-    if isinstance(error, asyncio.TimeoutError): return
-
 bot.loop.create_task(one_ready())
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
 
