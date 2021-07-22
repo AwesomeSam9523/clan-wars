@@ -1092,7 +1092,7 @@ async def fotd_check():
         index += 1
         fotd = bot.get_channel(813535171117580350)
         role = bot.get_guild(719946380285837322).get_role(813704961103888434)
-        await fotd.send(f"__**{role.mention} #{index+1}**__\n\n"
+        await fotd.send(f"__**{role.mention} #{index+100}**__\n\n"
                         f"{facts[index]}")
         bot.refr["factindex"] = index
         bot.refr["fotd"] = time.time()
