@@ -5,6 +5,7 @@ from discord.ext import commands, tasks
 from discord.ext.commands import *
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageSequence, ImageColor
 from io import BytesIO
+import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor
 
 print("Starting")
@@ -4338,20 +4339,20 @@ async def usage(ctx, state=None):
         x.field_names = ["Type", "Usage"]
         x.add_row(["RAM", f"{mempercent}%"])
         x.add_row(["CPU", f"{cpupercent}%"])
-        x.add_row(["Network", netusage])
+        x.add_row(["Network", f"{int(float(netusage))} KB"])
         x.title = "Usage Stats"
         embed = discord.Embed(title="🔴 Updating Live",
                               description=f"```\n{x}```",
                               color=localembed)
         await bot.usagemsg.edit(embed = embed)
-        await asyncio.sleep(1)
+        await asyncio.sleep(1.1)
 
 def get_net_usage():
     old_value = 0
     new_value = psutil.net_io_counters().bytes_sent + psutil.net_io_counters().bytes_recv
     diff = new_value - old_value
     old_value = new_value
-    return "{:.3f}".format(diff)
+    return "{:.3f}".format(diff/8000)
 
 @bot.command(aliases=["ref"])
 async def load_data(ctx=None):
