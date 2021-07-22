@@ -74,6 +74,7 @@ bot.reqs = 0
 bot.pause = False
 bot.cwpause = True
 allowdevs = False
+bot.usage_ = True
 if os.path.exists("C:"): bot.beta = True
 else: bot.beta = False
 bot.webworking = False
@@ -4318,17 +4319,17 @@ async def enable(ctx, cmd):
 @bot.command()
 @commands.is_owner()
 async def usage(ctx, state=None):
-    embed = discord.Embed(title="🔴 Updating Live",
-                         description="Running Tests...",
-                         color=localembed)
-    msg = await ctx.send(embed=embed)
-    bot.usage_ = True
-    if state is not None: bot.usage_ = False
+    if state is None:
+        embed = discord.Embed(title="🔴 Updating Live",
+                             description="Running Tests...",
+                             color=localembed)
+        bot.usagemsg = await ctx.send(embed=embed)
+    else: bot.usage_ = False
     while True:
         if not bot.usage_:
             embed = discord.Embed(title="⚪ Stopped",
                                   color=localembed)
-            await msg.edit(embed=embed)
+            await bot.usagemsg.edit(embed=embed)
             break
         mempercent = psutil.virtual_memory().percent
         cpupercent = psutil.cpu_percent()
