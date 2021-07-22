@@ -58,7 +58,7 @@ bot.twitchapi = {"expiry":0}
 bot.links = {}
 bot.userdata = {}
 bot.bgdata = {}
-bot.suggestions = {}
+bot.refr["suggestions"] = {}
 bot.unsaved = {}
 bot.cache = {}
 bot.pendings = {}
@@ -3849,10 +3849,12 @@ async def suggest(ctx, *, sug):
                           color=localembed)
     embed.set_author(name=ctx.author, icon_url=ctx.author.avatar.url)
     em = await stfchl.send(embed=embed)
-    bot.suggestions[em.id] = (ctx.author.id, sug)
+    bot.refr["suggestions"][em.id] = (ctx.author.id, sug)
     await em.add_reaction(economysuccess)
     await em.add_reaction(economyerror)
     await ctx.message.add_reaction(economysuccess)
+    await asyncio.sleep(5)
+    await ctx.message.delete()
 
 @bot.command()
 @commands.check(general)
@@ -4458,7 +4460,7 @@ async def on_raw_reaction_add(payload):
         bot.pendings.pop(payload.message_id)
     if payload.channel_id == 813447381752348723 and str(payload.emoji) in [economyerror, economysuccess]:
         chan = bot.get_channel(payload.channel_id)
-        userd = bot.suggestions.get(payload.message_id)
+        userd = bot.refr["suggestions"].get(payload.message_id)
         mod = bot.get_user(payload.user_id)
         if userd is None: return
         user = userd[0]
@@ -4476,7 +4478,7 @@ async def on_raw_reaction_add(payload):
             em = await sugchl.send(embed=embed)
             await em.add_reaction("👍")
             await em.add_reaction("👎")
-        bot.suggestions.pop(payload.message_id)
+        bot.refr["suggestions"].pop(payload.message_id)
     if str(payload.emoji) == "🔒":
         if payload.message_id in bot.refr.get("opent", []):
             tchl = bot.get_channel(payload.channel_id)
