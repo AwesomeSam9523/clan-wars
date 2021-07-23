@@ -1781,8 +1781,6 @@ async def profile(ctx, *, ign=None, via=False):
                     bgdata = newbgdata
                     found = True
                     break
-    if not found:
-        bgdata = bot.bgdata["vntasam123"]
     if ign.lower() in bot.cache:
         t = bot.cache[ign.lower()]["time"]
         if time.time() - t < 15:
@@ -1816,6 +1814,12 @@ async def profile(ctx, *, ign=None, via=False):
     userdata = userdata["data"]
     username = userdata["username"]
     clan = userdata["clan"]
+    if not found:
+        if clan == "VNTA":
+            bgdata = bot.bgdata["vntasam123"]
+        else:
+            bgdata = {'file': 'https://media.discordapp.net/attachments/856723935357173780/856731786456858684/unknown.png',
+             'hd': [255, 123, 57], 'st': [222, 222, 222], 'mt': '#vantalizing', 'us': [36, 36, 36], 'ov': True}
     kills = userdata["kills"]
     deaths = userdata["deaths"]
     kr = userdata["funds"]
@@ -1899,7 +1903,11 @@ async def profile(ctx, *, ign=None, via=False):
             xloc += 214
         yloc += 119
     if bgdata["file"] == "":
-        bgdata["file"] = bot.bgdata["vntasam123"]["file"]
+        bgdata["file"] = 'https://media.discordapp.net/attachments/856723935357173780/856731786456858684/unknown.png'
+    if userdata["hacker"]:
+        bgdata["file"] = "https://media.discordapp.net/attachments/865932222577115146/867999500252381194/image_13.png"
+        bgdata['hd'] = [255, 121, 121]
+        bgdata['st'] = [183, 183, 183]
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(bgdata["file"]) as r:
