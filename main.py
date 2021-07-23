@@ -4382,7 +4382,7 @@ async def usage(ctx, state=None):
 async def mute(ctx, mem:discord.Member):
     bot.refr["disregarded"].append(mem.id)
     embed = discord.Embed(title=f'{economyerror} Warning!',
-                          description=f'{ctx.author.mention} has been disregarded!',
+                          description=f'{mem.mention} has been disregarded!',
                           color=error_embed)
     await ctx.send(embed=embed)
 
