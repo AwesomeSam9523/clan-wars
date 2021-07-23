@@ -199,7 +199,6 @@ bot.help_json = {
     }
 }
 bot.ytcache = {}
-disregarded = []
 warn1 = []
 warn2 = []
 devs = [771601176155783198]
@@ -408,9 +407,9 @@ async def handle_2(userid):
     warn2.remove(userid)
 
 async def handle_disregard(userid):
-    disregarded.append(userid)
+    bot.refr["disregarded"].append(userid)
     await asyncio.sleep(10*60)
-    disregarded.remove(userid)
+    bot.refr["disregarded"].remove(userid)
 
 async def general(ctx):
     state = await spam_protect(ctx.author.id)
@@ -1174,7 +1173,7 @@ async def get_admin():
     return bot.refr["719946380285837322"]
 
 async def spam_protect(userid):
-    if userid in disregarded:
+    if userid in bot.refr["disregarded"]:
         if userid not in devs: return 'return'
         else: return 'ok'
     last = usercmds.get(userid, 0)
@@ -4378,6 +4377,21 @@ async def usage(ctx, state=None):
         await bot.usagemsg.edit(embed = embed)
         await asyncio.sleep(1.1)
 
+@bot.command()
+@commands.check(general)
+async def mute(ctx, mem:discord.Member):
+    bot.refr["disregarded"].append(mem.id)
+    embed = discord.Embed(title=f'{economyerror} Warning!',
+                          description=f'{ctx.author.mention} has been disregarded!',
+                          color=error_embed)
+    await ctx.send(embed=embed)
+
+@bot.command()
+@commands.check(general)
+async def unmute(ctx, mem:discord.Member):
+    bot.refr["disregarded"].remove(mem.id)
+    await ctx.message.add_reaction(economysuccess)
+
 def get_net_usage():
     old_value = 0
     new_value = psutil.net_io_counters().bytes_sent + psutil.net_io_counters().bytes_recv
@@ -4572,5 +4586,3 @@ async def dividers(ctx):
 
 bot.loop.create_task(one_ready())
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
-
-
