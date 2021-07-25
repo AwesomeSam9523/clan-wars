@@ -24,17 +24,17 @@ class PersistentView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="Pubstomper", custom_id="pubs_2",
+    @discord.ui.button(style=discord.ButtonStyle.blurple, label="Pubstomper", custom_id="pubs_3",
                               emoji="<:ak:861873538134573056>")
     async def pubsb(self, button: discord.ui.Button, interaction: discord.Interaction):
         await pubs(interaction)
 
-    @discord.ui.button(style=discord.ButtonStyle.green, label="Competitive", custom_id="comp_2",
+    @discord.ui.button(style=discord.ButtonStyle.green, label="Competitive", custom_id="comp_3",
                               emoji="<:smg:861873439421235220>")
     async def compb(self, button: discord.ui.Button, interaction: discord.Interaction):
         await comp(interaction)
 
-    @discord.ui.button(style=discord.ButtonStyle.red, label="Content Creation", custom_id="cc_2",
+    @discord.ui.button(style=discord.ButtonStyle.red, label="Content Creation", custom_id="cc_3",
                               emoji="<:trooper:861873482576953385>")
     async def ccb(self, button: discord.ui.Button, interaction: discord.Interaction):
         await cc(interaction)
@@ -2516,12 +2516,19 @@ async def ping(ctx):
                            f'Web: `{pingtime}`')
 
 @bot.command(aliases=["app"])
-@commands.is_owner()
 async def application(ctx):
+    if ctx.author.id not in staff: return
     embed = discord.Embed(title="VNTA Applications",
                           description="Click on the button below to start the application process!",
                           color=localembed)
     await ctx.send(view=PersistentView(), embed=embed)
+    try:
+        await ctx.author.send(f"You have successfully setup Applications in {ctx.channel.id}.\n"
+                              f"Please DO NOT use the command again, as it will stop the current applications.\n"
+                              f"If you want to change the channel, or re-use the command, tell {bot.dev.mention} beforehand.\n\n"
+                              f"**PLEASE DO NOT RUN `v.app` AGAIN!**")
+    except: pass
+    bot.add_view(PersistentView())
 
 async def pubs(data):
     kdr_req = bot.refr["pubs_con"]["kdr"]
