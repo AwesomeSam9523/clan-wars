@@ -258,6 +258,7 @@ sampfp = "https://media.discordapp.net/attachments/854008993248051230/8547088890
 async def if_allowed(ctx):
     if bot.apidown: await load_peeps()
     if bot.beta: return True
+    if "ticket" in ctx.channel.name: return True
     else: return await check_channel(ctx.channel.id)
 
 @bot.check
@@ -2662,10 +2663,11 @@ async def pubs(data):
                 bot.refr["apps"] = allapps
                 await close_admin()
                 if p:
-                    embed.add_field(name="If you wish to continue:", value=f"Head over to <#813437412071440394>, and type `v.result {rescode}`.\n"
-                                                                  "A new ticket will be opened with your result posted."
-                                                                  " The staff will guide you after that.\n\n"
-                                                                  "Note: To abort the process, dont use `v.result` command.",
+                    aft = bot.get_guild(719946380285837322).get_role(835545980811870218)
+                    await bot.get_guild(719946380285837322).get_member(user.id).add_roles(aft)
+                    embed.add_field(name="If you wish to continue:", value=f"Head over to <#848532015270854668>, and create a ticket.\n"
+                                                                           f"Next, type `v.result {rescode}` in that channel.\n"
+                                                                           f" The staff will guide you after that.",
                                     inline=False)
                 embed.set_footer(text="#vantalizing")
                 embed.set_thumbnail(url="https://images-ext-2.discordapp.net/external/l8ile3RBeJ7FZELTOiecL6LMUQz5qmExL8ELzQFuEag/https/media.discordapp.net/attachments/817374020810178583/838450855648690226/vnta_logo_png.png")
@@ -2801,10 +2803,13 @@ async def cc(data):
         bot.refr["apps"] = allapps
         await close_admin()
         await em.remove_reaction(loading, bot.user)
-        embed.add_field(name="What to do now?",
-                        value=f"Head over to <#813437412071440394>, and type `v.result {rescode}`.\n"
-                              "A new ticket will be opened with your stats posted. "
-                              "The staff will guide you after that.", inline=False)
+        aft = bot.get_guild(719946380285837322).get_role(835545980811870218)
+        await bot.get_guild(719946380285837322).get_member(user.id).add_roles(aft)
+        embed.add_field(name="If you wish to continue:",
+                        value=f"Head over to <#848532015270854668>, and create a ticket.\n"
+                              f"Next, type `v.result {rescode}` in that channel.\n"
+                              f" The staff will guide you after that.",
+                        inline=False)
         embed.set_footer(text="#vantalizing")
         embed.set_thumbnail(
             url="https://images-ext-2.discordapp.net/external/l8ile3RBeJ7FZELTOiecL6LMUQz5qmExL8ELzQFuEag/https/media.discordapp.net/attachments/817374020810178583/838450855648690226/vnta_logo_png.png")
@@ -2943,12 +2948,14 @@ async def comp(data):
                 allapps.append({rescode:{"type":"comp", "kdr":kdr, "level":level, "kpg":kpg, "username":username, "nukes":nukes}})
                 bot.refr["apps"] = allapps
                 await close_admin()
-                embed.add_field(name="If you wish to continue:",
-                                value=f"Head over to <#813437412071440394>, and type `v.result {rescode}`.\n"
-                                      "A new ticket will be opened with your result posted."
-                                      " The staff will guide you after that.\n\n"
-                                      "Note: To abort the process, dont use `v.result` command.",
-                                inline=False)
+                if p:
+                    aft = bot.get_guild(719946380285837322).get_role(835545980811870218)
+                    await bot.get_guild(719946380285837322).get_member(user.id).add_roles(aft)
+                    embed.add_field(name="Follow the steps below:",
+                                    value=f"Head over to <#848532015270854668>, and create a ticket.\n"
+                                          f"Next, type `v.result {rescode}` in that channel.\n"
+                                          f" The staff will guide you after that.",
+                                    inline=False)
                 embed.set_footer(text="#vantalizing")
                 embed.set_thumbnail(url="https://images-ext-2.discordapp.net/external/l8ile3RBeJ7FZELTOiecL6LMUQz5qmExL8ELzQFuEag/https/media.discordapp.net/attachments/817374020810178583/838450855648690226/vnta_logo_png.png")
                 await fetch.edit(embed=embed, content=None)
@@ -3154,6 +3161,8 @@ async def emoji(ctx, link, name):
 @bot.command()
 @commands.check(general)
 async def result(ctx, code):
+    if "ticket" not in ctx.channel.name:
+        return await ctx.reply("Resut can be viewed in tickets created via <#848532015270854668> only.")
     apps = bot.refr.get("apps", [])
     found = False
     userapp = {}
@@ -3171,16 +3180,7 @@ async def result(ctx, code):
     if not found:
         return await ctx.reply("Invalid code or ticket already opened")
     await ctx.message.delete()
-    guild = ctx.guild
-    overwrites = {
-        guild.default_role: discord.PermissionOverwrite(read_messages=False),
-        guild.get_role(853997809212588073): discord.PermissionOverwrite(read_messages=True),
-        bot.get_user(ctx.author.id): discord.PermissionOverwrite(read_messages=True)
-    }
-    num = bot.refr.setdefault("appcount", 0)
-    channel = await guild.create_text_channel(f'open-appl-{num+1}', overwrites=overwrites,
-                                              category=bot.get_channel(853973632153944064))
-    bot.refr["appcount"] = num + 1
+
     score = 0
     economysuccess = "✔️"
     embedslist = []
@@ -3372,14 +3372,10 @@ async def result(ctx, code):
         embed.add_field(name="Result", value=res)
         embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
         embedslist.append(embed)
-    msg = await channel.send(f"{ctx.author.mention}", embeds=embedslist)
-    opent = bot.refr.setdefault("opent", [])
-    opent.append(msg.id)
-    bot.refr["opent"] = opent
-    await msg.add_reaction("🔒")
+    msg = await ctx.send(f"{ctx.author.mention}", embeds=embedslist)
     if userapp["type"] in ["pubs", "comp"]:
-        await channel.send("Kindly wait for a <@&813729487292334081> to respond.\n"
-                           "In the meanwhile, please post the screenshot of your best game")
+        await ctx.send("Kindly wait for a <@&813729487292334081> to respond.\n"
+                        "In the meanwhile, please post the screenshot of your best game")
     await close_admin()
 
 @bot.command(aliases=["rem", "rems", "reminders"])
