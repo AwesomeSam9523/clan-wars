@@ -451,9 +451,9 @@ async def checkuserclan(ign):
         async with session.get(f"https://kr.vercel.app/api/profile?username={ign}") as data:
             userdata = json.loads(await data.text())
             clan = userdata["data"]["clan"]
+            if clan == "": return "no"
             clandata = await getdata(clan)
             data2 = clandata["data"]["members"]
-            print(data2)
             found = False
             datafile = []
             for i in data2: datafile.append(i["username"].lower())
@@ -1665,6 +1665,8 @@ async def contract(ctx, *, ign=None):
             ign = ign["main"]
     await ctx.message.add_reaction(loading)
     personclan = await checkuserclan(ign)
+    if personclan == "no":
+        return await ctx.send(embed=discord.Embed(description=f"{economyerror} User not in any clan"))
     data = await getdata(personclan)
     if data == "error":
         embed = discord.Embed(title=f"{economyerror} Error",
