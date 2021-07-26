@@ -3188,48 +3188,49 @@ async def result(ctx, code):
     economysuccess = "✔️"
     embedslist = []
     if userapp["type"] == "pubs":
+        kdr_req = bot.refr["pubs_con"]["kdr"]
+        level_req = bot.refr["pubs_con"]["level"]
+        kpg_req = bot.refr["pubs_con"]["kpg"]
+        nukes_req = bot.refr["pubs_con"]["nukes"]
+
         level = userapp["level"]
         kdr = userapp["kdr"]
         kpg = userapp["kpg"]
         nukes = userapp["nukes"]
 
         embed = discord.Embed(title=f'{userapp["username"]} | Pubstomper Application', colour=localembed, url=f"https://kr.social/p/{userapp['username']}")
-        if level >= 60:
+        if level >= level_req:
             mark = economysuccess
             score += 1
         else:
             mark = economyerror
         embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
 
-        if float(kdr) >= 4:
+        if float(kdr) >= kdr_req:
             mark = economysuccess
             score += 1
         else:
             mark = economyerror
         embed.add_field(name=f"\\{mark} KDR", value=str(kdr), inline=False)
 
-        if float(kpg) >= 16:
+        if float(kpg) >= kpg_req:
             mark = economysuccess
             score += 1
         else:
             mark = economyerror
         embed.add_field(name=f"\\{mark} KPG", value=str(kpg), inline=False)
 
-        if nukes >= 100:
+        if nukes >= nukes_req:
             mark = economysuccess
             score += 1
         else:
             mark = economyerror
         embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
-
-        if score == 5:
-            res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
-        elif 2 <= score <= 4:
+        if 2 <= score <= 4:
             res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
         else:
             res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
         embed.add_field(name="Result", value=res)
-        embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
         embedslist.append(embed)
     elif userapp["type"] == "cc":
         yt = userapp["yt"]
@@ -3328,9 +3329,13 @@ async def result(ctx, code):
         else:
             embed = discord.Embed(title="<:Twitch:865575682208825355> Twitch", colour=localembed,
                                   description="Not Linked")
-            embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
             embedslist.append(embed)
     else:
+        kdr_req = bot.refr["comp_con"]["kdr"]
+        level_req = bot.refr["comp_con"]["level"]
+        kpg_req = bot.refr["comp_con"]["kpg"]
+        nukes_req = bot.refr["comp_con"]["nukes"]
+
         level = userapp["level"]
         kdr = userapp["kdr"]
         kpg = userapp["kpg"]
@@ -3338,42 +3343,39 @@ async def result(ctx, code):
 
         embed = discord.Embed(title=f'{userapp["username"]} | Competitive Application', colour=localembed,
                               url=f"https://kr.social/p/{userapp['username']}")
-        if level >= 40:
+        if level >= level_req:
             mark = economysuccess
             score += 1
         else:
             mark = economyerror
         embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
 
-        if float(kdr) >= 4:
+        if float(kdr) >= kdr_req:
             mark = economysuccess
             score += 1
         else:
             mark = economyerror
         embed.add_field(name=f"\\{mark} KDR", value=str(kdr), inline=False)
 
-        if float(kpg) >= 16:
+        if float(kpg) >= kpg_req:
             mark = economysuccess
             score += 1
         else:
             mark = economyerror
         embed.add_field(name=f"\\{mark} KPG", value=str(kpg), inline=False)
 
-        if nukes >= 100:
+        if nukes >= nukes_req:
             mark = economysuccess
             score += 1
         else:
             mark = economyerror
         embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
 
-        if score == 5:
-            res = f"\\{economysuccess} QUALIFIED \\{economysuccess}"
-        elif 2 <= score <= 4:
+        if 2 <= score <= 4:
             res = f"<a:Unknown:849189167522381834> TO BE TESTED <a:Unknown:849189167522381834>"
         else:
             res = f"\\{economyerror} NOT QUALIFIED \\{economyerror}"
         embed.add_field(name="Result", value=res)
-        embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
         embedslist.append(embed)
     msg = await ctx.send(f"{ctx.author.mention}", embeds=embedslist)
     if userapp["type"] in ["pubs", "comp"]:
