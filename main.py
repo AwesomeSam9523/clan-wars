@@ -2631,6 +2631,9 @@ async def pubs(data):
                 if level >= level_req:
                     mark = economysuccess
                     score += 1
+                if level <= 25:
+                    mark = economyerror
+                    score -= 2
                 else: mark = economyerror
                 embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
 
@@ -2919,6 +2922,9 @@ async def comp(data):
                 if level >= level_req:
                     mark = economysuccess
                     score += 1
+                if level <= 25:
+                    mark = economyerror
+                    score -= 2
                 else: mark = economyerror
                 embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
 
