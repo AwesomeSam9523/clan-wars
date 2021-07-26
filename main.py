@@ -2686,8 +2686,8 @@ async def pubs(data):
                 if p:
                     aft = bot.get_guild(719946380285837322).get_role(835545980811870218)
                     await bot.get_guild(719946380285837322).get_member(user.id).add_roles(aft)
-                    embed.add_field(name="If you wish to continue:", value=f"Head over to <#848532015270854668>, and create a ticket.\n"
-                                                                           f"Next, type `v.result {rescode}` in that channel.\n"
+                    embed.add_field(name="If you wish to continue:", value=f"Head over to <#848532015270854668>, and click on 📩 to create a ticket.\n"
+                                                                           f"After opening of the ticket, type `v.result {rescode}` in **your ticket channel.**\n"
                                                                            f" The staff will guide you after that.",
                                     inline=False)
                 embed.set_footer(text="#vantalizing")
@@ -2723,7 +2723,7 @@ async def cc(data):
             return user_ == user and str(reaction.emoji) == economysuccess
 
         reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=check)
-
+        await timeout(user)
         embed = discord.Embed(title="Step I",
                               description="Please authorize to the bot here: [Auth URL](https://vntaweb.herokuapp.com/)",
                               colour=localembed)
@@ -2828,8 +2828,8 @@ async def cc(data):
         aft = bot.get_guild(719946380285837322).get_role(835545980811870218)
         await bot.get_guild(719946380285837322).get_member(user.id).add_roles(aft)
         embed.add_field(name="If you wish to continue:",
-                        value=f"Head over to <#848532015270854668>, and create a ticket.\n"
-                              f"Next, type `v.result {rescode}` in that channel.\n"
+                        value=f"Head over to <#848532015270854668>, and click on 📩 to create a ticket.\n"
+                              f"After opening of the ticket, type `v.result {rescode}` in **your ticket channel.**\n"
                               f" The staff will guide you after that.",
                         inline=False)
         embed.set_footer(text="#vantalizing")
@@ -2978,8 +2978,8 @@ async def comp(data):
                     aft = bot.get_guild(719946380285837322).get_role(835545980811870218)
                     await bot.get_guild(719946380285837322).get_member(user.id).add_roles(aft)
                     embed.add_field(name="Follow the steps below:",
-                                    value=f"Head over to <#848532015270854668>, and create a ticket.\n"
-                                          f"Next, type `v.result {rescode}` in that channel.\n"
+                                    value=f"Head over to <#848532015270854668>, and click on 📩 to create a ticket.\n"
+                                          f"After opening of the ticket, type `v.result {rescode}` in **your ticket channel.**\n"
                                           f" The staff will guide you after that.",
                                     inline=False)
                 embed.set_footer(text="#vantalizing")
