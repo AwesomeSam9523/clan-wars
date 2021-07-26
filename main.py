@@ -441,6 +441,26 @@ async def updateuserdata():
         f.write(json.dumps(bot.userdata, indent=2))
     await chl.send(file=discord.File("userdata.json"))
 
+async def checkuserclan(ign):
+    clanlist = bot.refr.setdefault("userclans", {})
+
+    for k, v in clanlist:
+        if ign.lower() in v:
+            return k
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://kr.vercel.app/api/profile?username={ign}") as data:
+            userdata = json.loads(await data.text())
+            clan = userdata["data"]["clan"]
+            clandata = await getdata(clan)
+            data2 = clandata["data"]["members"]
+            print(data2)
+            found = False
+            datafile = []
+            for i in data2: datafile.append(i["username"].lower())
+            clanlist[clan] = datafile
+            bot.refr["userclans"] = clanlist
+            return clan
+
 @tasks.loop(minutes=5.0)
 async def auto_update():
     await update_embeds("VNTA")
@@ -1623,8 +1643,6 @@ async def contract(ctx, *, ign=None):
                               colour=error_embed)
         embed.set_footer(text="To view past contracts and analytics, use 'v.cw'")
         return await ctx.reply(embed=embed)
-    if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
-        return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
@@ -1643,11 +1661,11 @@ async def contract(ctx, *, ign=None):
             if ign is None:
                 embed = discord.Embed(description="User not linked yet.",
                                       color=error_embed)
-                embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
                 return await ctx.reply(embed=embed)
             ign = ign["main"]
     await ctx.message.add_reaction(loading)
-    data = await getdata("VNTA")
+    personclan = await checkuserclan(ign)
+    data = await getdata(personclan)
     if data == "error":
         embed = discord.Embed(title=f"{economyerror} Error",
                               description="API didnt respond in time",
@@ -1663,9 +1681,6 @@ async def contract(ctx, *, ign=None):
             con = i["contract"]
             found = True
             break
-    if not found:
-        await ctx.message.clear_reaction(loading)
-        return await ctx.reply("User not in VNTA or incorrect IGN!")
     timeplayed = int(con["timeplayed"] / 1000)
     left = datetime.timedelta(seconds=timeplayed)
     if timeplayed > 10800:
