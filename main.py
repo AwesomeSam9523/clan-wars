@@ -2543,6 +2543,7 @@ async def pubs(data):
 
     if not a_open:
         await data.response.send_message("Pubstomper applications are closed", ephemeral=True)
+        return
     try:
         test = await data.user.send("DM Testing")
         await test.delete()
@@ -2682,6 +2683,7 @@ async def cc(data):
 
     if not a_open:
         await data.response.send_message("CC applications are closed", ephemeral=True)
+        return
     try:
         test = await data.user.send("DM Testing")
         await test.delete()
@@ -2829,6 +2831,7 @@ async def comp(data):
 
     if not a_open:
         await data.response.send_message("Competitive applications are closed", ephemeral=True)
+        return
     try:
         test = await data.user.send("DM Testing")
         await test.delete()
