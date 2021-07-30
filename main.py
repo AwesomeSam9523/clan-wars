@@ -3493,7 +3493,7 @@ async def reminder(ctx, action=None, *args):
             bot.refr["rems_c"] = remid + 1
             allrems = bot.refr.setdefault("rems", {})
             autrems = allrems.setdefault(str(ctx.author.id), [])
-            autrems.append({"tadd":time.time(), "desc":desc, "time":secs, "id":remid+1, "chl":ctx.channel})
+            autrems.append({"tadd":time.time(), "desc":desc, "time":secs, "id":remid+1, "chl":ctx.channel.id})
             allrems[str(ctx.author.id)] = autrems
             bot.refr["rems"] = allrems
             await msg_.delete()
