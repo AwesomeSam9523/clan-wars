@@ -52,7 +52,7 @@ bot = PersistentViewBot()
 bot.apikey = YT_API_KEY
 bot.remove_command("help")
 bot.loop.set_debug(True)
-bot.loop.slow_callback_duration = 0.3
+bot.loop.slow_callback_duration = 1
 bot.refr = {}
 bot.twitchapi = {"expiry":0}
 bot.links = {}
@@ -569,7 +569,7 @@ async def newtweet(user, data):
     bot.refr["twitterdone"] = donevids
     await close_admin()
 
-@tasks.loop(minutes=2)
+@tasks.loop(minutes=60)
 async def webping():
     a = requests.get("https://vntaweb.herokuapp.com/ping")
     if a.status_code == 200:
@@ -2723,7 +2723,7 @@ async def cc(data):
             return user_ == user and str(reaction.emoji) == economysuccess
 
         reaction, user_ = await bot.wait_for('reaction_add', timeout=60.0, check=check)
-        await timeout(user)
+        asyncio.create_task(timeout(user))
         embed = discord.Embed(title="Step I",
                               description="Please authorize to the bot here: [Auth URL](https://vntaweb.herokuapp.com/)",
                               colour=localembed)
