@@ -444,7 +444,7 @@ async def updateuserdata():
 async def checkuserclan(ign):
     clanlist = bot.refr.setdefault("userclans", {})
 
-    for k, v in clanlist:
+    for k, v in clanlist.items():
         if ign.lower() in v:
             return k
     async with aiohttp.ClientSession() as session:
