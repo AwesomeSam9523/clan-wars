@@ -445,6 +445,7 @@ async def checkuserclan(ign):
     clanlist = bot.refr.setdefault("userclans", {})
 
     for k, v in clanlist.items():
+        print(k, v)
         if ign.lower() in v:
             return k
     async with aiohttp.ClientSession() as session:
@@ -515,7 +516,7 @@ async def twitch_socials_check():
         uri = f"https://api.twitch.tv/helix/streams?user_login={i}"
         a = requests.get(uri, headers=header)
         data = json.loads(a.text)
-        fin = data["data"]
+        fin = data.get("data")
         checklist = bot.refr.setdefault("twitchlive", [])
         if (len(fin) != 0) and (i not in checklist): await streamstart(fin); checklist.append(i)
         elif i in checklist: checklist.remove(i)
@@ -568,14 +569,6 @@ async def newtweet(user, data):
     donevids.append(data['id'])
     bot.refr["twitterdone"] = donevids
     await close_admin()
-
-@tasks.loop(minutes=60)
-async def webping():
-    a = requests.get("https://vntaweb.herokuapp.com/ping")
-    if a.status_code == 200:
-        bot.webworking = True
-    else:
-        bot.webworking = False
 
 facts = ("Most American car horns honk in the key of F.",
     "The name Wendy was made up for the book 'Peter Pan.'",
@@ -1136,6 +1129,7 @@ facts = ("Most American car horns honk in the key of F.",
 
 @tasks.loop(minutes=1)
 async def fotd_check():
+    raise ValueError
     last = bot.refr.setdefault("fotd", 0)
     if time.time() - last >= 86400:
         index = bot.refr.setdefault("factindex", -1)
@@ -1678,11 +1672,14 @@ async def contract(ctx, *, ign=None):
     data = data["data"]["members"]
     found = False
     for i in data:
+        print(i)
         if ign.lower() == i["username"].lower():
             userdata = i
             con = i["contract"]
             found = True
             break
+    if not found:
+        return await ctx.reply("Something went wrong.. Maybe try again")
     timeplayed = int(con["timeplayed"] / 1000)
     left = datetime.timedelta(seconds=timeplayed)
     if timeplayed > 10800:
@@ -4476,7 +4473,6 @@ async def one_ready():
         if not bot.cwpause: auto_update.start()
     if not bot.beta:
         handle_rems.start()
-        webping.start()
         yt_socials_check.start()
         twitch_socials_check.start()
         twitter_socials_check.start()
@@ -4623,6 +4619,79 @@ async def dividers(ctx):
                     await after.remove_roles(vnta.get_role(k))
         i += 1
         print()
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, CheckFailure): return
+
+    etype = type(error)
+    trace = error.__traceback__
+    lines = traceback.format_exception(etype, error, trace)
+    traceback_text = ''.join(lines)
+    print(traceback_text)
+    lent = 1970 - len(ctx.message.content)
+    await bot.get_channel(873038954163748954).send(f"Command: `{ctx.message.content}`\n"
+                                                   f"```py\n{traceback_text[:lent]}```")
+
+@auto_update.error
+async def autoerror(error):
+    etype = type(error)
+    trace = error.__traceback__
+    lines = traceback.format_exception(etype, error, trace)
+    traceback_text = ''.join(lines)
+    if bot.beta: print(traceback_text); return
+    await bot.get_channel(873038954163748954).send(f"Task: auto_updater\n"
+                                                   f"```py\n{traceback_text[:1979]}```")
+
+@yt_socials_check.error
+async def yterror(error):
+    etype = type(error)
+    trace = error.__traceback__
+    lines = traceback.format_exception(etype, error, trace)
+    traceback_text = ''.join(lines)
+    if bot.beta: print(traceback_text); return
+    await bot.get_channel(873038954163748954).send(f"Task: yt_socials_check\n"
+                                                   f"```py\n{traceback_text[:1970]}```")
+
+@twitch_socials_check.error
+async def twitcherror(error):
+    etype = type(error)
+    trace = error.__traceback__
+    lines = traceback.format_exception(etype, error, trace)
+    traceback_text = ''.join(lines)
+    if bot.beta: print(traceback_text); return
+    await bot.get_channel(873038954163748954).send(f"Task: twitch_socials_check\n"
+                                                   f"```py\n{traceback_text[:1970]}```")
+
+@twitch_socials_check.error
+async def twittererror(error):
+    etype = type(error)
+    trace = error.__traceback__
+    lines = traceback.format_exception(etype, error, trace)
+    traceback_text = ''.join(lines)
+    if bot.beta: print(traceback_text); return
+    await bot.get_channel(873038954163748954).send(f"Task: twitter_socials_check\n"
+                                                   f"```py\n{traceback_text[:1970]}```")
+
+@fotd_check.error
+async def fotderror(error):
+    etype = type(error)
+    trace = error.__traceback__
+    lines = traceback.format_exception(etype, error, trace)
+    traceback_text = ''.join(lines)
+    if bot.beta: print(traceback_text); return
+    await bot.get_channel(873038954163748954).send(f"Task: fotd_check\n"
+                                                   f"```py\n{traceback_text[:1979]}```")
+
+@handle_rems.error
+async def handleerror(error):
+    etype = type(error)
+    trace = error.__traceback__
+    lines = traceback.format_exception(etype, error, trace)
+    traceback_text = ''.join(lines)
+    if bot.beta: print(traceback_text); return
+    await bot.get_channel(873038954163748954).send(f"Task: handle_rems\n"
+                                                   f"```py\n{traceback_text[:1979]}```")
 
 bot.loop.create_task(one_ready())
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
