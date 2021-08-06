@@ -516,7 +516,7 @@ async def twitch_socials_check():
         uri = f"https://api.twitch.tv/helix/streams?user_login={i}"
         a = requests.get(uri, headers=header)
         data = json.loads(a.text)
-        fin = data.get("data")
+        fin = data.get("data", [])
         checklist = bot.refr.setdefault("twitchlive", [])
         if (len(fin) != 0) and (i not in checklist): await streamstart(fin); checklist.append(i)
         elif i in checklist: checklist.remove(i)
@@ -1129,7 +1129,6 @@ facts = ("Most American car horns honk in the key of F.",
 
 @tasks.loop(minutes=1)
 async def fotd_check():
-    raise ValueError
     last = bot.refr.setdefault("fotd", 0)
     if time.time() - last >= 86400:
         index = bot.refr.setdefault("factindex", -1)
@@ -4663,7 +4662,7 @@ async def twitcherror(error):
     await bot.get_channel(873038954163748954).send(f"Task: twitch_socials_check\n"
                                                    f"```py\n{traceback_text[:1970]}```")
 
-@twitch_socials_check.error
+@twitter_socials_check.error
 async def twittererror(error):
     etype = type(error)
     trace = error.__traceback__
