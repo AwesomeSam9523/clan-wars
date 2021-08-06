@@ -2644,10 +2644,9 @@ async def pubs(data):
                 if level >= level_req:
                     mark = economysuccess
                     score += 1
-                elif level <= 25:
+                else:
                     mark = economyerror
                     score -= 2
-                else: mark = economyerror
                 embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
 
                 if float(kdr) >= kdr_req:
@@ -2665,7 +2664,9 @@ async def pubs(data):
                 if nukes >= nukes_req:
                     mark = economysuccess
                     score += 1
-                else: mark = economyerror
+                else:
+                    mark = economyerror
+                    score -= 2
                 embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
 
                 p = False
@@ -2935,11 +2936,9 @@ async def comp(data):
                 if level >= level_req:
                     mark = economysuccess
                     score += 1
-                elif level <= 25:
-                    mark = economyerror
-                    score -= 2
                 else:
                     mark = economyerror
+                    score -= 2
                 embed.add_field(name=f" \\{mark} Level", value=str(level), inline=False)
 
                 if float(kdr) >= kdr_req:
@@ -2957,7 +2956,9 @@ async def comp(data):
                 if nukes >= nukes_req:
                     mark = economysuccess
                     score += 1
-                else: mark = economyerror
+                else:
+                    mark = economyerror
+                    score -= 2
                 embed.add_field(name=f"\\{mark} Nukes", value=str(nukes), inline=False)
 
                 p = False
