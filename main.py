@@ -517,6 +517,7 @@ async def twitch_socials_check():
         a = requests.get(uri, headers=header)
         data = json.loads(a.text)
         fin = data.get("data")
+        if fin is None: continue
         checklist = bot.refr.setdefault("twitchlive", [])
         if (len(fin) != 0) and (i not in checklist): await streamstart(fin[0]); checklist.append(i)
         elif i in checklist: checklist.remove(i)
