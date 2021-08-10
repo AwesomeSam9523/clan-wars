@@ -3294,14 +3294,14 @@ async def result(ctx, code):
                                                                                       f"\u200b",
                                                             inline=False)
                 if i["likes"] == max_likes: embed.add_field(name=f"Most Liked:", value=f"[`{i['name']}`]({i['url']})\n"
-                                                                                       f"**Views:** {max_likes}\n"
+                                                                                       f"**Views:** {i['views']}\n"
                                                                                       f"**Likes:** {i['likes']}\n"
                                                                                       f"**Dislikes:** {i['dislikes']}\n"
                                                                                       f"**Comments:** {i['comments']}\n"
                                                                                       f"\u200b",
                                                             inline=False)
                 if i["dislikes"] == max_dislikes: embed.add_field(name=f"Most Disliked:", value=f"[`{i['name']}`]({i['url']})\n"
-                                                                                                f"**Views:** {max_dislikes}\n"
+                                                                                                f"**Views:** {i['views']}\n"
                                                                                       f"**Likes:** {i['likes']}\n"
                                                                                       f"**Dislikes:** {i['dislikes']}\n"
                                                                                       f"**Comments:** {i['comments']}\n"
@@ -3344,7 +3344,6 @@ async def result(ctx, code):
                                           f"**Views:** {maxview}\n"
                                           f"**Duration:** `{hrs}h {mins}m`\n"
                                           f"**Streamed On:** <t:{timeobj}:D> (<t:{timeobj}:R>)")
-            embed.add_field(name="\u200b", value="React with 🔒 to close the ticket", inline=False)
 
             embed.set_thumbnail(url=twitchdata["pfp"])
             embedslist.append(embed)
@@ -4489,7 +4488,7 @@ async def on_message(message):
             data = dict(eval(data))
             old = bot.refr.setdefault("con", {})
             for k, v in data.items():
-                old[k] = v
+                old[str(k)] = v
             bot.refr["con"] = old
             await close_admin()
     await bot.process_commands(message)
@@ -4530,7 +4529,7 @@ async def on_raw_reaction_add(payload):
             oldflag = userdata["data"]["stats"].get("flg", "a")
             if oldflag != userd[2]:
                 return await chan.send(f"{user.mention} The flag change wasn't detected. Make sure to stick to the end of the match\n"
-                                       f"Retry using `v.link {userdata['data']['username']}`")
+                                       f"**Note: If you are linked with GameBot, ask a staff to forcelink you**")
             t = bot.links.get(str(user.id), {"main":userdata['data']['username'], "all":[]})
             t["all"] = list(set(t["all"]))
             t["all"].append(userdata['data']['username'])
