@@ -4645,6 +4645,7 @@ async def starboard(payload:discord.RawReactionActionEvent):
         embed.timestamp = datetime.datetime.utcnow()
         msg = await bot.starboards.send(f"✨ **{stars}** <#{payload.channel_id}>", embed=embed)
         msgdata[str(payload.message_id)] = str(msg.id)
+        await close_admin()
 
     elif (msgdata.get(str(payload.message_id)) is not None):
         oldmsg = msgdata[str(payload.message_id)]
