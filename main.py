@@ -4648,7 +4648,7 @@ async def starboard(payload:discord.RawReactionActionEvent):
 
     elif (msgdata.get(str(payload.message_id)) is not None):
         oldmsg = msgdata[str(payload.message_id)]
-        msg = await bot.get_guild(payload.guild_id).get_channel(payload.channel_id).fetch_message(int(oldmsg))
+        msg = await bot.get_guild(payload.guild_id).get_channel(874717466134208612).fetch_message(int(oldmsg))
         await msg.edit(content=f"✨ **{stars}** <#{payload.channel_id}>")
 
 @bot.event
