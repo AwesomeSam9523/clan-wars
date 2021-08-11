@@ -4637,9 +4637,8 @@ async def starboard(payload:discord.RawReactionActionEvent):
         if str(i.emoji) == "⭐":
             stars = i.count
             break
-    print(stars, stars_)
     msgdata = bot.refr.setdefault("starboard", {})
-    if stars == 1 and (msgdata.get(str(payload.message_id)) is None):
+    if stars == 5 and (msgdata.get(str(payload.message_id)) is None):
         embed = discord.Embed(description=msg.content, color=localembed)
         embed.set_author(name=msg.author, icon_url=msg.author.avatar.url)
         embed.add_field(name="Orignal", value=f"[Jump!]({msg.jump_url})")
