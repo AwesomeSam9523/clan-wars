@@ -67,6 +67,7 @@ bot.excl = [671436261482823763]
 bot.dcmds = []
 bot.dev = bot.get_user(771601176155783198)
 bot.linkinglogs = bot.get_channel(861463678179999784)
+bot.starboards = bot.get_channel(874717466134208612)
 bot.interlist = []
 bot.uptime = time.time()
 bot.reqs = 0
@@ -4466,6 +4467,7 @@ async def one_ready():
     await load_peeps()
     print("Ready")
     vnta = bot.get_guild(719946380285837322)
+    bot.starboards = bot.get_channel(874717466134208612)
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{vnta.member_count} peeps"))
     bot.dev = bot.get_user(771601176155783198)
     bot.linkinglogs = bot.get_channel(861463678179999784)
@@ -4496,7 +4498,8 @@ async def on_message(message):
 @bot.event
 async def on_raw_reaction_add(payload):
     if payload.user_id == 853971223682482226: return
-
+    if str(payload.emoji) == "⭐":
+        return await starboard(payload)
     if str(payload.emoji) == "🗑️" and payload.user_id == 771601176155783198:
         chl = await bot.fetch_channel(payload.channel_id)
         msg = await chl.fetch_message(payload.message_id)
@@ -4588,6 +4591,12 @@ async def on_raw_reaction_add(payload):
             await tchl.delete()
 
 @bot.event
+async def on_raw_reaction_remove(payload):
+    if payload.user_id == 853971223682482226: return
+    if str(payload.emoji) == "⭐":
+        return await starboard(payload)
+
+@bot.event
 async def on_member_update(before, after):
     if before.roles == after.roles: return
     autroles = [y.id for y in after.roles]
@@ -4619,6 +4628,29 @@ async def dividers(ctx):
                     await after.remove_roles(vnta.get_role(k))
         i += 1
         print()
+
+async def starboard(payload:discord.RawReactionActionEvent):
+    msg = await bot.get_guild(payload.guild_id).get_channel(payload.channel_id).fetch_message(payload.message_id)
+    stars_ = msg.reactions
+    stars = 0
+    for i in stars_:
+        if str(i.emoji) == "⭐":
+            stars = i.count
+            break
+    print(stars, stars_)
+    msgdata = bot.refr.setdefault("starboard", {})
+    if stars == 1 and (msgdata.get(str(payload.message_id)) is None):
+        embed = discord.Embed(description=msg.content, color=localembed)
+        embed.set_author(name=msg.author, icon_url=msg.author.avatar.url)
+        embed.add_field(name="Orignal", value=f"[Jump!]({msg.jump_url})")
+        embed.timestamp = datetime.datetime.utcnow()
+        msg = await bot.starboards.send(f"✨ **{stars}** <#{payload.channel_id}>", embed=embed)
+        msgdata[str(payload.message_id)] = str(msg.id)
+
+    elif (msgdata.get(str(payload.message_id)) is not None):
+        oldmsg = msgdata[str(payload.message_id)]
+        msg = await bot.get_guild(payload.guild_id).get_channel(payload.channel_id).fetch_message(int(oldmsg))
+        await msg.edit(content=f"✨ **{stars}** <#{payload.channel_id}>")
 
 @bot.event
 async def on_command_error(ctx, error):
