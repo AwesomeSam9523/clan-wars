@@ -4643,6 +4643,8 @@ async def starboard(payload:discord.RawReactionActionEvent):
         embed.set_author(name=msg.author, icon_url=msg.author.avatar.url)
         embed.add_field(name="Orignal", value=f"[Jump!]({msg.jump_url})")
         embed.timestamp = datetime.datetime.utcnow()
+        if len(msg.attachments) != 0:
+            embed.set_image(url=msg.attachments[0].url)
         msg = await bot.starboards.send(f"✨ **{stars}** <#{payload.channel_id}>", embed=embed)
         msgdata[str(payload.message_id)] = str(msg.id)
         await close_admin()
