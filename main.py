@@ -1609,8 +1609,6 @@ async def forcelink(ctx, user:discord.Member, *, ign):
 @bot.command()
 @commands.check(general)
 async def unlink(ctx, *, ign):
-    if ctx.author.id not in staff: return
-
     t = bot.links.get(str(ctx.author.id), {"main": ign, "all": []})
     t["all"] = list(set(t["all"]))
     found = False
