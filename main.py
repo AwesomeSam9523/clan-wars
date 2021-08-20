@@ -517,15 +517,15 @@ async def twitch_socials_check():
         uri = f"https://api.twitch.tv/helix/streams?user_login={i}"
         a = requests.get(uri, headers=header)
         data = json.loads(a.text)
-        fin = data.get("data")
+        fin = data.get("data", [])
         checklist = bot.refr.setdefault("twitchlive", [])
-        if fin is None:
-            if i in checklist: checklist.remove(i)
-            continue
-        if i in checklist: continue
         if len(fin) != 0:
+            if i in checklist: continue
             checklist.append(i)
             await streamstart(fin[0])
+        else:
+            if i in checklist: checklist.remove(i)
+            continue
     await close_admin()
 
 @tasks.loop(seconds=20)
@@ -544,7 +544,6 @@ async def twitter_socials_check():
             else:
                 firstcheck.append(i)
                 donetweets.append(data['id'])
-    await close_admin()
 
 async def newvideo(vidid, name):
     ytdata = bot.refr["social_yt"]
@@ -554,7 +553,6 @@ async def newvideo(vidid, name):
     donevids = bot.refr["ytdone"]
     donevids.append(vidid)
     bot.refr["ytdone"] = donevids
-    await close_admin()
 
 async def streamstart(data):
     ytdata = bot.refr["social_twitch"]
