@@ -1354,7 +1354,7 @@ async def view(ctx, clan=None, via=None):
         for j in em:
             a = await ctx.send(embed=j)
             ids.append(a.id)
-            await ctx2.message.clear_reaction(loading)
+            #await ctx2.message.clear_reaction(loading)
         if via == "sam123" and clan is not None:
             maybeupdate[i] = ids
     if len(maybeupdate.values()) != 0:
