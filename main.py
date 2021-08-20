@@ -14,10 +14,32 @@ class PersistentViewBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=["V.", "v."], case_insensitive=True, intents=intents)
         self.persistent_views_added = False
+        self.pause = False
+        self.cwpause = True
+        if os.path.exists("C:"): self.beta = True
+        else: self.beta = False
 
     async def on_ready(self):
         if not self.persistent_views_added:
             self.add_view(PersistentView())
+            print("Connected")
+            await load_data()
+            await load_peeps()
+            print("Ready")
+            vnta = self.get_guild(719946380285837322)
+            self.starboards = self.get_channel(874717466134208612)
+            await self.change_presence(
+                activity=discord.Activity(type=discord.ActivityType.watching, name=f"{vnta.member_count} peeps"))
+            self.dev = self.get_user(771601176155783198)
+            self.linkinglogs = self.get_channel(861463678179999784)
+            if not self.pause or not self.beta:
+                if not self.cwpause: auto_update.start()
+            if not self.beta:
+                handle_rems.start()
+                yt_socials_check.start()
+                twitch_socials_check.start()
+                twitter_socials_check.start()
+                fotd_check.start()
             self.persistent_views_added = True
 
 class PersistentView(discord.ui.View):
@@ -4434,26 +4456,6 @@ async def load_data(ctx=None):
     if ctx is not None:
         await ctx.message.add_reaction(economysuccess)
 
-async def one_ready():
-    print("Connected")
-    await bot.wait_until_ready()
-    await load_data()
-    await load_peeps()
-    print("Ready")
-    vnta = bot.get_guild(719946380285837322)
-    bot.starboards = bot.get_channel(874717466134208612)
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{vnta.member_count} peeps"))
-    bot.dev = bot.get_user(771601176155783198)
-    bot.linkinglogs = bot.get_channel(861463678179999784)
-    if not bot.pause or not bot.beta:
-        if not bot.cwpause: auto_update.start()
-    if not bot.beta:
-        handle_rems.start()
-        yt_socials_check.start()
-        twitch_socials_check.start()
-        twitter_socials_check.start()
-        fotd_check.start()
-
 @bot.event
 async def on_message(message):
     if bot.beta:
@@ -4705,5 +4707,4 @@ async def handleerror(error):
     await bot.get_channel(873038954163748954).send(f"Task: handle_rems\n"
                                                    f"```py\n{traceback_text[:1979]}```")
 
-bot.loop.create_task(one_ready())
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
