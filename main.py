@@ -4433,8 +4433,7 @@ def get_net_usage():
     old_value = new_value
     return "{:.3f}".format(diff/8000)
 
-@bot.command(aliases=["ref"])
-async def load_data(ctx=None):
+async def load_data():
     chl = bot.get_channel(854692793276170280)
     msgs = await chl.history(limit=1).flatten()
     bot.refr = json.loads(requests.get(msgs[0].attachments[0]).text)
@@ -4452,9 +4451,6 @@ async def load_data(ctx=None):
     chl = bot.get_channel(854698116255318057)
     msgs = await chl.history(limit=1).flatten()
     bot.bgdata = json.loads(requests.get(msgs[0].attachments[0]).text)
-
-    if ctx is not None:
-        await ctx.message.add_reaction(economysuccess)
 
 @bot.event
 async def on_message(message):
