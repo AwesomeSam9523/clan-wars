@@ -1673,7 +1673,6 @@ async def contract(ctx, *, ign=None):
     data = data["data"]["members"]
     found = False
     for i in data:
-        print(i)
         if ign.lower() == i["username"].lower():
             userdata = i
             con = i["contract"]
@@ -2074,7 +2073,6 @@ async def cbg(ctx):
         return msg.author == ctx.author and msg.channel == ctx.channel
     try:
         while True:
-            print(bot.bgdata, bot.unsaved)
             mainmsg = await bot.wait_for("message", check=check, timeout=180)
             msgc = mainmsg.content.lower()
             if msgc == "cancel":
@@ -2134,13 +2132,8 @@ async def cbg(ctx):
                         if (r>255 or r<0) or (g>255 or g<0) or (b>255 or b<0): raise ValueError
 
                         types = {2: "hd", 3: "st", 5: "us", 6:"bt"}
-                        print(bot.bgdata)
-                        print(bot.unsaved)
                         bot.unsaved["vntasam123"][types[int(msgc[-1])]] = [r, g, b]
                         await ctx.send("Done!")
-                        print()
-                        print(bot.bgdata)
-                        print(bot.unsaved)
                         await sendnew(ctx, bot.unsaved["vntasam123"], "AwesomeSam")
                     except:
                         await ctx.send("Incorrect `R, G, B` / `#Hex` code. Please retry")
@@ -2397,7 +2390,6 @@ async def help(ctx, specify=None):
             for i in bot.help_json[j].keys():
                 if i == "category": continue
                 info = bot.help_json[j][i]['usage']
-                print(info)
                 cmdl = len(info.split(' ')[0])
                 if cmdl > max_l:
                     max_l = cmdl
