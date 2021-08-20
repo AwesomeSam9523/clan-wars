@@ -14,32 +14,10 @@ class PersistentViewBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=["V.", "v."], case_insensitive=True, intents=intents)
         self.persistent_views_added = False
-        self.pause = False
-        self.cwpause = True
-        if os.path.exists("C:"): self.beta = True
-        else: self.beta = False
 
     async def on_ready(self):
         if not self.persistent_views_added:
             self.add_view(PersistentView())
-            print("Connected")
-            await load_data()
-            await load_peeps()
-            print("Ready")
-            vnta = self.get_guild(719946380285837322)
-            self.starboards = self.get_channel(874717466134208612)
-            await self.change_presence(
-                activity=discord.Activity(type=discord.ActivityType.watching, name=f"{vnta.member_count} peeps"))
-            self.dev = self.get_user(771601176155783198)
-            self.linkinglogs = self.get_channel(861463678179999784)
-            if not self.pause or not self.beta:
-                if not self.cwpause: auto_update.start()
-            if not self.beta:
-                handle_rems.start()
-                yt_socials_check.start()
-                twitch_socials_check.start()
-                twitter_socials_check.start()
-                fotd_check.start()
             self.persistent_views_added = True
 
 class PersistentView(discord.ui.View):
@@ -1387,6 +1365,24 @@ async def view(ctx, clan=None, via=None):
         await update_embeds(clan)
 
 @bot.command()
+@commands.is_owner()
+async def sizes(ctx):
+    def sizeof_fmt(num, suffix='B'):
+        for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
+            if abs(num) < 1024.0:
+                return "%3.1f %s%s" % (num, unit, suffix)
+            num /= 1024.0
+        return "%.1f %s%s" % (num, 'Yi', suffix)
+
+    allsizes = ""
+    for name, size in sorted(((name, sys.getsizeof(value)) for name, value in globals().items()),
+                             key=lambda x: -x[1])[:10]:
+        allsizes += "{:>30}: {:>8}".format(name, sizeof_fmt(size))
+    with open("sizes.txt", "w") as f:
+        f.write(allsizes)
+    await ctx.reply(file=discord.File("sizes.txt"))
+
+@bot.command()
 @commands.check(general)
 @commands.has_permissions(manage_channels=True)
 async def refresh(ctx, what:str=None):
@@ -1526,6 +1522,17 @@ async def execute(ctx, *, expression):
         await ctx.message.add_reaction(economysuccess)
     except Exception as e:
         await ctx.reply(f'Command:```py\n{expression}```\nOutput:```\n{e}```')
+
+@bot.command()
+@commands.is_owner()
+async def test(ctx):
+    copy_d = copy.copy(bot.links)
+    new = {}
+    for i in copy_d.keys():
+        new[i] = copy_d[i]["main"]
+    bot.links.clear()
+    bot.links = new
+    await update_links()
 
 @bot.command()
 @commands.check(general)
@@ -2363,8 +2370,8 @@ async def alts(ctx, mem:discord.Member=None):
     await ctx.send(embed=embed)
 
 @bot.command()
+@commands.is_owner()
 async def ov(ctx, *, bgname):
-    if ctx.author.id not in staff: return
     bgname = bgname.lower()
     bgdat = bot.bgdata.get(bgname)
     if bgdat is None:
@@ -3625,9 +3632,7 @@ async def target(ctx, kills:int, *, ign=None):
     await ctx.send(embed=discord.Embed(title=userdata["username"], description=f"```py\n{x}```", color=localembed))
     await ctx.message.clear_reaction(loading)
 
-@bot.command()
-@commands.is_owner()
-async def load_peeps(ctx=None):
+async def load_peeps():
     timeout = aiohttp.ClientTimeout(total=10)
     try:
         async with aiohttp.ClientSession() as session:
@@ -3640,8 +3645,6 @@ async def load_peeps(ctx=None):
                 bot.vntapeeps.clear()
                 for i in data["data"]["members"]:
                     bot.vntapeeps.append(i["username"].lower())
-                if ctx is not None:
-                    await ctx.message.add_reaction(economysuccess)
     except: pass
 
 @bot.command()
@@ -4452,6 +4455,27 @@ async def load_data():
     msgs = await chl.history(limit=1).flatten()
     bot.bgdata = json.loads(requests.get(msgs[0].attachments[0]).text)
 
+
+async def one_ready():
+    print("Connected")
+    await bot.wait_until_ready()
+    await load_data()
+    await load_peeps()
+    print("Ready")
+    vnta = bot.get_guild(719946380285837322)
+    bot.starboards = bot.get_channel(874717466134208612)
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{vnta.member_count} peeps"))
+    bot.dev = bot.get_user(771601176155783198)
+    bot.linkinglogs = bot.get_channel(861463678179999784)
+    if not bot.pause or not bot.beta:
+        if not bot.cwpause: auto_update.start()
+    if not bot.beta:
+        handle_rems.start()
+        yt_socials_check.start()
+        twitch_socials_check.start()
+        twitter_socials_check.start()
+        fotd_check.start()
+
 @bot.event
 async def on_message(message):
     if bot.beta:
@@ -4703,4 +4727,5 @@ async def handleerror(error):
     await bot.get_channel(873038954163748954).send(f"Task: handle_rems\n"
                                                    f"```py\n{traceback_text[:1979]}```")
 
+bot.loop.create_task(one_ready())
 bot.run("ODUzOTcxMjIzNjgyNDgyMjI2.YMdIrQ.N-06PP7nmUz-E-3bQvWqCtArhP0")
