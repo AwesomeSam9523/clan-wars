@@ -1365,24 +1365,6 @@ async def view(ctx, clan=None, via=None):
         await update_embeds(clan)
 
 @bot.command()
-@commands.is_owner()
-async def sizes(ctx):
-    def sizeof_fmt(num, suffix='B'):
-        for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
-            if abs(num) < 1024.0:
-                return "%3.1f %s%s" % (num, unit, suffix)
-            num /= 1024.0
-        return "%.1f %s%s" % (num, 'Yi', suffix)
-
-    allsizes = ""
-    for name, size in sorted(((name, sys.getsizeof(value)) for name, value in globals().items()),
-                             key=lambda x: -x[1])[:10]:
-        allsizes += "{:>30}: {:>8}".format(name, sizeof_fmt(size))
-    with open("sizes.txt", "w") as f:
-        f.write(allsizes)
-    await ctx.reply(file=discord.File("sizes.txt"))
-
-@bot.command()
 @commands.check(general)
 @commands.has_permissions(manage_channels=True)
 async def refresh(ctx, what:str=None):
@@ -1522,17 +1504,6 @@ async def execute(ctx, *, expression):
         await ctx.message.add_reaction(economysuccess)
     except Exception as e:
         await ctx.reply(f'Command:```py\n{expression}```\nOutput:```\n{e}```')
-
-@bot.command()
-@commands.is_owner()
-async def test(ctx):
-    copy_d = copy.copy(bot.links)
-    new = {}
-    for i in copy_d.keys():
-        new[i] = copy_d[i]["main"]
-    bot.links.clear()
-    bot.links = new
-    await update_links()
 
 @bot.command()
 @commands.check(general)
@@ -2186,6 +2157,7 @@ async def main(ctx, *, ign):
 @bot.command()
 @commands.check(general)
 async def pbg(ctx, *, ign=None):
+    return await ctx.reply("Command Deleted")
     if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
     if ign is not None and ctx.author.id in devs:
         ign = {"main":ign}
@@ -2369,8 +2341,8 @@ async def alts(ctx, mem:discord.Member=None):
     await ctx.send(embed=embed)
 
 @bot.command()
-@commands.is_owner()
 async def ov(ctx, *, bgname):
+    if ctx.author.id not in staff: return
     bgname = bgname.lower()
     bgdat = bot.bgdata.get(bgname)
     if bgdat is None:
@@ -4502,6 +4474,10 @@ async def on_raw_reaction_add(payload):
     if payload.user_id == 853971223682482226: return
     if str(payload.emoji) == "⭐":
         return await starboard(payload)
+    if str(payload.emoji) == "✨" and payload.user_id in staff:
+        msg = await bot.get_guild(payload.guild_id).get_channel(payload.channel_id).fetch_message(payload.message_id)
+        await msg.add_reaction("⭐")
+        return await starboard(payload, force=True)
     if str(payload.emoji) == "🗑️" and payload.user_id == 771601176155783198:
         chl = await bot.fetch_channel(payload.channel_id)
         msg = await chl.fetch_message(payload.message_id)
@@ -4631,7 +4607,7 @@ async def dividers(ctx):
         i += 1
         print()
 
-async def starboard(payload:discord.RawReactionActionEvent):
+async def starboard(payload:discord.RawReactionActionEvent, force=False):
     msg = await bot.get_guild(payload.guild_id).get_channel(payload.channel_id).fetch_message(payload.message_id)
     stars_ = msg.reactions
     stars = 0
@@ -4640,7 +4616,7 @@ async def starboard(payload:discord.RawReactionActionEvent):
             stars = i.count
             break
     msgdata = bot.refr.setdefault("starboard", {})
-    if stars >= 5 and (msgdata.get(str(payload.message_id)) is None):
+    if (stars >= 5 and (msgdata.get(str(payload.message_id)) is None)) or force:
         embed = discord.Embed(description=msg.content, color=localembed)
         embed.set_author(name=msg.author, icon_url=msg.author.avatar.url)
         embed.add_field(name="Orignal", value=f"[Jump!]({msg.jump_url})")
