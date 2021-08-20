@@ -4445,7 +4445,6 @@ async def load_data():
     msgs = await chl.history(limit=1).flatten()
     bot.bgdata = json.loads(requests.get(msgs[0].attachments[0]).text)
 
-
 async def one_ready():
     print("Connected")
     await bot.wait_until_ready()
@@ -4489,6 +4488,7 @@ async def on_raw_reaction_add(payload):
     if str(payload.emoji) == "✨" and payload.user_id in staff:
         msg = await bot.get_guild(payload.guild_id).get_channel(payload.channel_id).fetch_message(payload.message_id)
         await msg.add_reaction("⭐")
+        await msg.clear_reaction("✨")
         return await starboard(payload, force=True)
     if str(payload.emoji) == "🗑️" and payload.user_id == 771601176155783198:
         chl = await bot.fetch_channel(payload.channel_id)
@@ -4628,7 +4628,12 @@ async def starboard(payload:discord.RawReactionActionEvent, force=False):
             stars = i.count
             break
     msgdata = bot.refr.setdefault("starboard", {})
-    if (stars >= 5 and (msgdata.get(str(payload.message_id)) is None)) or force:
+    if msgdata.get(str(payload.message_id)) is not None:
+        oldmsg = msgdata[str(payload.message_id)]
+        msg = await bot.get_guild(payload.guild_id).get_channel(874717466134208612).fetch_message(int(oldmsg))
+        await msg.edit(content=f"✨ **{stars}** <#{payload.channel_id}>")
+
+    elif (stars >= 5 and (msgdata.get(str(payload.message_id)) is None)) or force:
         embed = discord.Embed(description=msg.content, color=localembed)
         embed.set_author(name=msg.author, icon_url=msg.author.avatar.url)
         embed.add_field(name="Orignal", value=f"[Jump!]({msg.jump_url})")
@@ -4638,11 +4643,6 @@ async def starboard(payload:discord.RawReactionActionEvent, force=False):
         msg = await bot.starboards.send(f"✨ **{stars}** <#{payload.channel_id}>", embed=embed)
         msgdata[str(payload.message_id)] = str(msg.id)
         await close_admin()
-
-    elif (msgdata.get(str(payload.message_id)) is not None):
-        oldmsg = msgdata[str(payload.message_id)]
-        msg = await bot.get_guild(payload.guild_id).get_channel(874717466134208612).fetch_message(int(oldmsg))
-        await msg.edit(content=f"✨ **{stars}** <#{payload.channel_id}>")
 
 @bot.event
 async def on_command_error(ctx, error):
