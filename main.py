@@ -6,6 +6,7 @@ from discord.ext.commands import *
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageSequence, ImageColor
 from io import BytesIO
 from concurrent.futures import ThreadPoolExecutor
+from typing import Union
 
 print("Starting")
 intents = discord.Intents.default()
@@ -4466,6 +4467,34 @@ async def one_ready():
         twitch_socials_check.start()
         twitter_socials_check.start()
         fotd_check.start()
+
+@bot.command(aliases=["addemoji"])
+@commands.has_permissions(manage_emojis=True)
+async def steal(ctx:Context, name:str, emoji:Union[discord.Emoji, str]=None):
+    url = ""
+    if isinstance(emoji, discord.Emoji):
+        url = emoji.url
+    elif isinstance(emoji, str):
+        url = emoji
+    elif emoji is None and len(ctx.message.attachments) != 0:
+        url = ctx.message.attachments[0].url
+    else:
+        await ctx.send("Incorrect Syntax! Use `v.steal <name> [url or emoji or file-attachment]`")
+
+    try:
+        r = requests.get(url, stream=True)
+        if r.status_code == 200:
+            r.raw.decode_content = True
+            a = r.content
+            name = name.replace(" ", "_")
+            if len(name) < 2:
+                return await ctx.reply("Name should be minimum 2 characters long")
+            newemoji = await ctx.guild.create_custom_emoji(name=name, image=a)
+            await ctx.send(f"Added emoji successfully!\nEmoji: {newemoji}\nName: {newemoji.name}\nCode: `:{newemoji.name}:{newemoji.id}:`")
+        else:
+            await ctx.reply("Invalid URL")
+    except Exception as e:
+        await ctx.send(f"An error occured: {e}")
 
 @bot.event
 async def on_message(message):
