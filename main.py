@@ -240,7 +240,7 @@ order = {813713185462681610: [814511339905089577, 813704960565837864, 8137049611
                                   813441662588157952, 819077019949727804]}
 usercmds = {}
 saycmd = {}
-lastdata = {"time":0}
+lastdata = {}
 
 error_embed = 16730441
 embedcolor = 5046208
@@ -281,16 +281,16 @@ async def check_channel(chlid):
 
 async def getdata(clan):
     bot.reqs += 1
-    if time.time() - lastdata["time"] < 5:
-        return lastdata["data"]
+    if time.time() - lastdata.setdefault(clan, {}).setdefault("time", 0) < 5:
+        return lastdata[clan]["data"]
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://kr.vercel.app/api/clan?clan={clan}", timeout=aiohttp.ClientTimeout(total=10)) as data:
                 if data.status != 200:
                     return "error"
                 res = json.loads(await data.text())
-                lastdata["time"] = time.time()
-                lastdata["data"] = res
+                lastdata[clan]["time"] = time.time()
+                lastdata[clan]["data"] = res
                 return res
     except: return "error"
 
@@ -360,7 +360,7 @@ async def embed_view(clan):
             break
         else:
             if count > len(active.get_string()): break
-            active_con = discord.Embed(description=f"```css\n{active.get_string()[count:2000]}```",
+            active_con = discord.Embed(description=f"```css\n{active.get_string()[count:count+2000]}```",
                                    color=color)
             active_con.set_footer(text=f"Bot by {bot.dev}", icon_url=sampfp)
             count += 2000
@@ -390,7 +390,7 @@ async def embed_view(clan):
             break
         else:
             if count > len(expired.get_string()): break
-            active_con = discord.Embed(description=f"```css\n{expired.get_string()[count:2000]}```",
+            active_con = discord.Embed(description=f"```css\n{expired.get_string()[count:count+2000]}```",
                                    color=color)
             active_con.set_footer(text=f"Bot by {bot.dev}", icon_url=sampfp)
             count += 2000
@@ -1325,8 +1325,7 @@ async def view(ctx, clan=None, via=None):
         if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
             return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
         if clan is not None:
-            if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
-                print("not qual")
+            if ctx.author.id not in staff:
                 clan = "VNTA"
             else:
                 if ctx.channel.id not in staffchl:
@@ -1407,7 +1406,8 @@ async def end(ctx=None, clan=None, via=False):
         if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
             return await ctx.reply("Only VNTA members are given the exclusive rights to use the bot.")
         if clan is not None:
-            if not any(allow in [role.id for role in ctx.author.roles] for allow in staff):
+            if ctx.author.id not in staff:
+                print("not qualified")
                 clan = "VNTA"
             else:
                 if ctx.channel.id not in staffchl:
@@ -1418,7 +1418,9 @@ async def end(ctx=None, clan=None, via=False):
         if ctx.channel.id not in staffchl+[813437673926557736]:
             return await ctx.reply("You are not allowed to use this command in public chat")
         await ctx.message.add_reaction(loading)
+    print("reqesting for", clan)
     data = await getdata(clan)
+    print(data)
     if data == "error":
         embed = discord.Embed(title=f"{economyerror} Error",
                               description="API didnt respond in time",
@@ -1484,7 +1486,7 @@ async def end(ctx=None, clan=None, via=False):
             break
         else:
             if count > len(active.get_string()): break
-            active_con = discord.Embed(description=f"```css\n{active.get_string()[count:2000]}```",
+            active_con = discord.Embed(description=f"```css\n{active.get_string()[count:count+2000]}```",
                                        color=color)
             count += 2000
             actlist.append(active_con)
