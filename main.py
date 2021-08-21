@@ -1641,8 +1641,6 @@ async def contract(ctx, *, ign=None):
                               colour=error_embed)
         embed.set_footer(text="To view past contracts and analytics, use 'v.cw'")
         return await ctx.reply(embed=embed)
-    if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
-        return await ctx.reply("Only VNTA clan members are given the exclusive rights to use the bot.")
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
