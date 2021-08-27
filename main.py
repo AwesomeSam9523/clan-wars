@@ -549,8 +549,10 @@ async def twitter_socials_check():
 async def newvideo(vidid, name):
     ytdata = bot.refr["social_yt"]
     chl = bot.get_channel(ytdata["channel"])
-    role = chl.guild.get_role(ytdata["role"])
-    await chl.send(ytdata["msg"].format(name=name, role=role.mention, link=f"https://youtu.be/{vidid}"))
+    if name == "VNTA Krunker":
+        role = chl.guild.get_role(ytdata["role"]).mention
+    else: role = ""
+    await chl.send(ytdata["msg"].format(name=name, role=role, link=f"https://youtu.be/{vidid}"))
     donevids = bot.refr["ytdone"]
     donevids.append(vidid)
     bot.refr["ytdone"] = donevids
@@ -1302,7 +1304,7 @@ async def exec_rem(rem, userid):
                           description=f"{rem['desc']}\n"
                                       f"Set at: <t:{int(rem['tadd'])}:F> (<t:{int(rem['tadd'])}:R>)",
                           color=embedcolor)
-    embed.set_author(name=user.name, icon_url=user.default_avatar.url)
+    embed.set_author(name=user.name, icon_url=user.avatar.url)
     embed.set_thumbnail(
         url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
     try: await user.send(embed=embed)
@@ -1525,17 +1527,6 @@ async def execute(ctx, *, expression):
         await ctx.reply(f'Command:```py\n{expression}```\nOutput:```\n{e}```')
 
 @bot.command()
-@commands.is_owner()
-async def test(ctx):
-    copy_d = copy.copy(bot.links)
-    new = {}
-    for i in copy_d.keys():
-        new[i] = copy_d[i]["main"]
-    bot.links.clear()
-    bot.links = new
-    await update_links()
-
-@bot.command()
 @commands.check(general)
 async def link(ctx, *, ign):
     d = bot.links.get(str(ctx.author.id), [])
@@ -1641,6 +1632,8 @@ async def contract(ctx, *, ign=None):
                               colour=error_embed)
         embed.set_footer(text="To view past contracts and analytics, use 'v.cw'")
         return await ctx.reply(embed=embed)
+    if not any(allow in [role.id for role in ctx.author.roles] for allow in accepted):
+        return await ctx.reply("Only VNTA clan members are given the exclusive rights to use the bot.")
     if ign is None:
         ign = bot.links.get(str(ctx.author.id))
         if ign is None:
@@ -3427,14 +3420,14 @@ async def reminder(ctx, action=None, *args):
             embed = discord.Embed(title="Your Reminders",
                                   description="Nothing here. But its never too late to add a reminder!",
                                   color=localembed)
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
             embed.set_thumbnail(
                 url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
 
             return await ctx.send(embed=embed)
         embed = discord.Embed(title="Your Reminders",
                               color=localembed)
-        embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
+        embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
         embed.set_thumbnail(
             url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
         for i in aut:
@@ -3451,7 +3444,7 @@ async def reminder(ctx, action=None, *args):
             embed = discord.Embed(title="Add a reminder",
                                   description="Enter the description for the reminder.\nFor empty description, type `skip`",
                                   color=localembed)
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
             embed.set_thumbnail(url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             em = await ctx.send(embed=embed)
 
@@ -3469,7 +3462,7 @@ async def reminder(ctx, action=None, *args):
                                               "`5h10m` => 5 hrs 10 mins\n"
                                               "`5m30s` => 5 mins 30 secs",
                                   color=localembed)
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
             embed.set_thumbnail(
                 url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             await em.edit(embed=embed)
@@ -3494,7 +3487,7 @@ async def reminder(ctx, action=None, *args):
             embed = discord.Embed(title="Add a reminder",
                                   description=f"Done! I will remind you at <t:{int(time.time() + secs)}:F> ;)",
                                   colour=localembed)
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
             embed.set_thumbnail(
                 url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             await em.edit(embed=embed)
@@ -3507,7 +3500,7 @@ async def reminder(ctx, action=None, *args):
             embed = discord.Embed(title="Your Reminders",
                                   description="Nothing here. But its never too late to add a reminder!",
                                   color=localembed)
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
             embed.set_thumbnail(
                 url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             return await ctx.send(embed=embed)
@@ -3552,7 +3545,7 @@ async def remindme(ctx, rtime, *, desc=None):
     embed = discord.Embed(title="Quick Reminder",
                           description=f"Done! I will remind you at <t:{int(time.time() + secs)}:F> ;)",
                           colour=localembed)
-    embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
+    embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
     embed.set_thumbnail(
         url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
     await ctx.send(embed=embed)
@@ -3906,7 +3899,7 @@ async def suggest(ctx, *, sug):
     embed = discord.Embed(title="Suggestion Approval",
                           description=sug,
                           color=localembed)
-    embed.set_author(name=ctx.author, icon_url=ctx.author.default_avatar.url)
+    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar.url)
     em = await stfchl.send(embed=embed)
     bot.refr["suggestions"][str(em.id)] = (ctx.author.id, sug)
     await em.add_reaction(economysuccess)
@@ -4496,8 +4489,27 @@ async def steal(ctx:Context, name:str, emoji:Union[discord.Emoji, str]=None):
     except Exception as e:
         await ctx.send(f"An error occured: {e}")
 
+@bot.command()
+async def embed(ctx):
+    embed = discord.Embed(title="Test")
+    embed.add_field(name="Staff Opinions:", value="\u200b")
+    await ctx.send(embed=embed)
+
 @bot.event
-async def on_message(message):
+async def on_message(message: discord.Message):
+    def get_ops(text):
+        if text == "": return {}
+        text = text.replace("\n\n", "\n> ")
+        ops = text.split("\n> ")
+        i = 0
+        sugs = {}
+        while i < len(ops):
+            user = int(ops[i].replace("<@", "").replace(">", ""))
+            sug = ops[i+1]
+            sugs[user] = sug
+            i += 2
+        return sugs
+
     if bot.beta:
         if message.channel.id not in [826824650713595967,864755738609057822, 854008993248051230, 853973674309582868, 862265264838410241, 839080243485736970, 865896015641706504]: return
     else:
@@ -4509,6 +4521,27 @@ async def on_message(message):
                 old[str(k)] = v
             bot.refr["con"] = old
             await close_admin()
+        if (message.channel.id == 861555361264697355) and (message.author.id in staff) and (message.reference is not None):
+            reply = message.reference.message_id
+            msg = await message.channel.fetch_message(reply)
+            embed = msg.embeds[0]
+            oldval = ""
+            for index, i in enumerate(embed.fields):
+                if i.name == "Staff Opinions:":
+                    oldval = i.value
+                    embed.remove_field(index)
+                    break
+            if oldval == "\u200b": oldval = ""
+            ops = get_ops(oldval)
+            ops[message.author.id] = message.content
+            oldval = ""
+            for k, v in ops.items():
+                print(k, v)
+                oldval += f"<@{k}>\n> {v}\n\n"
+            embed.add_field(name="Staff Opinions:", value=oldval)
+            await msg.edit(embed=embed)
+            await message.delete(delay=2)
+
     await bot.process_commands(message)
 
 @bot.event
@@ -4576,7 +4609,8 @@ async def on_raw_reaction_add(payload):
             sugchl = bot.get_channel(861555361264697355)
             embed = discord.Embed(description=userd[1],
                                   color=localembed)
-            embed.set_author(name=f"By: {user}", icon_url=user.default_avatar.url)
+            embed.add_field(name="Staff Opinions:", value="\u200b")
+            embed.set_author(name=f"By: {user}", icon_url=user.avatar.url)
             embed.set_footer(text="#vantalizing")
             embed.timestamp = datetime.datetime.utcnow()
             em = await sugchl.send(embed=embed)
@@ -4666,7 +4700,7 @@ async def starboard(payload:discord.RawReactionActionEvent, force=False):
 
     elif (stars >= 5 and (msgdata.get(str(payload.message_id)) is None)) or force:
         embed = discord.Embed(description=msg.content, color=localembed)
-        embed.set_author(name=msg.author, icon_url=msg.author.default_avatar.url)
+        embed.set_author(name=msg.author, icon_url=msg.author.avatar.url)
         embed.add_field(name="Orignal", value=f"[Jump!]({msg.jump_url})")
         embed.timestamp = datetime.datetime.utcnow()
         if len(msg.attachments) != 0:
