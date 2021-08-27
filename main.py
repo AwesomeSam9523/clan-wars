@@ -549,8 +549,10 @@ async def twitter_socials_check():
 async def newvideo(vidid, name):
     ytdata = bot.refr["social_yt"]
     chl = bot.get_channel(ytdata["channel"])
-    role = chl.guild.get_role(ytdata["role"])
-    await chl.send(ytdata["msg"].format(name=name, role=role.mention, link=f"https://youtu.be/{vidid}"))
+    if name == "VNTA Krunker":
+        role = chl.guild.get_role(ytdata["role"]).mention
+    else: role = ""
+    await chl.send(ytdata["msg"].format(name=name, role=role, link=f"https://youtu.be/{vidid}"))
     donevids = bot.refr["ytdone"]
     donevids.append(vidid)
     bot.refr["ytdone"] = donevids
@@ -1523,17 +1525,6 @@ async def execute(ctx, *, expression):
         await ctx.message.add_reaction(economysuccess)
     except Exception as e:
         await ctx.reply(f'Command:```py\n{expression}```\nOutput:```\n{e}```')
-
-@bot.command()
-@commands.is_owner()
-async def test(ctx):
-    copy_d = copy.copy(bot.links)
-    new = {}
-    for i in copy_d.keys():
-        new[i] = copy_d[i]["main"]
-    bot.links.clear()
-    bot.links = new
-    await update_links()
 
 @bot.command()
 @commands.check(general)
@@ -4498,8 +4489,27 @@ async def steal(ctx:Context, name:str, emoji:Union[discord.Emoji, str]=None):
     except Exception as e:
         await ctx.send(f"An error occured: {e}")
 
+@bot.command()
+async def embed(ctx):
+    embed = discord.Embed(title="Test")
+    embed.add_field(name="Staff Opinions:", value="\u200b")
+    await ctx.send(embed=embed)
+
 @bot.event
-async def on_message(message):
+async def on_message(message: discord.Message):
+    def get_ops(text):
+        if text == "": return {}
+        text = text.replace("\n\n", "\n> ")
+        ops = text.split("\n> ")
+        i = 0
+        sugs = {}
+        while i < len(ops):
+            user = int(ops[i].replace("<@", "").replace(">", ""))
+            sug = ops[i+1]
+            sugs[user] = sug
+            i += 2
+        return sugs
+
     if bot.beta:
         if message.channel.id not in [826824650713595967,864755738609057822, 854008993248051230, 853973674309582868, 862265264838410241, 839080243485736970, 865896015641706504]: return
     else:
@@ -4511,6 +4521,27 @@ async def on_message(message):
                 old[str(k)] = v
             bot.refr["con"] = old
             await close_admin()
+        if (message.channel.id == 861555361264697355) and (message.author.id in staff) and (message.reference is not None):
+            reply = message.reference.message_id
+            msg = await message.channel.fetch_message(reply)
+            embed = msg.embeds[0]
+            oldval = ""
+            for index, i in enumerate(embed.fields):
+                if i.name == "Staff Opinions:":
+                    oldval = i.value
+                    embed.remove_field(index)
+                    break
+            if oldval == "\u200b": oldval = ""
+            ops = get_ops(oldval)
+            ops[message.author.id] = message.content
+            oldval = ""
+            for k, v in ops.items():
+                print(k, v)
+                oldval += f"<@{k}>\n> {v}\n\n"
+            embed.add_field(name="Staff Opinions:", value=oldval)
+            await msg.edit(embed=embed)
+            await message.delete(delay=2)
+
     await bot.process_commands(message)
 
 @bot.event
@@ -4578,6 +4609,7 @@ async def on_raw_reaction_add(payload):
             sugchl = bot.get_channel(861555361264697355)
             embed = discord.Embed(description=userd[1],
                                   color=localembed)
+            embed.add_field(name="Staff Opinions:", value="\u200b")
             embed.set_author(name=f"By: {user}", icon_url=user.avatar.url)
             embed.set_footer(text="#vantalizing")
             embed.timestamp = datetime.datetime.utcnow()
