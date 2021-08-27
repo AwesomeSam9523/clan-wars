@@ -1304,7 +1304,7 @@ async def exec_rem(rem, userid):
                           description=f"{rem['desc']}\n"
                                       f"Set at: <t:{int(rem['tadd'])}:F> (<t:{int(rem['tadd'])}:R>)",
                           color=embedcolor)
-    embed.set_author(name=user.name, icon_url=user.avatar.url)
+    embed.set_author(name=user.name, icon_url=user.default_avatar.url)
     embed.set_thumbnail(
         url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
     try: await user.send(embed=embed)
@@ -3420,14 +3420,14 @@ async def reminder(ctx, action=None, *args):
             embed = discord.Embed(title="Your Reminders",
                                   description="Nothing here. But its never too late to add a reminder!",
                                   color=localembed)
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
             embed.set_thumbnail(
                 url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
 
             return await ctx.send(embed=embed)
         embed = discord.Embed(title="Your Reminders",
                               color=localembed)
-        embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+        embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
         embed.set_thumbnail(
             url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
         for i in aut:
@@ -3444,7 +3444,7 @@ async def reminder(ctx, action=None, *args):
             embed = discord.Embed(title="Add a reminder",
                                   description="Enter the description for the reminder.\nFor empty description, type `skip`",
                                   color=localembed)
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
             embed.set_thumbnail(url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             em = await ctx.send(embed=embed)
 
@@ -3462,7 +3462,7 @@ async def reminder(ctx, action=None, *args):
                                               "`5h10m` => 5 hrs 10 mins\n"
                                               "`5m30s` => 5 mins 30 secs",
                                   color=localembed)
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
             embed.set_thumbnail(
                 url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             await em.edit(embed=embed)
@@ -3487,7 +3487,7 @@ async def reminder(ctx, action=None, *args):
             embed = discord.Embed(title="Add a reminder",
                                   description=f"Done! I will remind you at <t:{int(time.time() + secs)}:F> ;)",
                                   colour=localembed)
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
             embed.set_thumbnail(
                 url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             await em.edit(embed=embed)
@@ -3500,7 +3500,7 @@ async def reminder(ctx, action=None, *args):
             embed = discord.Embed(title="Your Reminders",
                                   description="Nothing here. But its never too late to add a reminder!",
                                   color=localembed)
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
             embed.set_thumbnail(
                 url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
             return await ctx.send(embed=embed)
@@ -3545,7 +3545,7 @@ async def remindme(ctx, rtime, *, desc=None):
     embed = discord.Embed(title="Quick Reminder",
                           description=f"Done! I will remind you at <t:{int(time.time() + secs)}:F> ;)",
                           colour=localembed)
-    embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+    embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
     embed.set_thumbnail(
         url="https://pngimg.com/uploads/stopwatch/stopwatch_PNG140.png")
     await ctx.send(embed=embed)
@@ -3899,7 +3899,7 @@ async def suggest(ctx, *, sug):
     embed = discord.Embed(title="Suggestion Approval",
                           description=sug,
                           color=localembed)
-    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar.url)
+    embed.set_author(name=ctx.author, icon_url=ctx.author.default_avatar.url)
     em = await stfchl.send(embed=embed)
     bot.refr["suggestions"][str(em.id)] = (ctx.author.id, sug)
     await em.add_reaction(economysuccess)
@@ -4610,7 +4610,7 @@ async def on_raw_reaction_add(payload):
             embed = discord.Embed(description=userd[1],
                                   color=localembed)
             embed.add_field(name="Staff Opinions:", value="\u200b")
-            embed.set_author(name=f"By: {user}", icon_url=user.avatar.url)
+            embed.set_author(name=f"By: {user}", icon_url=user.default_avatar.url)
             embed.set_footer(text="#vantalizing")
             embed.timestamp = datetime.datetime.utcnow()
             em = await sugchl.send(embed=embed)
@@ -4700,7 +4700,7 @@ async def starboard(payload:discord.RawReactionActionEvent, force=False):
 
     elif (stars >= 5 and (msgdata.get(str(payload.message_id)) is None)) or force:
         embed = discord.Embed(description=msg.content, color=localembed)
-        embed.set_author(name=msg.author, icon_url=msg.author.avatar.url)
+        embed.set_author(name=msg.author, icon_url=msg.author.default_avatar.url)
         embed.add_field(name="Orignal", value=f"[Jump!]({msg.jump_url})")
         embed.timestamp = datetime.datetime.utcnow()
         if len(msg.attachments) != 0:
