@@ -4671,7 +4671,9 @@ async def on_member_update(before, after):
 @bot.event
 async def on_guild_update(before: discord.Guild, after: discord.Guild):
     if before.premium_subscription_count == after.premium_subscription_count: return
-    user = [x for x in after.premium_subscribers if x not in before.premium_subscribers][0]
+    user = [x for x in after.premium_subscribers if x not in before.premium_subscribers]
+    if len(user) == 0: return
+    user = user[0]
     emoji = "<a:Boost_Spin:883010481437155368>"
     perks = """__**Single Booster Perks:**__
 
