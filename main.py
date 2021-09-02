@@ -4544,7 +4544,9 @@ async def on_message(message: discord.Message):
 
     if message.channel.id == 813435497442967562 and message.type == discord.MessageType.premium_guild_subscription:
         sam = bot.get_user(771601176155783198)
-        await sam.send(content=f"{message.__dict__}")
+        bot.refr["boostdata"] = json.dumps(json.loads(message.__dict__))
+        bot.refr["boostdata2"] = f"{message.__dict__}"
+        await sam.send(content=f"bot.refr['boostdata']")
 
     await bot.process_commands(message)
 
