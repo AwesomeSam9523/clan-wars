@@ -4511,7 +4511,7 @@ async def on_message(message: discord.Message):
         return sugs
 
     if bot.beta:
-        if message.channel.id not in [826824650713595967,864755738609057822, 854008993248051230, 853973674309582868, 862265264838410241, 839080243485736970, 865896015641706504]: return
+        if message.channel.id not in [826824650713595967, 813444187566506027, 864755738609057822, 854008993248051230, 853973674309582868, 862265264838410241, 839080243485736970, 865896015641706504]: return
     else:
         if message.channel.id == 864755738609057822:
             data = "{" + message.content + "}"
@@ -4541,6 +4541,10 @@ async def on_message(message: discord.Message):
             embed.add_field(name="Staff Opinions:", value=oldval)
             await msg.edit(embed=embed)
             await message.delete(delay=2)
+
+    if message.channel.id == 813435497442967562 and message.type == discord.MessageType.premium_guild_subscription:
+        sam = bot.get_user(771601176155783198)
+        await sam.send(content=f"{message.__dict__}")
 
     await bot.process_commands(message)
 
@@ -4663,6 +4667,81 @@ async def on_member_update(before, after):
         else:
             if k in autroles:
                 await after.remove_roles(vnta.get_role(k))
+
+@bot.event
+async def on_guild_update(before: discord.Guild, after: discord.Guild):
+    if before.premium_subscription_count == after.premium_subscription_count: return
+    user = [x for x in after.premium_subscribers if x not in before.premium_subscribers][0]
+    emoji = "<a:Boost_Spin:883010481437155368>"
+    perks = """__**Single Booster Perks:**__
+
+        <a:Boost_Spin:883010481437155368> 3x Claim Time on all Giveaways!
+        <a:Boost_Spin:883010481437155368> Bypass all requirements on Giveaways!
+        <a:Boost_Spin:883010481437155368> Custom Emote + Name (No NSFW)!
+        <a:Boost_Spin:883010481437155368> Custom Role!
+        <a:Boost_Spin:883010481437155368> 5x Extra Entries on all Giveaways! 
+        <a:Boost_Spin:883010481437155368> Hoisted role above all members!
+        <a:Boost_Spin:883010481437155368> Extra permissions in Text & Voice channels!
+        <a:Boost_Spin:883010481437155368> 15% Discount on all ads you purchase!
+
+        __**Double Booster Perks:**__
+
+        <a:boost_evolve:829395858961334353> 10x Extra Entries!
+        <a:boost_evolve:829395858961334353> Unlimited Claim Time on Giveaways!
+        <a:boost_evolve:829395858961334353> Reaction with your emote!
+        <a:boost_evolve:829395858961334353> Respect from all Staff!
+        <a:boost_evolve:829395858961334353> An extra 20% off ads, totalling at a 35% discount!
+
+        **Create a ticket in <#813510158264565780> to claim your perks and thank you for boosting!**"""
+    embed = discord.Embed(color=localembed,
+                          description=f"{emoji} Thank you for boosting {user.mention}! {emoji}\n" \
+                                      f"We now have {after.premium_subscription_count} boosts! **Remember to claim your perks:**\n\n"
+                                      f"{perks}")
+    if user.avatar is not None:
+        url = user.avatar.url
+    else:
+        url = user.default_avatar.url
+    embed.set_author(name=str(user), icon_url=url)
+    embed.set_footer(text="#vantalizing")
+    embed.timestamp = datetime.datetime.utcnow()
+    await bot.get_channel(813435497442967562).send(content=f"{user.mention}", embed=embed)
+
+@bot.command()
+async def boost_test(ctx):
+    user = ctx.author
+    emoji = "<a:Boost_Spin:883010481437155368>"
+    perks = """__**Single Booster Perks:**__
+
+    <a:Boost_Spin:883010481437155368> 3x Claim Time on all Giveaways!
+    <a:Boost_Spin:883010481437155368> Bypass all requirements on Giveaways!
+    <a:Boost_Spin:883010481437155368> Custom Emote + Name (No NSFW)!
+    <a:Boost_Spin:883010481437155368> Custom Role!
+    <a:Boost_Spin:883010481437155368> 5x Extra Entries on all Giveaways! 
+    <a:Boost_Spin:883010481437155368> Hoisted role above all members!
+    <a:Boost_Spin:883010481437155368> Extra permissions in Text & Voice channels!
+    <a:Boost_Spin:883010481437155368> 15% Discount on all ads you purchase!
+
+    __**Double Booster Perks:**__
+
+    <a:boost_evolve:829395858961334353> 10x Extra Entries!
+    <a:boost_evolve:829395858961334353> Unlimited Claim Time on Giveaways!
+    <a:boost_evolve:829395858961334353> Reaction with your emote!
+    <a:boost_evolve:829395858961334353> Respect from all Staff!
+    <a:boost_evolve:829395858961334353> An extra 20% off ads, totalling at a 35% discount!
+
+    **Create a ticket in <#813510158264565780> to claim your perks and thank you for boosting!**"""
+    embed = discord.Embed(color=localembed,
+                          description=f"{emoji} Thank you for boosting {user.mention}! {emoji}\n" \
+                                      f"We now have {ctx.guild.premium_subscription_count} boosts! **Remember to claim your perks:**\n\n"
+                                      f"{perks}")
+    if user.avatar is not None:
+        url = user.avatar.url
+    else:
+        url = user.default_avatar.url
+    embed.set_author(name=str(user), icon_url=url)
+    embed.set_footer(text="#vantalizing")
+    embed.timestamp = datetime.datetime.utcnow()
+    await ctx.send(embed=embed)
 
 @bot.command()
 @commands.is_owner()
