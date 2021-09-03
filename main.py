@@ -4542,9 +4542,9 @@ async def on_message(message: discord.Message):
             await msg.edit(embed=embed)
             await message.delete(delay=2)
 
-    if message.channel.id == 813435497442967562 and message.type == discord.MessageType.premium_guild_subscription:
+    if message.channel.id == 813435497442967562 and message.type != discord.MessageType.default:
         sam = bot.get_user(771601176155783198)
-        bot.refr["boostdata"] = json.dumps(json.loads(message.__dict__))
+        bot.refr["boostdata"] = json.dumps(message.__dict__)
         bot.refr["boostdata2"] = f"{message.__dict__}"
         await sam.send(content=f"bot.refr['boostdata']")
 
