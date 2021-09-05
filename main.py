@@ -4521,7 +4521,9 @@ class Post(discord.ui.View):
             a = await bot.get_channel(883302381188681739).send(embed=embed)
             await a.add_reaction(economysuccess)
             await a.add_reaction(economyerror)
-            bot.refr.setdefault("review", {'settings':[], 'css':[], 'scopes':[]})
+            reviews = bot.refr.setdefault("review", {'settings':[], 'css':[], 'scopes':[]})
+            reviews["settings"].append([ctx.author.id, file])
+            await ctx.send("Your settings are sent to staff for approval. It will show in <#882312116797861899> once they are approved!")
         except:
             pass
 
