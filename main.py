@@ -4490,10 +4490,40 @@ async def steal(ctx:Context, name:str, emoji:Union[discord.Emoji, str]=None):
         await ctx.send(f"An error occured: {e}")
 
 @bot.command()
-async def embed(ctx):
-    embed = discord.Embed(title="Test")
-    embed.add_field(name="Staff Opinions:", value="\u200b")
-    await ctx.send(embed=embed)
+async def post(ctx):
+    view = Post(ctx)
+    a = await ctx.send("Select the type:", view=view)
+    view.msg = a
+
+class Post(discord.ui.View):
+    def __init__(self, ctx: Context):
+        super().__init__()
+        self.ctx = ctx
+        self.msg = None
+
+    @discord.ui.button(label="Settings", emoji="⚙️", style=discord.ButtonStyle.green)
+    async def settings(self, button, interaction: discord.Interaction):
+        if interaction.user.id != self.ctx.author.id: return await interaction.response.defer()
+        ctx = self.ctx
+        def check(msg):
+            return msg.author == ctx.author and len(msg.attachments) != 0
+
+        await interaction.response.send_message("Upload the `.txt` file", ephemeral=True)
+        try:
+            msg = await bot.wait_for("message", timeout=180, check=check)
+            file = msg.attachments[0].url
+            await ctx.send(f"{ctx.author.mention} Your file is sent for review to our staff team. You will\n"
+                           f" receive a DM soon!")
+            embed = discord.Embed(title="Settings Approval",
+                                  description=file,
+                                  color=localembed)
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+            a = await bot.get_channel(883302381188681739).send(embed=embed)
+            await a.add_reaction(economysuccess)
+            await a.add_reaction(economyerror)
+            bot.refr.setdefault("review", {'settings':[], 'css':[], 'scopes':[]})
+        except:
+            pass
 
 @bot.event
 async def on_message(message: discord.Message):
