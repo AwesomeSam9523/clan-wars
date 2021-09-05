@@ -3901,7 +3901,7 @@ async def suggest(ctx, *, sug):
                           color=localembed)
     embed.set_author(name=ctx.author, icon_url=ctx.author.default_avatar.url)
     em = await stfchl.send(embed=embed)
-    bot.refr["suggestions"][str(em.id)] = (ctx.author.id, sug)
+    bot.refr["review"]["suggestions"][str(em.id)] = (ctx.author.id, sug)
     await em.add_reaction(economysuccess)
     await em.add_reaction(economyerror)
     await ctx.message.add_reaction(economysuccess)
@@ -4489,7 +4489,7 @@ async def steal(ctx:Context, name:str, emoji:Union[discord.Emoji, str]=None):
     except Exception as e:
         await ctx.send(f"An error occured: {e}")
 
-@bot.command()
+#@bot.command()
 async def post(ctx):
     view = Post(ctx)
     a = await ctx.send("Select the type:", view=view)
@@ -4521,8 +4521,8 @@ class Post(discord.ui.View):
             a = await bot.get_channel(883302381188681739).send(embed=embed)
             await a.add_reaction(economysuccess)
             await a.add_reaction(economyerror)
-            reviews = bot.refr.setdefault("review", {'settings':[], 'css':[], 'scopes':[]})
-            reviews["settings"].append([ctx.author.id, file])
+            bot.refr["review"]["settings"].append([ctx.author.id, file])
+            bot.refr["types"][str(a.id)] = "settings"
             await ctx.send("Your settings are sent to staff for approval. It will show in <#882312116797861899> once they are approved!")
         except:
             pass
@@ -4665,54 +4665,66 @@ async def on_raw_reaction_add(payload):
             await linklog(ign=userdata['data']['username'], user=user, t="l")
         bot.pendings.pop(payload.message_id)
     if payload.channel_id == 813447381752348723 and str(payload.emoji) in [economyerror, economysuccess]:
+        rev_type = bot.refr["types"].get(str(payload.message_id))
+        if rev_type == "suggest":
+            await suggest_approval(payload)
+        elif rev_type == "settings":
+            await settings_approval(payload)
+
+async def suggest_approval(payload: discord.RawReactionActionEvent):
+    chan = bot.get_channel(payload.channel_id)
+    userd = bot.refr["review"]["suggest"].get(str(payload.message_id))
+    mod = bot.get_user(payload.user_id)
+    if userd is None: return
+    user = userd[0]
+    user = bot.get_user(user)
+    if str(payload.emoji) == "❌":
+        await user.send(f"{economyerror} Your suggestion: `{userd[1]}` was rejected by `{mod}`")
+    else:
+        await user.send(f"{economysuccess} Your suggestion: `{userd[1]}` was accepted by `{mod}`")
+        sugchl = bot.get_channel(861555361264697355)
+        embed = discord.Embed(description=userd[1],
+                              color=localembed)
+        embed.add_field(name="Staff Opinions:", value="\u200b")
+        if user.avatar is not None:
+            url = user.avatar.url
+        else:
+            url = user.default_avatar.url
+        embed.set_author(name=f"By: {user}", icon_url=url)
+        embed.set_footer(text="#vantalizing")
+        embed.timestamp = datetime.datetime.utcnow()
+        em = await sugchl.send(embed=embed)
+        await em.add_reaction("👍")
+        await em.add_reaction("👎")
+    bot.refr["review"]["suggest"].pop(str(payload.message_id))
+
+async def settings_approval(payload: discord.RawReactionActionEvent):
+    async def suggest_approval(payload: discord.RawReactionActionEvent):
         chan = bot.get_channel(payload.channel_id)
-        userd = bot.refr["suggestions"].get(str(payload.message_id))
+        userd = bot.refr["review"]["settings"].get(str(payload.message_id))
         mod = bot.get_user(payload.user_id)
         if userd is None: return
         user = userd[0]
         user = bot.get_user(user)
         if str(payload.emoji) == "❌":
-            await user.send(f"{economyerror} Your suggestion: `{userd[1]}` was rejected by `{mod}`")
+            await user.send(f"{economyerror} Your settings: `{userd[1]}` was rejected by `{mod}`")
         else:
-            await user.send(f"{economysuccess} Your suggestion: `{userd[1]}` was accepted by `{mod}`")
-            sugchl = bot.get_channel(861555361264697355)
-            embed = discord.Embed(description=userd[1],
-                                  color=localembed)
-            embed.add_field(name="Staff Opinions:", value="\u200b")
-            embed.set_author(name=f"By: {user}", icon_url=user.default_avatar.url)
-            embed.set_footer(text="#vantalizing")
-            embed.timestamp = datetime.datetime.utcnow()
-            em = await sugchl.send(embed=embed)
+            await user.send(f"{economysuccess} Your settings: `{userd[1]}` was accepted by `{mod}` and"
+                            f" are added to <#865587676999843840>")
+            chl = bot.get_channel(865587676999843840)
+            async with aiohttp.ClientSession() as session:
+                async with session.get(userd[1]) as r:
+                    text = await r.text()
+                    with open(f"settings.txt", "w") as f:
+                        f.write(text)
+            file = discord.File("settings.txt")
+            em = await chl.send(f"Settings by: {user.mention}\n"
+                                f"React with 👍 or 👎 to rate it",
+                                file=file)
             await em.add_reaction("👍")
             await em.add_reaction("👎")
-        bot.refr["suggestions"].pop(str(payload.message_id))
-    if str(payload.emoji) == "🔒":
-        if payload.message_id in bot.refr.get("opent", []):
-            tchl = bot.get_channel(payload.channel_id)
-            guild = bot.get_guild(payload.guild_id)
-            overwrites = {
-                guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                guild.get_role(853997809212588073): discord.PermissionOverwrite(read_messages=True)
-            }
-            await tchl.edit(name=f"{tchl.name.replace('open', 'closed')}", overwrites=overwrites)
-            embed = discord.Embed(title="Ticket Closed",
-                                  description="React with ⛔ to delete the channel",
-                                  colour=localembed)
-            clsd = await tchl.send(embed=embed)
-            await clsd.add_reaction("⛔")
-            oldclsd = bot.refr.setdefault("closet", [])
-            oldclsd.append(clsd.id)
-            bot.refr["closet"] = oldclsd
-            new = bot.refr["opent"]
-            new.remove(payload.message_id)
-            bot.refr["opent"] = new
-            await close_admin()
-    if str(payload.emoji) == "⛔":
-        if payload.message_id in bot.refr.get("closet", []):
-            tchl = bot.get_channel(payload.channel_id)
-            await tchl.send("Deleting in 5 secs...")
-            await asyncio.sleep(5)
-            await tchl.delete()
+        bot.refr["review"]["suggest"].pop(str(payload.message_id))
+
 
 @bot.event
 async def on_raw_reaction_remove(payload):
@@ -4806,7 +4818,11 @@ async def starboard(payload:discord.RawReactionActionEvent, force=False):
 
     elif (stars >= 5 and (msgdata.get(str(payload.message_id)) is None)) or force:
         embed = discord.Embed(description=msg.content, color=localembed)
-        embed.set_author(name=msg.author, icon_url=msg.author.default_avatar.url)
+        if msg.author.avatar is not None:
+            url = msg.author.avatar.url
+        else:
+            url = msg.author.default_avatar.url
+        embed.set_author(name=msg.author, icon_url=url)
         embed.add_field(name="Orignal", value=f"[Jump!]({msg.jump_url})")
         embed.timestamp = datetime.datetime.utcnow()
         if len(msg.attachments) != 0:
