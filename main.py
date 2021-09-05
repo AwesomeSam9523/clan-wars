@@ -206,7 +206,7 @@ warn2 = []
 devs = [771601176155783198]
 staffchl = [854008993248051230, 813444187566506027]
 flags_list = [['Afghanistan', 'af', 0], ['Albania', 'al', 1], ['Algeria', 'dz', 2], ['American Samoa', 'as', 3], ['Andorra', 'ad', 4], ['Angola', 'ao', 5], ['Anguilla', 'ai', 6], ['Antarctica', 'aq', 7], ['Antigua and Barbuda', 'ag', 8], ['Argentina', 'ar', 9], ['Armenia', 'am', 10], ['Aruba', 'aw', 11], ['Australia', 'au', 12], ['Austria', 'at', 13], ['Azerbaijan', 'az', 14], ['Bahamas', 'bs', 15], ['Bahrain', 'bh', 16], ['Bangladesh', 'bd', 17], ['Barbados', 'bb', 18], ['Belarus', 'by', 19], ['Belgium', 'be', 20], ['Belize', 'bz', 21], ['Benin', 'bj', 22], ['Bermuda', 'bm', 23], ['Bhutan', 'bt', 24], ['Bolivia', 'bo', 25], ['Bosnia and Herzegovina', 'ba', 26], ['Botswana', 'bw', 27], ['Brazil', 'br', 28], ['British Indian Ocean Territory', 'io', 29], ['British Virgin Islands', 'vg', 30], ['Brunei', 'bn', 31], ['Bulgaria', 'bg', 32], ['Burkina Faso', 'bf', 33], ['Burundi', 'bi', 34], ['Cambodia', 'kh', 35], ['Cameroon', 'cm', 36], ['Canada', 'ca', 37], ['Cape Verde', 'cv', 38], ['Cayman Islands', 'ky', 39], ['Central African Republic', 'cf', 40], ['Chad', 'td', 41], ['Chile', 'cl', 42], ['China', 'cn', 43], ['Christmas Island', 'cx', 44], ['Cocos Islands', 'cc', 45], ['Colombia', 'co', 46], ['Comoros', 'km', 47], ['Cook Islands', 'ck', 48], ['Costa Rica', 'cr', 49], ['Croatia', 'hr', 50], ['Cuba', 'cu', 51], ['Curacao', 'cw', 52], ['Cyprus', 'cy', 53], ['Czech Republic', 'cz', 54], ['Democratic Republic of the Congo', 'cd', 55], ['Denmark', 'dk', 56], ['Djibouti', 'dj', 57], ['Dominica', 'dm', 58], ['Dominican Republic', 'do', 59], ['East Timor', 'tl', 60], ['Ecuador', 'ec', 61], ['Egypt', 'eg', 62], ['El Salvador', 'sv', 63], ['Equatorial Guinea', 'gq', 64], ['Eritrea', 'er', 65], ['Estonia', 'ee', 66], ['Ethiopia', 'et', 67], ['Falkland Islands', 'fk', 68], ['Faroe Islands', 'fo', 69], ['Fiji', 'fj', 70], ['Finland', 'fi', 71], ['France', 'fr', 72], ['French Polynesia', 'pf', 73], ['Gabon', 'ga', 74], ['Gambia', 'gm', 75], ['Georgia', 'ge', 76], ['Germany', 'de', 77], ['Ghana', 'gh', 78], ['Gibraltar', 'gi', 79], ['Greece', 'gr', 80], ['Greenland', 'gl', 81], ['Grenada', 'gd', 82], ['Guam', 'gu', 83], ['Guatemala', 'gt', 84], ['Guernsey', 'gg', 85], ['Guinea', 'gn', 86], ['Guinea-Bissau', 'gw', 87], ['Guyana', 'gy', 88], ['Haiti', 'ht', 89], ['Honduras', 'hn', 90], ['Hong Kong', 'hk', 91], ['Hungary', 'hu', 92], ['Iceland', 'is', 93], ['India', 'in', 94], ['Indonesia', 'id', 95], ['Iran', 'ir', 96], ['Iraq', 'iq', 97], ['Ireland', 'ie', 98], ['Isle of Man', 'im', 99], ['Israel', 'il', 100], ['Italy', 'it', 101], ['Ivory Coast', 'ci', 102], ['Jamaica', 'jm', 103], ['Japan', 'jp', 104], ['Jersey', 'je', 105], ['Jordan', 'jo', 106], ['Kazakhstan', 'kz', 107], ['Kenya', 'ke', 108], ['Kiribati', 'ki', 109], ['Kosovo', 'xk', 110], ['Kuwait', 'kw', 111], ['Kyrgyzstan', 'kg', 112], ['Laos', 'la', 113], ['Latvia', 'lv', 114], ['Lebanon', 'lb', 115], ['Lesotho', 'ls', 116], ['Liberia', 'lr', 117], ['Libya', 'ly', 118], ['Liechtenstein', 'li', 119], ['Lithuania', 'lt', 120], ['Luxembourg', 'lu', 121], ['Macau', 'mo', 122], ['Macedonia', 'mk', 123], ['Madagascar', 'mg', 124], ['Malawi', 'mw', 125], ['Malaysia', 'my', 126], ['Maldives', 'mv', 127], ['Mali', 'ml', 128], ['Malta', 'mt', 129], ['Marshall Islands', 'mh', 130], ['Mauritania', 'mr', 131], ['Mauritius', 'mu', 132], ['Mayotte', 'yt', 133], ['Mexico', 'mx', 134], ['Micronesia', 'fm', 135], ['Moldova', 'md', 136], ['Monaco', 'mc', 137], ['Mongolia', 'mn', 138], ['Montenegro', 'me', 139], ['Montserrat', 'ms', 140], ['Morocco', 'ma', 141], ['Mozambique', 'mz', 142], ['Myanmar', 'mm', 143], ['Namibia', 'na', 144], ['Nauru', 'nr', 145], ['Nepal', 'np', 146], ['Netherlands', 'nl', 147], ['Netherlands Antilles', 'an', 148], ['New Caledonia', 'nc', 149], ['New Zealand', 'nz', 150], ['Nicaragua', 'ni', 151], ['Niger', 'ne', 152], ['Nigeria', 'ng', 153], ['Niue', 'nu', 154], ['North Korea', 'kp', 155], ['Northern Mariana Islands', 'mp', 156], ['Norway', 'no', 157], ['Oman', 'om', 158], ['Pakistan', 'pk', 159], ['Palau', 'pw', 160], ['Palestine', 'ps', 161], ['Panama', 'pa', 162], ['Papua New Guinea', 'pg', 163], ['Paraguay', 'py', 164], ['Peru', 'pe', 165], ['Philippines', 'ph', 166], ['Pitcairn', 'pn', 167], ['Poland', 'pl', 168], ['Portugal', 'pt', 169], ['Puerto Rico', 'pr', 170], ['Qatar', 'qa', 171], ['Republic of the Congo', 'cg', 172], ['Reunion', 're', 173], ['Romania', 'ro', 174], ['Russia', 'ru', 175], ['Rwanda', 'rw', 176], ['Saint Barthelemy', 'bl', 177], ['Saint Helena', 'sh', 178], ['Saint Kitts and Nevis', 'kn', 179], ['Saint Lucia', 'lc', 180], ['Saint Martin', 'mf', 181], ['Saint Pierre and Miquelon', 'pm', 182], ['Saint Vincent and the Grenadines', 'vc', 183], ['Samoa', 'ws', 184], ['San Marino', 'sm', 185], ['Sao Tome and Principe', 'st', 186], ['Saudi Arabia', 'sa', 187], ['Senegal', 'sn', 188], ['Serbia', 'rs', 189], ['Seychelles', 'sc', 190], ['Sierra Leone', 'sl', 191], ['Singapore', 'sg', 192], ['Sint Maarten', 'sx', 193], ['Slovakia', 'sk', 194], ['Slovenia', 'si', 195], ['Solomon Islands', 'sb', 196], ['Somalia', 'so', 197], ['South Africa', 'za', 198], ['South Korea', 'kr', 199], ['South Sudan', 'ss', 200], ['Spain', 'es', 201], ['Sri Lanka', 'lk', 202], ['Sudan', 'sd', 203], ['Suriname', 'sr', 204], ['Svalbard and Jan Mayen', 'sj', 205], ['Swaziland', 'sz', 206], ['Sweden', 'se', 207], ['Switzerland', 'ch', 208], ['Syria', 'sy', 209], ['Taiwan', 'tw', 210], ['Tajikistan', 'tj', 211], ['Tanzania', 'tz', 212], ['Thailand', 'th', 213], ['Togo', 'tg', 214], ['Tokelau', 'tk', 215], ['Tonga', 'to', 216], ['Trinidad and Tobago', 'tt', 217], ['Tunisia', 'tn', 218], ['Turkey', 'tr', 219], ['Turkmenistan', 'tm', 220], ['Turks and Caicos Islands', 'tc', 221], ['Tuvalu', 'tv', 222], ['U.S. Virgin Islands', 'vi', 223], ['Uganda', 'ug', 224], ['Ukraine', 'ua', 225], ['United Arab Emirates', 'ae', 226], ['United Kingdom', 'gb', 227], ['United States', 'us', 228], ['Uruguay', 'uy', 229], ['Uzbekistan', 'uz', 230], ['Vanuatu', 'vu', 231], ['Vatican', 'va', 232], ['Venezuela', 've', 233], ['Vietnam', 'vn', 234], ['Wallis and Futuna', 'wf', 235], ['Western Sahara', 'eh', 236], ['Yemen', 'ye', 237], ['Zambia', 'zm', 238], ['Zimbabwe', 'zw', 239]]
-staff = [436589830777077782, 504029508295196683, 660353231565619200, 482612710018908190, 753869126522503310, 771601176155783198, 477176990961500201]
+staff = [436589830777077782, 471174028212568064, 504029508295196683, 660353231565619200, 482612710018908190, 753869126522503310, 771601176155783198, 477176990961500201]
 accepted = [813786315530305536, 813527378088951809, 813527377736761384, 813452412810690600, 813441662588157952, 853997809212588073]
 order = {813713185462681610: [814511339905089577, 813704960565837864, 813704961103888434, 813440705892057178,
                                   813440705497137212, 813441661806968878, 813440702788534303, 813439916842811433],
@@ -2513,7 +2513,7 @@ async def ping(ctx):
     t1 = time.time()
     a = requests.get("https://vntaweb.herokuapp.com/ping")
     if a.status_code == 200:
-        pingtime = "{:.2f} ms".format(time.time() - t1)
+        pingtime = "{:.2f} ms".format((time.time() - t1)*1000)
     else:
         pingtime = "Unreachable"
     await msg.edit(content=f'Pong!\n'
@@ -3902,6 +3902,7 @@ async def suggest(ctx, *, sug):
     embed.set_author(name=ctx.author, icon_url=ctx.author.default_avatar.url)
     em = await stfchl.send(embed=embed)
     bot.refr["review"]["suggestions"][str(em.id)] = (ctx.author.id, sug)
+    bot.refr["types"][str(em.id)] = "suggest"
     await em.add_reaction(economysuccess)
     await em.add_reaction(economyerror)
     await ctx.message.add_reaction(economysuccess)
@@ -4489,8 +4490,9 @@ async def steal(ctx:Context, name:str, emoji:Union[discord.Emoji, str]=None):
     except Exception as e:
         await ctx.send(f"An error occured: {e}")
 
-#@bot.command()
+@bot.command()
 async def post(ctx):
+    if ctx.author.id not in staff: return
     view = Post(ctx)
     a = await ctx.send("Select the type:", view=view)
     view.msg = a
@@ -4512,19 +4514,73 @@ class Post(discord.ui.View):
         try:
             msg = await bot.wait_for("message", timeout=180, check=check)
             file = msg.attachments[0].url
-            await ctx.send(f"{ctx.author.mention} Your file is sent for review to our staff team. You will\n"
-                           f" receive a DM soon!")
+            await msg.delete()
+            await ctx.send(
+                "Your settings are sent to staff for approval. It will show in <#882312116797861899> once they are approved!")
             embed = discord.Embed(title="Settings Approval",
                                   description=file,
                                   color=localembed)
-            embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.default_avatar.url)
             a = await bot.get_channel(883302381188681739).send(embed=embed)
             await a.add_reaction(economysuccess)
             await a.add_reaction(economyerror)
-            bot.refr["review"]["settings"].append([ctx.author.id, file])
+            bot.refr["review"]["settings"][str(a.id)] = [ctx.author.id, file]
             bot.refr["types"][str(a.id)] = "settings"
-            await ctx.send("Your settings are sent to staff for approval. It will show in <#882312116797861899> once they are approved!")
-        except:
+        except asyncio.TimeoutError:
+            pass
+
+    @discord.ui.button(label="CSS", emoji="🗒️", style=discord.ButtonStyle.blurple)
+    async def css(self, button, interaction: discord.Interaction):
+        if interaction.user.id != self.ctx.author.id: return await interaction.response.defer()
+        ctx = self.ctx
+
+        def check(msg):
+            return msg.author == ctx.author and len(msg.attachments) != 0
+
+        await interaction.response.send_message("Upload the `.css` file", ephemeral=True)
+        try:
+            msg = await bot.wait_for("message", timeout=180, check=check)
+            file = msg.attachments[0].url
+            await msg.delete()
+            await ctx.send(
+                "Your css is sent to staff for approval. It will show in <#865949527915888670> once it is approved!")
+            embed = discord.Embed(title="CSS Approval",
+                                  description=file,
+                                  color=localembed)
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.default_avatar.url)
+            a = await bot.get_channel(883302381188681739).send(embed=embed)
+            await a.add_reaction(economysuccess)
+            await a.add_reaction(economyerror)
+            bot.refr["review"]["css"][str(a.id)] = [ctx.author.id, file]
+            bot.refr["types"][str(a.id)] = "css"
+        except asyncio.TimeoutError:
+            pass
+
+    @discord.ui.button(label="Scope", emoji="🔭", style=discord.ButtonStyle.red)
+    async def scope(self, button, interaction: discord.Interaction):
+        if interaction.user.id != self.ctx.author.id: return await interaction.response.defer()
+        ctx = self.ctx
+
+        def check(msg):
+            return msg.author == ctx.author and len(msg.attachments) != 0
+
+        await interaction.response.send_message("Upload the `.png` file (DO NOT SEND THE LINK)", ephemeral=True)
+        try:
+            msg = await bot.wait_for("message", timeout=180, check=check)
+            file = msg.attachments[0].url
+            await msg.delete()
+            await ctx.send(
+                "Your scope is sent to staff for approval. It will show in <#884023065175007242> once it is approved!")
+            embed = discord.Embed(title="Scope Approval",
+                                  color=localembed)
+            embed.set_image(url=file)
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.default_avatar.url)
+            a = await bot.get_channel(883302381188681739).send(embed=embed)
+            await a.add_reaction(economysuccess)
+            await a.add_reaction(economyerror)
+            bot.refr["review"]["scopes"][str(a.id)] = [ctx.author.id, file]
+            bot.refr["types"][str(a.id)] = "scope"
+        except asyncio.TimeoutError:
             pass
 
 @bot.event
@@ -4543,7 +4599,8 @@ async def on_message(message: discord.Message):
         return sugs
 
     if bot.beta:
-        if message.channel.id not in [826824650713595967, 813444187566506027, 864755738609057822, 854008993248051230, 853973674309582868, 862265264838410241, 839080243485736970, 865896015641706504]: return
+        if message.guild is None: return
+        if message.guild.id != 826824650713595964: return
     else:
         if message.channel.id == 864755738609057822:
             data = "{" + message.content + "}"
@@ -4623,10 +4680,6 @@ async def on_raw_reaction_add(payload):
         await msg.add_reaction("⭐")
         await msg.clear_reaction("✨")
         return await starboard(payload, force=True)
-    if str(payload.emoji) == "🗑️" and payload.user_id == 771601176155783198:
-        chl = await bot.fetch_channel(payload.channel_id)
-        msg = await chl.fetch_message(payload.message_id)
-        await msg.delete()
     if payload.message_id in bot.pendings and str(payload.emoji) in [economyerror, economysuccess]:
         chan = bot.get_channel(payload.channel_id)
         userd = bot.pendings[payload.message_id]
@@ -4664,12 +4717,16 @@ async def on_raw_reaction_add(payload):
             await chan.send(f"{user.mention} {economysuccess} You are successfully linked with `{userdata['data']['username']}`!")
             await linklog(ign=userdata['data']['username'], user=user, t="l")
         bot.pendings.pop(payload.message_id)
-    if payload.channel_id == 813447381752348723 and str(payload.emoji) in [economyerror, economysuccess]:
+    if payload.channel_id == 883302381188681739 and str(payload.emoji) in [economyerror, economysuccess]:
         rev_type = bot.refr["types"].get(str(payload.message_id))
         if rev_type == "suggest":
             await suggest_approval(payload)
         elif rev_type == "settings":
             await settings_approval(payload)
+        elif rev_type == "css":
+            await css_approval(payload)
+        elif rev_type == "scope":
+            await scope_approval(payload)
 
 async def suggest_approval(payload: discord.RawReactionActionEvent):
     chan = bot.get_channel(payload.channel_id)
@@ -4699,32 +4756,76 @@ async def suggest_approval(payload: discord.RawReactionActionEvent):
     bot.refr["review"]["suggest"].pop(str(payload.message_id))
 
 async def settings_approval(payload: discord.RawReactionActionEvent):
-    async def suggest_approval(payload: discord.RawReactionActionEvent):
-        chan = bot.get_channel(payload.channel_id)
-        userd = bot.refr["review"]["settings"].get(str(payload.message_id))
-        mod = bot.get_user(payload.user_id)
-        if userd is None: return
-        user = userd[0]
-        user = bot.get_user(user)
-        if str(payload.emoji) == "❌":
-            await user.send(f"{economyerror} Your settings: `{userd[1]}` was rejected by `{mod}`")
-        else:
-            await user.send(f"{economysuccess} Your settings: `{userd[1]}` was accepted by `{mod}` and"
-                            f" are added to <#865587676999843840>")
-            chl = bot.get_channel(865587676999843840)
-            async with aiohttp.ClientSession() as session:
-                async with session.get(userd[1]) as r:
-                    text = await r.text()
-                    with open(f"settings.txt", "w") as f:
-                        f.write(text)
-            file = discord.File("settings.txt")
-            em = await chl.send(f"Settings by: {user.mention}\n"
-                                f"React with 👍 or 👎 to rate it",
-                                file=file)
-            await em.add_reaction("👍")
-            await em.add_reaction("👎")
-        bot.refr["review"]["suggest"].pop(str(payload.message_id))
+    chan = bot.get_channel(payload.channel_id)
+    userd = bot.refr["review"]["settings"].get(str(payload.message_id))
+    mod = bot.get_user(payload.user_id)
+    if userd is None: return
+    user = userd[0]
+    user = bot.get_user(user)
+    if str(payload.emoji) == "❌":
+        await user.send(f"{economyerror} Your settings: `{userd[1]}` was rejected by `{mod}`")
+    else:
+        await user.send(f"{economysuccess} Your settings: `{userd[1]}` was accepted by `{mod}` and"
+                        f" are added to <#865587676999843840>")
+        chl = bot.get_channel(865587676999843840)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(userd[1]) as r:
+                text = await r.text()
+                with open(f"settings.txt", "w", encoding='utf8') as f:
+                    f.write(text)
+        file = discord.File("settings.txt")
+        em = await chl.send(f"Settings by: {user.mention}\n"
+                            f"React with 👍 or 👎 to rate it",
+                            file=file)
+        await em.add_reaction("👍")
+        await em.add_reaction("👎")
+    bot.refr["review"]["settings"].pop(str(payload.message_id))
 
+async def css_approval(payload: discord.RawReactionActionEvent):
+    chan = bot.get_channel(payload.channel_id)
+    userd = bot.refr["review"]["css"].get(str(payload.message_id))
+    mod = bot.get_user(payload.user_id)
+    if userd is None: return
+    user = userd[0]
+    user = bot.get_user(user)
+    if str(payload.emoji) == "❌":
+        await user.send(f"{economyerror} Your css: `{userd[1]}` was rejected by `{mod}`")
+    else:
+        await user.send(f"{economysuccess} Your css: `{userd[1]}` was accepted by `{mod}` and"
+                        f" are added to <#865949527915888670>")
+        chl = bot.get_channel(865949527915888670)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(userd[1]) as r:
+                text = await r.text()
+                with open(f"main_custom.css", "w", encoding='utf8') as f:
+                    f.write(text)
+        file = discord.File("main_custom.css")
+        em = await chl.send(f"CSS by: {user.mention}\n"
+                            f"React with 👍 or 👎 to rate it",
+                            file=file)
+        await em.add_reaction("👍")
+        await em.add_reaction("👎")
+    bot.refr["review"]["css"].pop(str(payload.message_id))
+
+async def scope_approval(payload: discord.RawReactionActionEvent):
+    chan = bot.get_channel(payload.channel_id)
+    userd = bot.refr["review"]["scopes"].get(str(payload.message_id))
+    mod = bot.get_user(payload.user_id)
+    if userd is None: return
+    user = userd[0]
+    user = bot.get_user(user)
+    if str(payload.emoji) == "❌":
+        await user.send(f"{economyerror} Your scope: `{userd[1]}` was rejected by `{mod}`")
+    else:
+        await user.send(f"{economysuccess} Your scope: `{userd[1]}` was accepted by `{mod}` and"
+                        f" are added to <#884023065175007242>")
+        chl = bot.get_channel(884023065175007242)
+        em = await chl.send(f"Scope by: {user.mention}\n"
+                            f"{userd[1]}\n"
+                            f"React with 👍 or 👎 to rate it")
+        await em.add_reaction("👍")
+        await em.add_reaction("👎")
+    bot.refr["review"]["scopes"].pop(str(payload.message_id))
 
 @bot.event
 async def on_raw_reaction_remove(payload):
@@ -4831,7 +4932,7 @@ async def starboard(payload:discord.RawReactionActionEvent, force=False):
         msgdata[str(payload.message_id)] = str(msg.id)
         await close_admin()
 
-@bot.event
+#@bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, CheckFailure): return
 
