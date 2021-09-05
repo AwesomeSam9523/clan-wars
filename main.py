@@ -3901,7 +3901,7 @@ async def suggest(ctx, *, sug):
                           color=localembed)
     embed.set_author(name=ctx.author, icon_url=ctx.author.default_avatar.url)
     em = await stfchl.send(embed=embed)
-    bot.refr["review"]["suggestions"][str(em.id)] = (ctx.author.id, sug)
+    bot.refr["review"]["suggest"][str(em.id)] = (ctx.author.id, sug)
     bot.refr["types"][str(em.id)] = "suggest"
     await em.add_reaction(economysuccess)
     await em.add_reaction(economyerror)
@@ -4492,7 +4492,6 @@ async def steal(ctx:Context, name:str, emoji:Union[discord.Emoji, str]=None):
 
 @bot.command()
 async def post(ctx):
-    if ctx.author.id not in staff: return
     view = Post(ctx)
     a = await ctx.send("Select the type:", view=view)
     view.msg = a
@@ -4521,7 +4520,7 @@ class Post(discord.ui.View):
                                   description=file,
                                   color=localembed)
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.default_avatar.url)
-            a = await bot.get_channel(883302381188681739).send(embed=embed)
+            a = await bot.get_channel(813447381752348723).send(embed=embed)
             await a.add_reaction(economysuccess)
             await a.add_reaction(economyerror)
             bot.refr["review"]["settings"][str(a.id)] = [ctx.author.id, file]
@@ -4543,12 +4542,12 @@ class Post(discord.ui.View):
             file = msg.attachments[0].url
             await msg.delete()
             await ctx.send(
-                "Your css is sent to staff for approval. It will show in <#865949527915888670> once it is approved!")
+                "Your css is sent to staff for approval. It will show in <#882312235416965120> once it is approved!")
             embed = discord.Embed(title="CSS Approval",
                                   description=file,
                                   color=localembed)
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.default_avatar.url)
-            a = await bot.get_channel(883302381188681739).send(embed=embed)
+            a = await bot.get_channel(813447381752348723).send(embed=embed)
             await a.add_reaction(economysuccess)
             await a.add_reaction(economyerror)
             bot.refr["review"]["css"][str(a.id)] = [ctx.author.id, file]
@@ -4570,12 +4569,12 @@ class Post(discord.ui.View):
             file = msg.attachments[0].url
             await msg.delete()
             await ctx.send(
-                "Your scope is sent to staff for approval. It will show in <#884023065175007242> once it is approved!")
+                "Your scope is sent to staff for approval. It will show in <#882312052432068689> once it is approved!")
             embed = discord.Embed(title="Scope Approval",
                                   color=localembed)
             embed.set_image(url=file)
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.default_avatar.url)
-            a = await bot.get_channel(883302381188681739).send(embed=embed)
+            a = await bot.get_channel(813447381752348723).send(embed=embed)
             await a.add_reaction(economysuccess)
             await a.add_reaction(economyerror)
             bot.refr["review"]["scopes"][str(a.id)] = [ctx.author.id, file]
@@ -4717,7 +4716,7 @@ async def on_raw_reaction_add(payload):
             await chan.send(f"{user.mention} {economysuccess} You are successfully linked with `{userdata['data']['username']}`!")
             await linklog(ign=userdata['data']['username'], user=user, t="l")
         bot.pendings.pop(payload.message_id)
-    if payload.channel_id == 883302381188681739 and str(payload.emoji) in [economyerror, economysuccess]:
+    if payload.channel_id == 813447381752348723 and str(payload.emoji) in [economyerror, economysuccess]:
         rev_type = bot.refr["types"].get(str(payload.message_id))
         if rev_type == "suggest":
             await suggest_approval(payload)
@@ -4766,8 +4765,8 @@ async def settings_approval(payload: discord.RawReactionActionEvent):
         await user.send(f"{economyerror} Your settings: `{userd[1]}` was rejected by `{mod}`")
     else:
         await user.send(f"{economysuccess} Your settings: `{userd[1]}` was accepted by `{mod}` and"
-                        f" are added to <#865587676999843840>")
-        chl = bot.get_channel(865587676999843840)
+                        f" are added to <#882312116797861899>")
+        chl = bot.get_channel(882312116797861899)
         async with aiohttp.ClientSession() as session:
             async with session.get(userd[1]) as r:
                 text = await r.text()
@@ -4779,6 +4778,7 @@ async def settings_approval(payload: discord.RawReactionActionEvent):
                             file=file)
         await em.add_reaction("👍")
         await em.add_reaction("👎")
+        bot.refr["added"]["settings"].append(em.id)
     bot.refr["review"]["settings"].pop(str(payload.message_id))
 
 async def css_approval(payload: discord.RawReactionActionEvent):
@@ -4792,8 +4792,8 @@ async def css_approval(payload: discord.RawReactionActionEvent):
         await user.send(f"{economyerror} Your css: `{userd[1]}` was rejected by `{mod}`")
     else:
         await user.send(f"{economysuccess} Your css: `{userd[1]}` was accepted by `{mod}` and"
-                        f" are added to <#865949527915888670>")
-        chl = bot.get_channel(865949527915888670)
+                        f" are added to <#882312235416965120>")
+        chl = bot.get_channel(882312235416965120)
         async with aiohttp.ClientSession() as session:
             async with session.get(userd[1]) as r:
                 text = await r.text()
@@ -4805,6 +4805,7 @@ async def css_approval(payload: discord.RawReactionActionEvent):
                             file=file)
         await em.add_reaction("👍")
         await em.add_reaction("👎")
+        bot.refr["added"]["css"].append(em.id)
     bot.refr["review"]["css"].pop(str(payload.message_id))
 
 async def scope_approval(payload: discord.RawReactionActionEvent):
@@ -4818,13 +4819,14 @@ async def scope_approval(payload: discord.RawReactionActionEvent):
         await user.send(f"{economyerror} Your scope: `{userd[1]}` was rejected by `{mod}`")
     else:
         await user.send(f"{economysuccess} Your scope: `{userd[1]}` was accepted by `{mod}` and"
-                        f" are added to <#884023065175007242>")
-        chl = bot.get_channel(884023065175007242)
+                        f" are added to <#882312052432068689>")
+        chl = bot.get_channel(882312052432068689)
         em = await chl.send(f"Scope by: {user.mention}\n"
-                            f"{userd[1]}\n"
+                            f"{userd[1]}\n\n"
                             f"React with 👍 or 👎 to rate it")
         await em.add_reaction("👍")
         await em.add_reaction("👎")
+        bot.refr["added"]["scopes"].append(em.id)
     bot.refr["review"]["scopes"].pop(str(payload.message_id))
 
 @bot.event
@@ -4845,43 +4847,6 @@ async def on_member_update(before, after):
         else:
             if k in autroles:
                 await after.remove_roles(vnta.get_role(k))
-
-@bot.command()
-async def boost_test(ctx):
-    user = ctx.author
-    emoji = "<a:Boost_Spin:883010481437155368>"
-    perks = """__**Single Booster Perks:**__
-
-    <a:Boost_Spin:883010481437155368> 3x Claim Time on all Giveaways!
-    <a:Boost_Spin:883010481437155368> Bypass all requirements on Giveaways!
-    <a:Boost_Spin:883010481437155368> Custom Emote + Name (No NSFW)!
-    <a:Boost_Spin:883010481437155368> Custom Role!
-    <a:Boost_Spin:883010481437155368> 5x Extra Entries on all Giveaways! 
-    <a:Boost_Spin:883010481437155368> Hoisted role above all members!
-    <a:Boost_Spin:883010481437155368> Extra permissions in Text & Voice channels!
-    <a:Boost_Spin:883010481437155368> 15% Discount on all ads you purchase!
-
-    __**Double Booster Perks:**__
-
-    <a:boost_evolve:829395858961334353> 10x Extra Entries!
-    <a:boost_evolve:829395858961334353> Unlimited Claim Time on Giveaways!
-    <a:boost_evolve:829395858961334353> Reaction with your emote!
-    <a:boost_evolve:829395858961334353> Respect from all Staff!
-    <a:boost_evolve:829395858961334353> An extra 20% off ads, totalling at a 35% discount!
-
-    **Create a ticket in <#813510158264565780> to claim your perks and thank you for boosting!**"""
-    embed = discord.Embed(color=localembed,
-                          description=f"{emoji} Thank you for boosting {user.mention}! {emoji}\n" \
-                                      f"We now have {ctx.guild.premium_subscription_count} boosts! **Remember to claim your perks:**\n\n"
-                                      f"{perks}")
-    if user.avatar is not None:
-        url = user.avatar.url
-    else:
-        url = user.default_avatar.url
-    embed.set_author(name=str(user), icon_url=url)
-    embed.set_footer(text="#vantalizing")
-    embed.timestamp = datetime.datetime.utcnow()
-    await ctx.send(embed=embed)
 
 @bot.command()
 @commands.is_owner()
@@ -4932,7 +4897,7 @@ async def starboard(payload:discord.RawReactionActionEvent, force=False):
         msgdata[str(payload.message_id)] = str(msg.id)
         await close_admin()
 
-#@bot.event
+@bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, CheckFailure): return
 
