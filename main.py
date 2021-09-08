@@ -4519,7 +4519,15 @@ class Post(discord.ui.View):
         await interaction.response.send_message("Upload the `.txt` file", ephemeral=True)
         try:
             msg = await bot.wait_for("message", timeout=180, check=check)
-            file = msg.attachments[0].proxy_url
+            file = msg.attachments[0].url
+            async with aiohttp.ClientSession() as session:
+                async with session.get(file) as r:
+                    text = await r.text()
+                    with open(f"settings.txt", "w", encoding='utf8') as f:
+                        f.write(text)
+                    file = discord.File("settings.txt")
+                    a = await bot.get_channel(865587676999843840).send(file=file)
+                    file = a.attachments[0].url
             await msg.delete()
             await ctx.send(
                 "Your settings are sent to staff for approval. It will show in <#882312116797861899> once they are approved!")
@@ -4546,7 +4554,15 @@ class Post(discord.ui.View):
         await interaction.response.send_message("Upload the `.css` file", ephemeral=True)
         try:
             msg = await bot.wait_for("message", timeout=180, check=check)
-            file = msg.attachments[0].proxy_url
+            file = msg.attachments[0].url
+            async with aiohttp.ClientSession() as session:
+                async with session.get(file) as r:
+                    text = await r.text()
+                    with open(f"main_custom.css", "w", encoding='utf8') as f:
+                        f.write(text)
+                    file = discord.File("main_custom.css")
+                    a = await bot.get_channel(865587676999843840).send(file=file)
+                    file = a.attachments[0].url
             await msg.delete()
             await ctx.send(
                 "Your css is sent to staff for approval. It will show in <#882312235416965120> once it is approved!")
@@ -4573,7 +4589,7 @@ class Post(discord.ui.View):
         await interaction.response.send_message("Upload the `.png` file (DO NOT SEND THE LINK)", ephemeral=True)
         try:
             msg = await bot.wait_for("message", timeout=180, check=check)
-            file = msg.attachments[0].proxy_url
+            file = msg.attachments[0].url
             await msg.delete()
             await ctx.send(
                 "Your scope is sent to staff for approval. It will show in <#882312052432068689> once it is approved!")
