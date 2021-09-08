@@ -122,11 +122,6 @@ bot.help_json = {
             "usage":"v.unlink <ign>",
             "desc":"Unlinks your account from bot"
         },
-        "v.pbg":{
-            "aliases":["None"],
-            "usage":"v.pbg",
-            "desc":"Customize your background"
-        },
         "v.main":{
             "aliases":["None"],
             "usage":"v.main <ign>",
@@ -155,19 +150,14 @@ bot.help_json = {
             "desc":"Modern Calculator",
             "usage":"v.calc [equation]"
         },
-        "v.suggest":{
-            "aliases":["sug", "suggestion"],
-            "desc":"Suggest something.",
-            "usage":"v.sug <suggestion>"
+        "v.post":{
+            "aliases":["None"],
+            "desc":"Post your settings, css, scope or any suggestion",
+            "usage":"v.post"
         }
     },
     "Staff": {
         "category":"Staff",
-        "v.cbg":{
-            "aliases":["None"],
-            "usage":"v.cbg",
-            "desc":"Edit clan background"
-        },
         "v.appconfig": {
             "aliases": ["appc"],
             "usage": "v.appconfig",
@@ -3894,9 +3884,8 @@ async def say(ctx, *, sentence):
 
 @bot.command(aliases=["suggestion", "sug"])
 @commands.check(general)
-async def suggest(ctx, *, sug):
+async def suggest(ctx):
     return await ctx.reply("Use `v.post` to post suggestion!")
-
 
 @bot.command()
 @commands.check(general)
