@@ -3895,19 +3895,8 @@ async def say(ctx, *, sentence):
 @bot.command(aliases=["suggestion", "sug"])
 @commands.check(general)
 async def suggest(ctx, *, sug):
-    stfchl = bot.get_channel(813447381752348723)
-    embed = discord.Embed(title="Suggestion Approval",
-                          description=sug,
-                          color=localembed)
-    embed.set_author(name=ctx.author, icon_url=ctx.author.default_avatar.url)
-    em = await stfchl.send(embed=embed)
-    bot.refr["review"]["suggest"][str(em.id)] = (ctx.author.id, sug)
-    bot.refr["types"][str(em.id)] = "suggest"
-    await em.add_reaction(economysuccess)
-    await em.add_reaction(economyerror)
-    await ctx.message.add_reaction(economysuccess)
-    await asyncio.sleep(5)
-    await ctx.message.delete()
+    return await ctx.reply("Use `v.post` to post suggestion!")
+
 
 @bot.command()
 @commands.check(general)
@@ -4502,7 +4491,36 @@ class Post(discord.ui.View):
         self.ctx = ctx
         self.msg = None
 
-    @discord.ui.button(label="Settings", emoji="⚙️", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Suggestion", emoji="👤", style=discord.ButtonStyle.green)
+    async def suggestion(self, button, interaction: discord.Interaction):
+        if interaction.user.id != self.ctx.author.id: return await interaction.response.defer()
+        ctx = self.ctx
+        def check(msg):
+            return msg.author == ctx.author and msg.channel == ctx.channel
+
+        await interaction.response.send_message("Enter your suggestion", ephemeral=True)
+        try:
+            msg = await bot.wait_for("message", timeout=180, check=check)
+            sug = msg.content
+            stfchl = bot.get_channel(813447381752348723)
+            embed = discord.Embed(title="Suggestion Approval",
+                                  description=sug,
+                                  color=localembed)
+            embed.set_author(name=ctx.author, icon_url=ctx.author.default_avatar.url)
+            em = await stfchl.send(embed=embed)
+            bot.refr["review"]["suggest"][str(em.id)] = (ctx.author.id, sug)
+            bot.refr["types"][str(em.id)] = "suggest"
+            await msg.delete()
+            await ctx.send(
+                "Your suggestion is sent to staff for approval."
+                " It will show in <#861555361264697355> once its approved!")
+            await em.add_reaction(economysuccess)
+            await em.add_reaction(economyerror)
+
+        except:
+            pass
+
+    @discord.ui.button(label="Settings", emoji="⚙️", style=discord.ButtonStyle.grey)
     async def settings(self, button, interaction: discord.Interaction):
         if interaction.user.id != self.ctx.author.id: return await interaction.response.defer()
         ctx = self.ctx
@@ -4512,7 +4530,7 @@ class Post(discord.ui.View):
         await interaction.response.send_message("Upload the `.txt` file", ephemeral=True)
         try:
             msg = await bot.wait_for("message", timeout=180, check=check)
-            file = msg.attachments[0].url
+            file = msg.attachments[0].proxy_url
             await msg.delete()
             await ctx.send(
                 "Your settings are sent to staff for approval. It will show in <#882312116797861899> once they are approved!")
@@ -4528,7 +4546,7 @@ class Post(discord.ui.View):
         except asyncio.TimeoutError:
             pass
 
-    @discord.ui.button(label="CSS", emoji="🗒️", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="CSS", emoji="🗒️", style=discord.ButtonStyle.red)
     async def css(self, button, interaction: discord.Interaction):
         if interaction.user.id != self.ctx.author.id: return await interaction.response.defer()
         ctx = self.ctx
@@ -4539,7 +4557,7 @@ class Post(discord.ui.View):
         await interaction.response.send_message("Upload the `.css` file", ephemeral=True)
         try:
             msg = await bot.wait_for("message", timeout=180, check=check)
-            file = msg.attachments[0].url
+            file = msg.attachments[0].proxy_url
             await msg.delete()
             await ctx.send(
                 "Your css is sent to staff for approval. It will show in <#882312235416965120> once it is approved!")
@@ -4555,7 +4573,7 @@ class Post(discord.ui.View):
         except asyncio.TimeoutError:
             pass
 
-    @discord.ui.button(label="Scope", emoji="🔭", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="Scope", emoji="🔭", style=discord.ButtonStyle.blurple)
     async def scope(self, button, interaction: discord.Interaction):
         if interaction.user.id != self.ctx.author.id: return await interaction.response.defer()
         ctx = self.ctx
@@ -4566,7 +4584,7 @@ class Post(discord.ui.View):
         await interaction.response.send_message("Upload the `.png` file (DO NOT SEND THE LINK)", ephemeral=True)
         try:
             msg = await bot.wait_for("message", timeout=180, check=check)
-            file = msg.attachments[0].url
+            file = msg.attachments[0].proxy_url
             await msg.delete()
             await ctx.send(
                 "Your scope is sent to staff for approval. It will show in <#882312052432068689> once it is approved!")
