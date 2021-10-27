@@ -4632,7 +4632,7 @@ async def on_message(message: discord.Message):
                 old[str(k)] = v
             bot.refr["con"] = old
             await close_admin()
-        if (message.channel.id == 861555361264697355) and (message.author.id in staff) and (message.reference is not None):
+        if (message.channel.id == 861555361264697355) and (message.reference is not None):
             reply = message.reference.message_id
             msg = await message.channel.fetch_message(reply)
             embed = msg.embeds[0]
