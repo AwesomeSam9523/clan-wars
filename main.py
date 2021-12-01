@@ -50,6 +50,7 @@ TWITTER_API_SECRET = "4s77OUIGgaB0j7T0xEs0KY9lVeIrcf75e2e17SOjFBt2xNWUaB"
 TWITTER_BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAALRjRwEAAAAA8Jzs2fXphQlosXN2ewneKU4gNvQ%3D6dKHyQTzIOjXnKJbxs7ltt5XmFoArwXyMqUKCLOBJWpNe8IJEZ"
 
 bot = PersistentViewBot()
+bot.session = None
 bot.apikey = YT_API_KEY
 bot.remove_command("help")
 bot.loop.set_debug(True)
@@ -4395,6 +4396,19 @@ async def unmute(ctx, mem:discord.Member):
     bot.refr["disregarded"].remove(mem.id)
     await ctx.message.add_reaction(economysuccess)
 
+@bot.command()
+async def chatbot(ctx, webhook: str):
+    if ctx.author.id not in staff:
+        return
+    async with aiohttp.ClientSession() as session:
+        webhook = discord.Webhook.from_url(webhook, session=session, bot_token=bot.http.token)
+        webhook = await bot.fetch_webhook(webhook.id)
+        bot.refr["cbChl"] = webhook.channel.id
+        bot.refr["cbWeb"] = webhook.id
+
+    await ctx.reply(f"Chatbot setup @ {webhook.channel.mention} via `{webhook.id}:{webhook.type}`")
+    await close_admin()
+
 def get_net_usage():
     old_value = 0
     new_value = psutil.net_io_counters().bytes_sent + psutil.net_io_counters().bytes_recv
@@ -4606,8 +4620,26 @@ class Post(discord.ui.View):
         except asyncio.TimeoutError:
             pass
 
+async def chatbotReply(message: discord.Message):
+    content = message.content
+    apiKey = bot.refr.get("apiKey")
+    webhook = await bot.fetch_webhook(bot.refr["cbWeb"])
+    if bot.session is None:
+        bot.session = aiohttp.ClientSession()
+    reply = await bot.session.get(f"https://some-random-api.ml/chatbot?message={content}&key={apiKey}")
+    reply = await reply.json()
+    if reply.get("error") is not None:
+        await webhook.send(f"> {content}\n"
+                           f"ERROR! Well something unexpected happened at my server!",
+                           allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
+        return
+    await webhook.send(f"> {content}\n"
+                               f"{reply['response']}", allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
+
 @bot.event
 async def on_message(message: discord.Message):
+    if message.author.bot:
+        return
     def get_ops(text):
         if text == "": return {}
         text = text.replace("\n\n", "\n> ")
@@ -4620,6 +4652,9 @@ async def on_message(message: discord.Message):
             sugs[user] = sug
             i += 2
         return sugs
+
+    if message.channel.id == bot.refr.get("cbChl", 0):
+        await chatbotReply(message)
 
     if bot.beta:
         if message.guild is None: return
@@ -4653,7 +4688,6 @@ async def on_message(message: discord.Message):
             embed.add_field(name="Staff Opinions:", value=oldval)
             await msg.edit(embed=embed)
             await message.delete(delay=2)
-
         if message.type in [discord.MessageType.premium_guild_subscription, discord.MessageType.premium_guild_tier_1,
                             discord.MessageType.premium_guild_tier_2, discord.MessageType.premium_guild_tier_3]:
             user = message.author
