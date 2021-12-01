@@ -4653,7 +4653,7 @@ async def on_message(message: discord.Message):
             i += 2
         return sugs
 
-    if message.channel.id == bot.refr.get("cbChl", 0) and message.reference is not None:
+    if message.channel.id == bot.refr.get("cbChl", 0) and message.reference is None:
         await chatbotReply(message)
 
     if bot.beta:
