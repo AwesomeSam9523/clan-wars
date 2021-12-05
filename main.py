@@ -478,7 +478,7 @@ async def yt_socials_check():
         if uploadsid is None:
             uri = f"https://www.googleapis.com/youtube/v3/channels?id={i}&key={YT_API_KEY}&part=contentDetails"
             a = requests.get(uri)
-            data = json.loads(a.text)
+            data = a.json()
             if data["pageInfo"]["totalResults"] == 0:
                 bot.refr["social_yt"]["subs"].remove(i)
                 continue
@@ -486,8 +486,11 @@ async def yt_socials_check():
             ytcache[i] = uploadsid
         uri2 = f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId={uploadsid}&key={SOCIAL_KEY}"
         b = requests.get(uri2)
-        vids = json.loads(b.text)
+        vids = b.json()
+        print(vids)
         vidid = vids["items"][0]["contentDetails"]["videoId"]
+        print(vidsid)
+        print('\n-----------------\n')
         donevids = bot.refr.setdefault("ytdone", [])
         if vidid not in donevids:
             firstcheck = bot.refr.setdefault("ytfirst", [])
@@ -497,6 +500,7 @@ async def yt_socials_check():
                 firstcheck.append(i)
                 donevids.append(vidid)
         bot.refr['api'] += 1
+    print('\n\n====================\n\n')
     await close_admin()
 
 @tasks.loop(seconds=40)
@@ -522,7 +526,6 @@ async def twitch_socials_check():
         else:
             if i in checklist: checklist.remove(i)
             continue
-    await close_admin()
 
 @tasks.loop(seconds=20)
 async def twitter_socials_check():
@@ -552,6 +555,7 @@ async def newvideo(vidid, name):
     donevids = bot.refr["ytdone"]
     donevids.append(vidid)
     bot.refr["ytdone"] = donevids
+    await close_admin()
 
 async def streamstart(data):
     ytdata = bot.refr["social_twitch"]
