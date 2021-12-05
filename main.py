@@ -4660,12 +4660,9 @@ async def chatbotReply(message: discord.Message):
     reply = await bot.session.get(f"https://some-random-api.ml/chatbot?message={content}&key={apiKey}")
     reply = await reply.json()
     if reply.get("error") is not None:
-        await webhook.send(f"> {content}\n"
-                           f"ERROR! Well something unexpected happened at my server!",
-                           allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
         return
     await webhook.send(f"> {content}\n"
-                               f"{reply['response']}", allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
+                       f"{reply['response']}", allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=False))
 
 @bot.event
 async def on_message(message: discord.Message):
