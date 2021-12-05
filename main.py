@@ -489,7 +489,7 @@ async def yt_socials_check():
         vids = b.json()
         print(vids)
         vidid = vids["items"][0]["contentDetails"]["videoId"]
-        print(vidsid)
+        print(vidid)
         print('\n-----------------\n')
         donevids = bot.refr.setdefault("ytdone", [])
         if vidid not in donevids:
