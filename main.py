@@ -461,13 +461,16 @@ async def auto_update():
 
 @tasks.loop(seconds=40)
 async def yt_socials_check():
-    reqs = bot.refr.setdefault("api", 0)
+    reqs = bot.refr.get("api", 0)
     if reqs >= 2500 and bot.apikey == YT_API_KEY:
         bot.apikey = SOCIAL_KEYS[0]
     elif reqs >= 12475 and bot.apikey == SOCIAL_KEYS[0]:
         bot.apikey = SOCIAL_KEYS[1]
     elif reqs >= 22450 and bot.apikey == SOCIAL_KEYS[1]:
         bot.apikey = SOCIAL_KEYS[2]
+    else:
+        bot.apikey = YT_API_KEY
+        bot.refr['api'] = 0
     SOCIAL_KEY = bot.apikey
     for i in bot.refr["social_yt"]["subs"]:
         ytcache = bot.refr.setdefault("ytcache", {})
@@ -493,6 +496,7 @@ async def yt_socials_check():
             else:
                 firstcheck.append(i)
                 donevids.append(vidid)
+        bot.refr['api'] += 1
     await close_admin()
 
 @tasks.loop(seconds=40)
@@ -542,7 +546,8 @@ async def newvideo(vidid, name):
     chl = bot.get_channel(ytdata["channel"])
     if name == "VNTA Krunker":
         role = chl.guild.get_role(ytdata["role"]).mention
-    else: role = ""
+    else: 
+        role = "Hey All!"
     await chl.send(ytdata["msg"].format(name=name, role=role, link=f"https://youtu.be/{vidid}"))
     donevids = bot.refr["ytdone"]
     donevids.append(vidid)
