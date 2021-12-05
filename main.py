@@ -462,11 +462,11 @@ async def auto_update():
 @tasks.loop(seconds=40)
 async def yt_socials_check():
     reqs = bot.refr.get("api", 0)
-    if reqs >= 2500 and bot.apikey == YT_API_KEY:
+    if reqs >= 2500:
         bot.apikey = SOCIAL_KEYS[0]
-    elif reqs >= 12475 and bot.apikey == SOCIAL_KEYS[0]:
+    elif reqs >= 12475:
         bot.apikey = SOCIAL_KEYS[1]
-    elif reqs >= 22450 and bot.apikey == SOCIAL_KEYS[1]:
+    elif reqs >= 22450:
         bot.apikey = SOCIAL_KEYS[2]
     else:
         bot.apikey = YT_API_KEY
@@ -486,6 +486,7 @@ async def yt_socials_check():
             ytcache[i] = uploadsid
         uri2 = f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId={uploadsid}&key={SOCIAL_KEY}"
         b = requests.get(uri2)
+        print(b.headers)
         vids = b.json()
         if vids.get('error'):
             err = vids['error']
