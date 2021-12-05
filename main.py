@@ -488,6 +488,23 @@ async def yt_socials_check():
         b = requests.get(uri2)
         vids = b.json()
         print(vids)
+        if vids.get('error'):
+            err = vids['error']
+            if err['code'] == 403:
+                await bot.get_channel(867264621211156500).send(
+                    f'<@771601176155783198> YT API Quota Exceeded.\n' + 
+                    f'Reqs: {reqs}. API Index: {SOCIAL_KEYS.index(bot.apikey)}'
+                )
+                if reqs >= 2500 and bot.apikey == YT_API_KEY:
+                    reqs = 12475
+                elif reqs >= 12475 and bot.apikey == SOCIAL_KEYS[0]:
+                    reqs = 22450
+                elif reqs >= 22450 and bot.apikey == SOCIAL_KEYS[1]:
+                    reqs = 0
+                else:
+                    reqs = 2500
+                bot.refr['api'] = reqs
+                return
         vidid = vids["items"][0]["contentDetails"]["videoId"]
         print(vidid)
         print('\n-----------------\n')
