@@ -487,7 +487,6 @@ async def yt_socials_check():
         uri2 = f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId={uploadsid}&key={SOCIAL_KEY}"
         b = requests.get(uri2)
         vids = b.json()
-        print(vids)
         if vids.get('error'):
             err = vids['error']
             if err['code'] == 403:
