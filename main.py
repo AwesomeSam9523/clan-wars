@@ -500,12 +500,12 @@ async def yt_socials_check():
                     f'<@771601176155783198> YT API Quota Exceeded.\n' + 
                     f'Reqs: {reqs}.'
                 )
-                if reqs >= 2500:
-                    reqs = 12475
+                if reqs >= 22450:
+                    reqs = 0
                 elif reqs >= 12475:
                     reqs = 22450
-                elif reqs >= 22450:
-                    reqs = 0
+                elif reqs >= 2500:
+                    reqs = 12475
                 else:
                     reqs = 2500
                 bot.refr['api'] = reqs
