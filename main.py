@@ -459,7 +459,7 @@ async def checkuserclan(ign):
 async def auto_update():
     await update_embeds("VNTA")
 
-@tasks.loop(seconds=40)
+@tasks.loop(seconds=60)
 async def yt_socials_check():
     reqs = bot.refr.get("api", 0)
     if reqs >= 2500:
@@ -1170,7 +1170,7 @@ async def fotd_check():
         await upv.add_reaction("<:Upvote:837564803090219028>")
         bot.refr["factindex"] = index
         bot.refr["fotd"] = time.time()
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(10)
 
 async def update_embeds(clan):
     await bot.wait_until_ready()
