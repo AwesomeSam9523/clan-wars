@@ -496,10 +496,11 @@ async def yt_socials_check():
             except:
                 print('YT_API_KEY')
             if err['code'] == 403:
+                '''
                 await bot.get_channel(867264621211156500).send(
                     f'<@771601176155783198> YT API Quota Exceeded.\n' + 
                     f'Reqs: {reqs}.'
-                )
+                )'''
                 if reqs >= 22450:
                     reqs = 0
                 elif reqs >= 12475:
