@@ -1866,7 +1866,7 @@ async def profile(ctx, *, ign=None, via=False):
     level = userdata["level"]
     played = userdata["games"]
     loses = played - wins
-    challenge = userdata["challenge"]
+    challenge = userdata.get("challenge")
     if challenge is None: challenge = 0
     else: challenge = int(challenge) + 1
     nukes = userdata["stats"].get("n", 0)
