@@ -1779,27 +1779,28 @@ async def contract(ctx, *, ign=None):
 @commands.check(general)
 async def profile(ctx, *, ign=None, via=False):
     if bot.pause: return await ctx.send("⚠ ️Maintainence Update. Please retry later")
-    if ign is None:
-        ign = bot.links.get(str(ctx.author.id))
+    if not via:
         if ign is None:
-            embed = discord.Embed(description="You aren't linked yet. Use `v.link <ign>` to get linked.\n"
-                                              "Or use `v.pf <ign>` to view",
-                                  color=16730441)
-            embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
-            return await ctx.reply(embed=embed)
-        ign = ign["main"]
-    else:
-        newign = str(ign).replace('<@!', '').replace('>', '')
-        if len(newign) == len("537623052775718912"):
-            ign = bot.links.get(str(newign))
-            work = bot.userdata.get(str(ctx.author.id), {"incognito": False})["incognito"]
-            if work and ctx.author.id != int(newign): ign = None
+            ign = bot.links.get(str(ctx.author.id))
             if ign is None:
-                embed = discord.Embed(description="User not linked yet.",
-                                      color=error_embed)
+                embed = discord.Embed(description="You aren't linked yet. Use `v.link <ign>` to get linked.\n"
+                                                  "Or use `v.pf <ign>` to view",
+                                      color=16730441)
                 embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
                 return await ctx.reply(embed=embed)
             ign = ign["main"]
+        else:
+            newign = str(ign).replace('<@!', '').replace('>', '')
+            if len(newign) == len("537623052775718912"):
+                ign = bot.links.get(str(newign))
+                work = bot.userdata.get(str(ctx.author.id), {"incognito": False})["incognito"]
+                if work and ctx.author.id != int(newign): ign = None
+                if ign is None:
+                    embed = discord.Embed(description="User not linked yet.",
+                                          color=error_embed)
+                    embed.set_footer(text=f"Bot by {bot.dev} | #vantalizing")
+                    return await ctx.reply(embed=embed)
+                ign = ign["main"]
     await ctx.message.add_reaction(loading)
     if type(ign) == dict:
         ign = ign["main"]
