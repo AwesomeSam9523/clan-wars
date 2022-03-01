@@ -1163,9 +1163,12 @@ facts = ("Most American car horns honk in the key of F.",
 @tasks.loop(minutes=1)
 async def fotd_check():
     last = bot.refr.setdefault("fotd", 0)
+    print('fotd-last', last)
+    print('diff', time.time() - last)
     if time.time() - last >= 86400:
         index = bot.refr.setdefault("factindex", -1)
         index += 1
+        print('fotd-index', index)
         fotd = bot.get_channel(813535171117580350)
         role = bot.get_guild(719946380285837322).get_role(813704961103888434)
         upv = await fotd.send(f"__**{role.mention} #{index+100}**__\n\n"
@@ -1173,7 +1176,6 @@ async def fotd_check():
         await upv.add_reaction("<:Upvote:837564803090219028>")
         bot.refr["factindex"] = index
         bot.refr["fotd"] = time.time()
-        await asyncio.sleep(10)
 
 async def update_embeds(clan):
     await bot.wait_until_ready()
