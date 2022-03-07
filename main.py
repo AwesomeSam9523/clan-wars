@@ -1173,7 +1173,11 @@ async def fotd_check():
         role = bot.get_guild(719946380285837322).get_role(813704961103888434)
         upv = await fotd.send(f"__**{role.mention} #{index+100}**__\n\n"
                         f"{facts[index]}")
-        await upv.add_reaction("<:Upvote:837564803090219028>")
+        try:
+            await upv.add_reaction("<:Upvote:837564803090219028>")
+        except:
+            pass
+        
         bot.refr["factindex"] = index
         bot.refr["fotd"] = time.time()
 
