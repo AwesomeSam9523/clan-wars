@@ -11,6 +11,7 @@ from typing import Union
 print("Starting")
 intents = discord.Intents.default()
 intents.members = True
+intents.message_content = True
 class PersistentViewBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=["V.", "v."], case_insensitive=True, intents=intents)
