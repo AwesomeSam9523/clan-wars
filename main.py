@@ -4459,21 +4459,21 @@ def get_net_usage():
 
 async def load_data():
     chl = bot.get_channel(854692793276170280)
-    msgs = await chl.history(limit=1).flatten()
+    msgs = [x async for x in chl.history(limit=1)]
     bot.refr = json.loads(requests.get(msgs[0].attachments[0]).text)
     bot.cwpause = bot.refr["cwpause"]
     bot.pause = bot.refr["pause"]
 
     chl = bot.get_channel(854721559359913994)
-    msgs = await chl.history(limit=1).flatten()
+    msgs = [x async for x in chl.history(limit=1)]
     bot.links.update(json.loads(requests.get(msgs[0].attachments[0]).text))
 
     chl = bot.get_channel(856070919033978932)
-    msgs = await chl.history(limit=1).flatten()
+    msgs = [x async for x in chl.history(limit=1)]
     bot.userdata = json.loads(requests.get(msgs[0].attachments[0]).text)
 
     chl = bot.get_channel(854698116255318057)
-    msgs = await chl.history(limit=1).flatten()
+    msgs = [x async for x in chl.history(limit=1)]
     bot.bgdata = json.loads(requests.get(msgs[0].attachments[0]).text)
 
 async def one_ready():
