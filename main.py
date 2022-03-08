@@ -251,8 +251,7 @@ sampfp = "https://media.discordapp.net/attachments/854008993248051230/8547088890
 async def if_allowed(ctx):
     if bot.apidown: await load_peeps()
     if bot.beta: return True
-    if "ticket" in ctx.channel.name: return True
-    else: return await check_channel(ctx.channel.id)
+    return True
 
 @bot.check
 async def if_enabled(ctx):
