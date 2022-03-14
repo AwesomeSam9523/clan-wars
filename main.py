@@ -511,7 +511,12 @@ async def yt_socials_check():
                     reqs = 2500
                 bot.refr['api'] = reqs
                 return
-        vidid = vids["items"][0]["contentDetails"]["videoId"]
+        try:
+            vidid = vids["items"][0]["contentDetails"]["videoId"]
+        except Exception as e:
+            print(vids)
+            print(e)
+            continue
         print(vidid)
         print('\n-----------------\n')
         donevids = bot.refr.setdefault("ytdone", [])
