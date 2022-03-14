@@ -3,4 +3,4 @@ prettytable~=2.1.0
 pillow
 psutil
 numexpr
-git+https://github.com/Rapptz/discord.py
+git+https://github.com/Rapptz/discord.py@a317ceb44a4d5d979d0e81580a621b304c657b0a
