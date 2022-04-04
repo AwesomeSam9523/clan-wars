@@ -11,6 +11,7 @@ from typing import Union
 print("Starting")
 intents = discord.Intents.default()
 intents.members = True
+intents.message_content = True
 class PersistentViewBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=["V.", "v."], case_insensitive=True, intents=intents)
@@ -251,8 +252,7 @@ sampfp = "https://media.discordapp.net/attachments/854008993248051230/8547088890
 async def if_allowed(ctx):
     if bot.apidown: await load_peeps()
     if bot.beta: return True
-    if "ticket" in ctx.channel.name: return True
-    else: return await check_channel(ctx.channel.id)
+    return True
 
 @bot.check
 async def if_enabled(ctx):
@@ -511,7 +511,12 @@ async def yt_socials_check():
                     reqs = 2500
                 bot.refr['api'] = reqs
                 return
-        vidid = vids["items"][0]["contentDetails"]["videoId"]
+        try:
+            vidid = vids["items"][0]["contentDetails"]["videoId"]
+        except Exception as e:
+            print(vids)
+            print(e)
+            continue
         print(vidid)
         print('\n-----------------\n')
         donevids = bot.refr.setdefault("ytdone", [])
@@ -1163,17 +1168,23 @@ facts = ("Most American car horns honk in the key of F.",
 @tasks.loop(minutes=1)
 async def fotd_check():
     last = bot.refr.setdefault("fotd", 0)
+    print('fotd-last', last)
+    print('diff', time.time() - last)
     if time.time() - last >= 86400:
         index = bot.refr.setdefault("factindex", -1)
         index += 1
+        print('fotd-index', index)
         fotd = bot.get_channel(813535171117580350)
         role = bot.get_guild(719946380285837322).get_role(813704961103888434)
         upv = await fotd.send(f"__**{role.mention} #{index+100}**__\n\n"
                         f"{facts[index]}")
-        await upv.add_reaction("<:Upvote:837564803090219028>")
+        try:
+            await upv.add_reaction("<:Upvote:837564803090219028>")
+        except:
+            pass
+        
         bot.refr["factindex"] = index
         bot.refr["fotd"] = time.time()
-        await asyncio.sleep(10)
 
 async def update_embeds(clan):
     await bot.wait_until_ready()
@@ -4456,21 +4467,21 @@ def get_net_usage():
 
 async def load_data():
     chl = bot.get_channel(854692793276170280)
-    msgs = await chl.history(limit=1).flatten()
+    msgs = [x async for x in chl.history(limit=1)]
     bot.refr = json.loads(requests.get(msgs[0].attachments[0]).text)
     bot.cwpause = bot.refr["cwpause"]
     bot.pause = bot.refr["pause"]
 
     chl = bot.get_channel(854721559359913994)
-    msgs = await chl.history(limit=1).flatten()
+    msgs = [x async for x in chl.history(limit=1)]
     bot.links.update(json.loads(requests.get(msgs[0].attachments[0]).text))
 
     chl = bot.get_channel(856070919033978932)
-    msgs = await chl.history(limit=1).flatten()
+    msgs = [x async for x in chl.history(limit=1)]
     bot.userdata = json.loads(requests.get(msgs[0].attachments[0]).text)
 
     chl = bot.get_channel(854698116255318057)
-    msgs = await chl.history(limit=1).flatten()
+    msgs = [x async for x in chl.history(limit=1)]
     bot.bgdata = json.loads(requests.get(msgs[0].attachments[0]).text)
 
 async def one_ready():
