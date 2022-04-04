@@ -1984,7 +1984,10 @@ async def profile(ctx, *, ign=None, via=False):
             work = bot.userdata.get(str(key), {"incognito": False})["incognito"]
             if not work:
                 user = bot.get_user(int(key))
-                user = f"{user.name}#{user.discriminator}"
+                if user:
+                    user = f"{user.name}#{user.discriminator}"
+                else:
+                    user = "Unknown#????"
             break
 
     yloc = 191
